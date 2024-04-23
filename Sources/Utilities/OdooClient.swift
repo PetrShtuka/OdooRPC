@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class OdooClient {
+class OdooClient {
     private let rpcClient: RPCClient
     
     init(baseURL: URL, authService: AuthService) {
