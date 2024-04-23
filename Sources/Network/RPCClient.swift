@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class RPCClient {
+public class RPCClient {
     private let session: URLSession
     private let baseURL: URL
     private var tasks: [Int: URLSessionDataTask] = [:]
