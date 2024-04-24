@@ -8,7 +8,7 @@
 import Foundation
 
 // Decodable structure to decode user data from JSON response
-struct UserData: Decodable {
+public struct UserData: Decodable {
     var uid: Int?
     var email: String?
     var language: String?

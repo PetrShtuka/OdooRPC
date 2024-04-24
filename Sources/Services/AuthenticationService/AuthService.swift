@@ -35,7 +35,7 @@ public class AuthService: SessionService {
         }
     }
 
-    func refreshSession(completion: @escaping (Result<UserData, Error>) -> Void) {
+    public func refreshSession(completion: @escaping (Result<UserData, Error>) -> Void) {
         guard let credentials = self.credentials else {
             completion(.failure(NSError(domain: "AuthService", code: 401, userInfo: [NSLocalizedDescriptionKey: "Credentials not available"])))
             return
@@ -44,6 +44,6 @@ public class AuthService: SessionService {
     }
 }
 
-protocol SessionService {
+public protocol SessionService {
     func refreshSession(completion: @escaping (Result<UserData, Error>) -> Void)
 }
