@@ -14,12 +14,12 @@ public class RPCClient {
     private let taskAccessQueue = DispatchQueue(label: "com.odooRPC.RPCClient.TaskAccessQueue")
     private var isRefreshingSession = false
     private var pendingRequests: [(Int, URLRequest, (Result<Data, Error>) -> Void)] = []
-    private var authService: AuthService  // Reference to AuthService for reauthentication
+    private var sessionService: SessionService
     
-    init(baseURL: URL, authService: AuthService) {
+    init(baseURL: URL, sessionService: SessionService) {
         self.baseURL = baseURL
         self.session = URLSession(configuration: .default)
-        self.authService = authService
+        self.sessionService = sessionService
     }
     
     @discardableResult
@@ -88,7 +88,7 @@ public class RPCClient {
     
     private func refreshSession() {
         isRefreshingSession = true
-        authService.refreshSession { [weak self] result in
+        sessionService.refreshSession { [weak self] result in
             guard let self = self else { return }
             self.taskAccessQueue.async {
                 self.isRefreshingSession = false

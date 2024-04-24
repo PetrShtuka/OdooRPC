@@ -11,30 +11,30 @@ public class OdooClient {
     private let rpcClient: RPCClient
     
     init(baseURL: URL, authService: AuthService) {
-        self.rpcClient = RPCClient(baseURL: baseURL, authService: authService)
+        self.rpcClient = RPCClient(baseURL: baseURL, sessionService: authService)
     }
     
-    var authService: AuthService {
+    public var authService: AuthService {
         return AuthService(client: rpcClient)
     }
     
-    var messagesService: MessagesServer {
+    public var messagesService: MessagesServer {
         return MessagesServer(rpcClient: rpcClient)
     }
     
-    var userDataService: UserDataService {
+    public var userDataService: UserDataService {
         return UserDataService(rpcClient: rpcClient)
     }
     
-    var odooService: OdooService {
+    public var odooService: OdooService {
         return OdooService(rpcClient: rpcClient)
     }
     
-    var authenticationServiceTotp: AuthenticationServiceTotp {
+    public var authenticationServiceTotp: AuthenticationServiceTotp {
         return AuthenticationServiceTotp(rpcClient: rpcClient)
     }
     
-    var databaseService: DatabaseService {
+    public var databaseService: DatabaseService {
         return DatabaseService(rpcClient: rpcClient)
     }
 }

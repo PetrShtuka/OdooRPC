@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class AuthService {
+public class AuthService: SessionService {
     private let client: RPCClient
     private var userData: UserData?  // Store user data after authentication
     private var credentials: Credentials?  // Optionally store credentials securely
@@ -44,3 +44,6 @@ public class AuthService {
     }
 }
 
+protocol SessionService {
+    func refreshSession(completion: @escaping (Result<UserData, Error>) -> Void)
+}
