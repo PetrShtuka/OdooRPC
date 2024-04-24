@@ -8,7 +8,7 @@
 import Foundation
 
 // Structure to handle the login credentials
-struct Credentials {
+public struct Credentials {
     var username: String    // Used as login
     var password: String
     var database: String

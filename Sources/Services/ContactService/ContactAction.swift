@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ContactAction {
+public enum ContactAction {
     case fetch
     case search
 }

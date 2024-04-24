@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ContactsModel: Codable {
+public struct ContactsModel: Codable {
     var id: Int
     var street: String?
     var street2: String?

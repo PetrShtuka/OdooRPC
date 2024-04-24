@@ -14,7 +14,7 @@ public class OdooService {
         self.rpcClient = rpcClient
     }
     
-    func getVersionOdoo(serverURL: URL, completion: @escaping (Result<Double, Error>) -> Void) {
+    public func getVersionOdoo(serverURL: URL, completion: @escaping (Result<Double, Error>) -> Void) {
         let endpoint = "/web/webclient/version_info"  // Confirm this endpoint with your server setup.
         
         // Use the provided URL directly in the RPCClient request

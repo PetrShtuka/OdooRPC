@@ -14,7 +14,7 @@ public class UserDataService {
         self.rpcClient = rpcClient
     }
 
-    func fetchUserData(uid: Int, completion: @escaping (Result<UserData, Error>) -> Void) {
+    public func fetchUserData(uid: Int, completion: @escaping (Result<UserData, Error>) -> Void) {
         let params: [String: Any] = [
             "model": "res.users",
             "method": "search_read",

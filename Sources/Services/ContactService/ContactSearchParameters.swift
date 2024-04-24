@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ContactParameters {
+public struct ContactParameters {
     var searchName: String = ""
     var searchEmail: String = ""
     var idFilter: IDFilterType?

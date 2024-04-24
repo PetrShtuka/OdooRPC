@@ -14,7 +14,7 @@ public class CetmixCommunicatorService {
         self.rpcClient = rpcClient
     }
     
-    func fetchDatabase(login: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
+    public func fetchDatabase(login: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
         let endpoint = "/cetmix_communicator/get_db"  // Modify if necessary
         let method: HTTPMethod = .post
         

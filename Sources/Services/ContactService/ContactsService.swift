@@ -14,7 +14,7 @@ public class ContactsService {
         self.rpcClient = rpcClient
     }
     
-    func loadContacts(action: ContactAction, searchParameters: ContactParameters, completion: @escaping (Result<[ContactsModel], Error>) -> Void) {
+    public func loadContacts(action: ContactAction, searchParameters: ContactParameters, completion: @escaping (Result<[ContactsModel], Error>) -> Void) {
         
         let endpoint = (action == .fetch) ? "/web/dataset/call_kw" : "/web/dataset/search_read"// Confirm this is the correct endpoint for your API
         let parameters = buildParameters(for: action,

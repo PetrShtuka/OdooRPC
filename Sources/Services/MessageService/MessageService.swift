@@ -14,7 +14,7 @@ public class MessagesServer {
         self.rpcClient = rpcClient
     }
     
-    func fetchMessages(request: MessageFetchRequest, completion: @escaping (Result<[MessageModel], Error>) -> Void) {
+    public func fetchMessages(request: MessageFetchRequest, completion: @escaping (Result<[MessageModel], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
         let params = buildParams(for: request)
         
@@ -60,11 +60,11 @@ public class MessagesServer {
     }
 }
 
-enum MailboxOperation {
+public enum MailboxOperation {
     case sharedInbox, search, archive, bin, outbox
 }
 
-enum MessageField: String, CaseIterable {
+public enum MessageField: String, CaseIterable {
     case deleteUID = "delete_uid"
     case active
     case authorAvatar = "author_avatar"
@@ -87,7 +87,7 @@ enum MessageField: String, CaseIterable {
     case mailMailIDInt = "mail_mail_id_int"
 }
 
-struct MessageFetchRequest {
+public struct MessageFetchRequest {
     var operation: MailboxOperation
     var messageId: Int
     var limit: Int

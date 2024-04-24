@@ -16,7 +16,7 @@ public class AuthService: SessionService {
         self.client = client
     }
 
-    func authenticate(credentials: Credentials, completion: @escaping (Result<UserData, Error>) -> Void) {
+    public func authenticate(credentials: Credentials, completion: @escaping (Result<UserData, Error>) -> Void) {
         self.credentials = credentials  // Store credentials if needed
         client.sendRPCRequest(endpoint: "/web/session/authenticate", method: .post, params: credentials.asDictionary()) { result in
             switch result {

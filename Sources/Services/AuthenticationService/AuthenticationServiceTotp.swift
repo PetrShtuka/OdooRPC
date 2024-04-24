@@ -14,7 +14,7 @@ public class AuthenticationServiceTotp {
         self.rpcClient = rpcClient
     }
     
-    func authenticateTotp(_ otp: String, db: String, completion: @escaping (Result<Int, Error>) -> Void) {
+    public func authenticateTotp(_ otp: String, db: String, completion: @escaping (Result<Int, Error>) -> Void) {
         let endpoint = "/cetmix_communicator/authenticate/totp"
         let parameters: [String: Any] = [
             "totp_token": otp,

@@ -14,7 +14,7 @@ public class DatabaseService {
         self.rpcClient = rpcClient
     }
     
-    func listDatabases(completion: @escaping (Result<[String], Error>) -> Void) {
+    public func listDatabases(completion: @escaping (Result<[String], Error>) -> Void) {
         let params: [String: Any] = [
             "service": "db",
             "method": "list",

@@ -14,7 +14,7 @@ public class ModuleService {
         self.rpcClient = rpcClient
     }
     
-    func loadModulesServer(serverURL: URL, completion: @escaping (Result<ModuleStatus, Error>) -> Void) {
+    public func loadModulesServer(serverURL: URL, completion: @escaping (Result<ModuleStatus, Error>) -> Void) {
         let endpoint = "/web/session/modules"  // Endpoint for fetching modules
         
         // Ensure method and endpoint are correctly matched to your API documentation

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MessageModel: Decodable, Hashable {
+public struct MessageModel: Decodable, Hashable {
     let messageId: Int
     let authorId: Int
     let authorName: String

@@ -8,7 +8,7 @@
 import Foundation
 
 // Assuming ModuleStatus is structured as below:
-struct ModuleStatus {
+public struct ModuleStatus {
     var mailMessages: Bool = false
     var mailMessagesPro: Bool = false
     var cetmixCommunicator: Bool = false
