@@ -9,14 +9,14 @@ import Foundation
 
 // Structure to handle the login credentials
 public struct Credentials {
-    var username: String    // Used as login
-    var password: String
-    var database: String
+    public var username: String    // Used as login
+    public  var password: String
+    public var database: String
 }
 
 // Extension to Credentials to make it easier to use with the AuthModule
 extension Credentials {
-    func asDictionary() -> [String: Any] {
+    public func asDictionary() -> [String: Any] {
         return [
             "db": self.database,
             "login": self.username,
