@@ -10,31 +10,16 @@ import Foundation
 public class OdooClient {
     private let rpcClient: RPCClient
     
-    init(baseURL: URL, authService: AuthService) {
-        self.rpcClient = RPCClient(baseURL: baseURL, sessionService: authService)
-    }
-    
-    public var authService: AuthService {
-        return AuthService(client: rpcClient)
-    }
-    
-    public var messagesService: MessagesServer {
-        return MessagesServer(rpcClient: rpcClient)
-    }
-    
-    public var userDataService: UserDataService {
-        return UserDataService(rpcClient: rpcClient)
-    }
-    
-    public var odooService: OdooService {
-        return OdooService(rpcClient: rpcClient)
-    }
-    
-    public var authenticationServiceTotp: AuthenticationServiceTotp {
-        return AuthenticationServiceTotp(rpcClient: rpcClient)
-    }
-    
-    public var databaseService: DatabaseService {
-        return DatabaseService(rpcClient: rpcClient)
-    }
+    // Initialize the services as lazy properties to ensure they are only created when needed
+    public lazy var authService: AuthService = AuthService(client: rpcClient)
+    public lazy var messagesService: MessagesServer = MessagesServer(rpcClient: rpcClient)
+    public lazy var userDataService: UserDataService = UserDataService(rpcClient: rpcClient)
+    public lazy var odooService: OdooService = OdooService(rpcClient: rpcClient)
+    public lazy var authenticationServiceTotp: AuthenticationServiceTotp = AuthenticationServiceTotp(rpcClient: rpcClient)
+    public lazy var databaseService: DatabaseService = DatabaseService(rpcClient: rpcClient)
+
+    // The initializer injects the authService dependency into the RPCClient
+    init(baseURL: URL, sessionService: SessionService) {
+          self.rpcClient = RPCClient(baseURL: baseURL, sessionService: sessionService)
+      }
 }
