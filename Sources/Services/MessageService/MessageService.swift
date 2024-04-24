@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class MessagesServer {
+public class MessagesServer {
     private var rpcClient: RPCClient
     
     init(rpcClient: RPCClient) {

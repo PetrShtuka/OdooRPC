@@ -7,7 +7,7 @@
 
 import Foundation
 
-class AuthService {
+public class AuthService {
     private let client: RPCClient
     private var userData: UserData?  // Store user data after authentication
     private var credentials: Credentials?  // Optionally store credentials securely

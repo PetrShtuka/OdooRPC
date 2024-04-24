@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class ModuleService {
+public class ModuleService {
     private let rpcClient: RPCClient
     
     init(rpcClient: RPCClient) {

@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class DatabaseService {
+public class DatabaseService {
     private let rpcClient: RPCClient
 
     init(rpcClient: RPCClient) {

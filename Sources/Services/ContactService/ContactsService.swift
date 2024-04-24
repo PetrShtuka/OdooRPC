@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class ContactsService {
+public class ContactsService {
     private let rpcClient: RPCClient
     
     init(rpcClient: RPCClient) {

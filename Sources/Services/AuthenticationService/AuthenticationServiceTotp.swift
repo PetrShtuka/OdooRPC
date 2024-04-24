@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class AuthenticationServiceTotp {
+public class AuthenticationServiceTotp {
     private let rpcClient: RPCClient
     
     init(rpcClient: RPCClient) {

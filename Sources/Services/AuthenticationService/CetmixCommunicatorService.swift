@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class CetmixCommunicatorService {
+public class CetmixCommunicatorService {
     private let rpcClient: RPCClient
 
     init(rpcClient: RPCClient) {

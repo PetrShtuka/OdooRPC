@@ -7,9 +7,7 @@
 
 import Foundation
 
-import Foundation
-
-final class UserDataService {
+public class UserDataService {
     private let rpcClient: RPCClient
 
     init(rpcClient: RPCClient) {
