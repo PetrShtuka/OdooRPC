@@ -21,8 +21,7 @@ public class OdooClient {
     // The initializer injects the authService dependency into the RPCClient
   
     // Make the initializer public so it can be accessed from outside the module
-    public init(baseURL: URL, sessionService: SessionService) {
-        self.rpcClient = RPCClient(baseURL: baseURL,
-                                   sessionService: sessionService)
+    public init(baseURL: URL) {
+        self.rpcClient = RPCClient(baseURL: baseURL)
     }
 }
