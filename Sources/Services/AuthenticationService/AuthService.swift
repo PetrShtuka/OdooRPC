@@ -23,17 +23,21 @@ public class AuthService: SessionService {
             case .success(let data):
                 do {
                     let decoder = JSONDecoder()
-                    let userData = try decoder.decode(UserData.self, from: data)
+                    let wrapper = try decoder.decode(ResponseWrapper.self, from: data)
+                    let userData = wrapper.result  // Now we get UserData from wrapper
                     self.userData = userData  // Store user data
                     completion(.success(userData))
                 } catch {
+                    print("Decoding error: \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             case .failure(let error):
+                print("Network request failed: \(error.localizedDescription)")
                 completion(.failure(error))
             }
         }
     }
+
 
     public func refreshSession(completion: @escaping (Result<UserData, Error>) -> Void) {
         guard let credentials = self.credentials else {
