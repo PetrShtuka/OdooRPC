@@ -30,4 +30,15 @@ public struct UserData: Decodable {
         case timezone = "tz"
         case partnerID = "partner_id"
     }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        uid = try container.decodeIfPresent(Int.self, forKey: .uid)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        sessionToken = try container.decodeIfPresent(String.self, forKey: .sessionToken)
+        isSuperuser = try container.decodeIfPresent(Bool.self, forKey: .isSuperuser)
+        language = try container.decodeIfPresent(String.self, forKey: .language)
+        timezone = try container.decodeIfPresent(String.self, forKey: .timezone)
+        partnerID = try container.decodeIfPresent(Int.self, forKey: .partnerID)
+    }
 }
