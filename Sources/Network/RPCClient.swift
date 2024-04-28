@@ -6,24 +6,25 @@
 //
 
 import Foundation
+import Foundation
 
 public class RPCClient {
     private let session: URLSession
     private let baseURL: URL
+    private var sessionService: SessionService?
     private var tasks: [Int: URLSessionDataTask] = [:]
     private let taskAccessQueue = DispatchQueue(label: "com.odooRPC.RPCClient.TaskAccessQueue")
     private var isRefreshingSession = false
     private var pendingRequests: [(Int, URLRequest, (Result<Data, Error>) -> Void)] = []
-    private var sessionService: SessionService?
-    
-    init(baseURL: URL) {
-        self.baseURL = baseURL
-        self.session = URLSession(configuration: .default)
-        self.sessionService = SessionService.self as? any SessionService
+
+    public init(baseURL: URL) {
+           self.baseURL = baseURL
+           self.session = URLSession(configuration: .default)
     }
+
     
     @discardableResult
-    func sendRPCRequest(endpoint: String, method: HTTPMethod, params: [String: Any], completion: @escaping (Result<Data, Error>) -> Void) -> Int {
+    public func sendRPCRequest(endpoint: String, method: HTTPMethod, params: [String: Any], completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask? {
         let url = baseURL.appendingPathComponent(endpoint)
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
@@ -36,7 +37,7 @@ public class RPCClient {
             request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
         } catch {
             completion(.failure(error))
-            return -1
+            return nil
         }
         
         let task = session.dataTask(with: request) { [weak self] data, response, error in
@@ -48,6 +49,7 @@ public class RPCClient {
                     NSLocalizedDescriptionKey: "Server returned status code \(httpResponse.statusCode)",
                     "StatusCode": "\(httpResponse.statusCode)"
                 ] as [String: Any]
+
                 completion(.failure(NSError(domain: "HTTPError", code: httpResponse.statusCode, userInfo: errorInfo)))
                 return
             }
@@ -58,10 +60,11 @@ public class RPCClient {
             }
             
             if self.isSessionExpired(data: data) {
-                self.taskAccessQueue.async {
-                    self.pendingRequests.append((requestId, request, completion))
-                    if !self.isRefreshingSession {
-                        self.refreshSession()
+                self.refreshSession { success in
+                    if success {
+                        self.sendRPCRequest(endpoint: endpoint, method: method, params: params, completion: completion)
+                    } else {
+                        completion(.failure(NSError(domain: "SessionRefreshError", code: 401, userInfo: ["message": "Session could not be refreshed"])))
                     }
                 }
             } else {
@@ -69,55 +72,42 @@ public class RPCClient {
             }
         }
         
-        taskAccessQueue.async {
-            self.tasks[requestId] = task
-            task.resume()
+        taskAccessQueue.sync {
+            tasks[requestId] = task
         }
-        
-        return requestId
+        task.resume()
+        return task
+    }
+    
+    private func refreshSession(completion: @escaping (Bool) -> Void) {
+        guard !isRefreshingSession else {
+            completion(false)
+            return
+        }
+        isRefreshingSession = true
+        sessionService?.refreshSession { [weak self] result in
+            guard let self = self else { return }
+            self.isRefreshingSession = false
+            switch result {
+            case .success:
+                completion(true)
+            case .failure:
+                completion(false)
+            }
+        }
     }
     
     private func isSessionExpired(data: Data) -> Bool {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-           let error = json["error"] as? [String: Any], let message = error["data"] as? [String: Any],
-           let name = message["name"] as? String, name.contains("SessionExpiredException") {
-            return true
+           let error = json["error"] as? [String: Any],
+           let message = error["data"] as? [String: Any],
+           let name = message["name"] as? String {
+            return name.contains("SessionExpiredException")
         }
         return false
     }
     
-    private func refreshSession() {
-        isRefreshingSession = true
-        sessionService?.refreshSession { [weak self] result in
-            guard let self = self else { return }
-            self.taskAccessQueue.async {
-                self.isRefreshingSession = false
-                let retry = (try? result.get()) != nil  // Assume successful reauthentication if we can get user data
-                self.processPendingRequests(retry: retry)
-            }
-        }
-    }
-    
-    private func processPendingRequests(retry: Bool) {
-        self.taskAccessQueue.sync {
-            for (id, request, completion) in self.pendingRequests {
-                if retry {
-                    let task = self.session.dataTask(with: request) { data, response, error in
-                        guard let data = data, error == nil else {
-                            completion(.failure(error ?? NSError(domain: "NetworkError", code: -1, userInfo: nil)))
-                            return
-                        }
-                        completion(.success(data))
-                    }
-                    self.tasks[id] = task
-                    task.resume()
-                } else {
-                    completion(.failure(NSError(domain: "SessionRefreshError", 
-                                                code: 0,
-                                                userInfo: ["message": "Failed to refresh session"])))
-                }
-            }
-            self.pendingRequests.removeAll()
-        }
+    public func updateSessionService(_ service: SessionService) {
+           self.sessionService = service
     }
 }
