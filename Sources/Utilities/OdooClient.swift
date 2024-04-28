@@ -9,11 +9,15 @@ import Foundation
 
 public class OdooClient {
     private var rpcClient: RPCClient
-    private lazy var authService: AuthService = {
+    private lazy var _authService: AuthService = {
         let service = AuthService(client: rpcClient)
         rpcClient.updateSessionService(service)
         return service
     }()
+    
+    public var authService: AuthService {
+        return _authService
+    }
 
     private let baseURL: URL
     
