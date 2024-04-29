@@ -79,12 +79,7 @@ public protocol SessionServiceDelegate {
 import Foundation
 
 public class AuthService: SessionServiceDelegate {
-    public var client: RPCClient? {
-          didSet {
-              totpService = AuthenticationServiceTotp(rpcClient: client!)
-          }
-      }
-    
+    public var client: RPCClient
     private var userData: UserData?
     private var credentials: Credentials?
     public weak var delegate: AuthServiceDelegate?
@@ -93,16 +88,20 @@ public class AuthService: SessionServiceDelegate {
     
     public func onRequestOtpCode(_ handler: @escaping (@escaping (String?) -> Void) -> Void) {
           self.requestOtpCode = handler
-      }
+    }
     
     public init(client: RPCClient) {
         self.client = client
         self.totpService = AuthenticationServiceTotp(rpcClient: client)
     }
     
+    public func setDelegate(_ delegate: AuthServiceDelegate) {
+          self.delegate = delegate
+    }
+    
     public func authenticate(credentials: Credentials, completion: @escaping (Result<UserData, Error>) -> Void) {
            self.credentials = credentials  // Сохраняем учетные данные при аутентификации
-        client?.sendAuthenticationRequest(endpoint: "/web/session/authenticate", method: .post, params: credentials.asDictionary()) { [weak self] result in
+        client.sendAuthenticationRequest(endpoint: "/web/session/authenticate", method: .post, params: credentials.asDictionary()) { [weak self] result in
                guard let self = self else { return }
                switch result {
                case .success(let data):
@@ -143,7 +142,7 @@ public class AuthService: SessionServiceDelegate {
         }
         var params = credentials.asDictionary()
         params["otp"] = otp
-        client?.sendAuthenticationRequest(endpoint: "/web/session/verify_otp", method: .post, params: params) { result in
+        client.sendAuthenticationRequest(endpoint: "/web/session/verify_otp", method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
