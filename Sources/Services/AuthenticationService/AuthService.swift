@@ -158,9 +158,8 @@ public class AuthService: SessionServiceDelegate {
         }
         task.resume()
     }
-    
 }
 
-extension Notification.Name {
+public extension Notification.Name {
     static let requireTwoFactorAuthentication = Notification.Name("requireTwoFactorAuthentication")
 }
