@@ -73,7 +73,7 @@ import Foundation
 
 public protocol SessionServiceDelegate {
     func refreshSession(completion: @escaping (Result<UserData, Error>) -> Void)
-    func isSessionValid(baseURL: URL, completion: @escaping (Result<Bool, Error>) -> Void) 
+    func isSessionValid(baseURL: URL, completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
 import Foundation
@@ -87,7 +87,7 @@ public class AuthService: SessionServiceDelegate {
     private var requestOtpCode: ((@escaping (String?) -> Void) -> Void)?
     
     public func onRequestOtpCode(_ handler: @escaping (@escaping (String?) -> Void) -> Void) {
-          self.requestOtpCode = handler
+        self.requestOtpCode = handler
     }
     
     public init(client: RPCClient) {
@@ -96,59 +96,25 @@ public class AuthService: SessionServiceDelegate {
     }
     
     public func setDelegate(_ delegate: AuthServiceDelegate) {
-          self.delegate = delegate
+        self.delegate = delegate
     }
     
     public func authenticate(credentials: Credentials, completion: @escaping (Result<UserData, Error>) -> Void) {
-           self.credentials = credentials  // Сохраняем учетные данные при аутентификации
+        self.credentials = credentials  // Сохраняем учетные данные при аутентификации
         client.sendAuthenticationRequest(endpoint: "/web/session/authenticate", method: .post, params: credentials.asDictionary()) { [weak self] result in
-               guard let self = self else { return }
-               switch result {
-               case .success(let data):
-                   do {
-                       let decoder = JSONDecoder()
-                       var userData = try decoder.decode(ResponseWrapper.self, from: data)
-                       if userData.result.uid == nil { // Проверяем, требуется ли 2FA
-                           // Запрос 2FA кода через делегат или интерфейс
-                           self.delegate?.requestTwoFactorCode { otpCode in
-                               self.totpService?.authenticateTotp(otpCode, db: credentials.database) { totpResult in
-                                   switch totpResult {
-                                   case .success(let uid):
-                                       userData.result.uid = uid // Обновляем uid после 2FA
-                                       self.userData =  userData.result
-                                       completion(.success( userData.result))
-                                   case .failure(let error):
-                                       completion(.failure(error))
-                                   }
-                               }
-                           }
-                       } else {
-                           self.userData =  userData.result
-                           completion(.success(userData.result))
-                       }
-                   } catch {
-                       completion(.failure(error))
-                   }
-               case .failure(let error):
-                   completion(.failure(error))
-               }
-           }
-       }
-
-    private func verifyTwoFactorCode(otp: String, completion: @escaping (Result<UserData, Error>) -> Void) {
-        guard let credentials = self.credentials else {
-            completion(.failure(NSError(domain: "AuthService", code: 401, userInfo: [NSLocalizedDescriptionKey: "Credentials not available"])))
-            return
-        }
-        var params = credentials.asDictionary()
-        params["otp"] = otp
-        client.sendAuthenticationRequest(endpoint: "/web/session/verify_otp", method: .post, params: params) { result in
+            guard let self = self else { return }
             switch result {
             case .success(let data):
                 do {
                     let decoder = JSONDecoder()
-                    let userData = try decoder.decode(UserData.self, from: data)
-                    completion(.success(userData))
+                    let userData = try decoder.decode(ResponseWrapper.self, from: data)
+                    if userData.result.uid == nil { // Проверяем, требуется ли 2FA
+                        // Отправляем уведомление, требующее ввода 2FA кода
+                        NotificationCenter.default.post(name: .requireTwoFactorAuthentication, object: nil, userInfo: ["credentials": credentials])
+                    } else {
+                        self.userData = userData.result
+                        completion(.success(userData.result))
+                    }
                 } catch {
                     completion(.failure(error))
                 }
@@ -192,5 +158,9 @@ public class AuthService: SessionServiceDelegate {
         }
         task.resume()
     }
+    
+}
 
+extension Notification.Name {
+    static let requireTwoFactorAuthentication = Notification.Name("requireTwoFactorAuthentication")
 }
