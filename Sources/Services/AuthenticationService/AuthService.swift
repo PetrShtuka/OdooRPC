@@ -83,7 +83,9 @@ public class AuthService: SessionServiceDelegate {
     private var userData: UserData?
     private var credentials: Credentials?
     public weak var delegate: AuthServiceDelegate?
-    private var totpService: AuthenticationServiceTotp
+    private lazy var totpService: AuthenticationServiceTotp = {
+         return AuthenticationServiceTotp(rpcClient: client)
+     }()
     private var requestOtpCode: ((@escaping (String?) -> Void) -> Void)?
     
     public func onRequestOtpCode(_ handler: @escaping (@escaping (String?) -> Void) -> Void) {
