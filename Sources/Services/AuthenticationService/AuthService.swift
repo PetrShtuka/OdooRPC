@@ -73,7 +73,7 @@ import Foundation
 
 public protocol SessionServiceDelegate {
     func refreshSession(completion: @escaping (Result<UserData, Error>) -> Void)
-    func isSessionValid(completion: @escaping (Result<Bool, Error>) -> Void)
+    func isSessionValid(baseURL: URL, completion: @escaping (Result<Bool, Error>) -> Void) 
 }
 
 import Foundation
@@ -162,22 +162,31 @@ public class AuthService: SessionServiceDelegate {
         authenticate(credentials: credentials, completion: completion)
     }
     
-    public func isSessionValid(completion: @escaping (Result<Bool, Error>) -> Void) {
-        // Example endpoint that checks session validity
-        let endpoint = "/web/session/get_session_info"
-        client.sendRPCRequest(endpoint: endpoint, method: .get, params: [:]) { result in
-            switch result {
-            case .success(let data):
-                if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let sessionValid = json["session_valid"] as? Bool {
-                    completion(.success(sessionValid))
-                } else {
-                    // Assume false if the data doesn't contain the expected key
-                    completion(.success(false))
-                }
-            case .failure(let error):
+    public func isSessionValid(baseURL: URL, completion: @escaping (Result<Bool, Error>) -> Void) {
+        let url = baseURL.appendingPathComponent("/web/session/get_session_info")
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
                 completion(.failure(error))
+                return
+            }
+            
+            guard let data = data, let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                completion(.success(false))  // Assume the session is invalid if the response isn't successful
+                return
+            }
+            
+            if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+               let sessionValid = json["session_valid"] as? Bool {
+                completion(.success(sessionValid))
+            } else {
+                completion(.success(false))
             }
         }
+        task.resume()
     }
+
 }

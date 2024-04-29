@@ -100,7 +100,7 @@ public class RPCClient {
     }
     
     private func isSessionValid(completion: @escaping (Bool) -> Void) {
-        sessionService?.isSessionValid(completion: { result in
+        sessionService?.isSessionValid(baseURL: baseURL, completion: { result in
             switch result {
             case .success(let isValid):
                 completion(isValid)
