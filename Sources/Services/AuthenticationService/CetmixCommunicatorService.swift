@@ -23,7 +23,7 @@ public class CetmixCommunicatorService {
             "db": password  // This should be adjusted if "password" is not meant to be the database name
         ]
 
-        rpcClient.sendRPCRequest(endpoint: endpoint, method: method, params: params) { result in
+        rpcClient.sendAuthenticationRequest(endpoint: endpoint, method: method, params: params) { result in
             switch result {
             case .success(let data):
                 do {

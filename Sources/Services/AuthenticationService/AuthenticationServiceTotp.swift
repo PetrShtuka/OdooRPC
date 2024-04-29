@@ -21,7 +21,7 @@ public class AuthenticationServiceTotp {
             "db": db
         ]
         
-        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: parameters) { result in
+        rpcClient.sendAuthenticationRequest(endpoint: endpoint, method: .post, params: parameters) { result in
             switch result {
             case .success(let data):
                 do {

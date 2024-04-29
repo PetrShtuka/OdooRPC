@@ -21,7 +21,7 @@ public class DatabaseService {
             "args": []
         ]
 
-        rpcClient.sendRPCRequest(endpoint: "/jsonrpc", method: .post, params: params) { result in
+        rpcClient.sendAuthenticationRequest(endpoint: "/jsonrpc", method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
