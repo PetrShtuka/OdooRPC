@@ -14,7 +14,7 @@ public class AuthenticationServiceTotp {
         self.rpcClient = rpcClient
     }
     
-    public func authenticateTotp(_ otp: String, db: String, completion: @escaping (Result<Int, Error>) -> Void) {
+    public func authenticateTotp(_ otp: String, db: String, completion: @escaping (Result<UserData, Error>) -> Void) {
         let endpoint = "/cetmix_communicator/authenticate/totp"
         let parameters: [String: Any] = [
             "totp_token": otp,
@@ -25,8 +25,8 @@ public class AuthenticationServiceTotp {
             switch result {
             case .success(let data):
                 do {
-                    let uid = try JSONDecoder().decode(Int.self, from: data)  // Assuming server returns UID directly as an integer
-                    completion(.success(uid))
+                    let userData = try JSONDecoder().decode(ResponseWrapper.self, from: data)  // Assuming server returns UID directly as an integer
+                    completion(.success(userData.result))
                 } catch {
                     completion(.failure(error))
                 }
