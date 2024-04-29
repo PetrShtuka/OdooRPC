@@ -37,28 +37,47 @@ public class RPCClient {
             return nil
         }
         
-        // Check session validity or refresh if necessary
+        var task: URLSessionDataTask?
         self.isSessionValid { [weak self] isValid in
             guard let self = self else { return }
             if isValid {
                 // Session is valid; proceed with the actual network request
-                self.executeNetworkRequest(request: request, completion: completion)
+                task = self.executeNetworkRequest(request: request, completion: completion)
             } else {
                 // Session is not valid; attempt to refresh it
                 self.refreshSession { success in
                     if success {
                         // After successful refresh, retry the network request
-                        self.executeNetworkRequest(request: request, completion: completion)
+                        task = self.executeNetworkRequest(request: request, completion: completion)
                     } else {
                         completion(.failure(NSError(domain: "SessionRefreshError", code: 401, userInfo: ["message": "Session could not be refreshed"])))
                     }
                 }
             }
         }
-        return nil
+        return task
     }
     
-    private func executeNetworkRequest(request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) {
+    @discardableResult
+    public func sendAuthenticationRequest(endpoint: String, method: HTTPMethod, params: [String: Any], completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask? {
+        let url = baseURL.appendingPathComponent(endpoint)
+        var request = URLRequest(url: url)
+        request.httpMethod = method.rawValue
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let requestBody = ["jsonrpc": "2.0", "method": "call", "params": params, "id": Int.random(in: 1...1000)] as [String: Any]
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
+        } catch {
+            completion(.failure(error))
+            return nil
+        }
+        
+        return executeNetworkRequest(request: request, completion: completion)
+    }
+
+    
+    private func executeNetworkRequest(request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask {
         let task = session.dataTask(with: request) { data, response, error in
             if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
                 let errorInfo = [NSLocalizedDescriptionKey: "Server returned status code \(httpResponse.statusCode)", "StatusCode": "\(httpResponse.statusCode)"] as [String: Any]
@@ -79,6 +98,7 @@ public class RPCClient {
             completion(.success(data))
         }
         task.resume()
+        return task
     }
     
     private func refreshSession(completion: @escaping (Bool) -> Void) {

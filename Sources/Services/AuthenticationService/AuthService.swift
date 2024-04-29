@@ -97,7 +97,7 @@ public class AuthService: SessionServiceDelegate {
     
     public func authenticate(credentials: Credentials, completion: @escaping (Result<UserData, Error>) -> Void) {
            self.credentials = credentials  // Сохраняем учетные данные при аутентификации
-           client.sendRPCRequest(endpoint: "/web/session/authenticate", method: .post, params: credentials.asDictionary()) { [weak self] result in
+        client.sendAuthenticationRequest(endpoint: "/web/session/authenticate", method: .post, params: credentials.asDictionary()) { [weak self] result in
                guard let self = self else { return }
                switch result {
                case .success(let data):
@@ -138,7 +138,7 @@ public class AuthService: SessionServiceDelegate {
         }
         var params = credentials.asDictionary()
         params["otp"] = otp
-        client.sendRPCRequest(endpoint: "/web/session/verify_otp", method: .post, params: params) { result in
+        client.sendAuthenticationRequest(endpoint: "/web/session/verify_otp", method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
