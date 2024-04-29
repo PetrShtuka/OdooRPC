@@ -79,13 +79,16 @@ public protocol SessionServiceDelegate {
 import Foundation
 
 public class AuthService: SessionServiceDelegate {
-    private var client: RPCClient
+    public var client: RPCClient? {
+          didSet {
+              totpService = AuthenticationServiceTotp(rpcClient: client!)
+          }
+      }
+    
     private var userData: UserData?
     private var credentials: Credentials?
     public weak var delegate: AuthServiceDelegate?
-    private lazy var totpService: AuthenticationServiceTotp = {
-         return AuthenticationServiceTotp(rpcClient: client)
-     }()
+    private var totpService: AuthenticationServiceTotp?
     private var requestOtpCode: ((@escaping (String?) -> Void) -> Void)?
     
     public func onRequestOtpCode(_ handler: @escaping (@escaping (String?) -> Void) -> Void) {
@@ -99,7 +102,7 @@ public class AuthService: SessionServiceDelegate {
     
     public func authenticate(credentials: Credentials, completion: @escaping (Result<UserData, Error>) -> Void) {
            self.credentials = credentials  // Сохраняем учетные данные при аутентификации
-        client.sendAuthenticationRequest(endpoint: "/web/session/authenticate", method: .post, params: credentials.asDictionary()) { [weak self] result in
+        client?.sendAuthenticationRequest(endpoint: "/web/session/authenticate", method: .post, params: credentials.asDictionary()) { [weak self] result in
                guard let self = self else { return }
                switch result {
                case .success(let data):
@@ -109,7 +112,7 @@ public class AuthService: SessionServiceDelegate {
                        if userData.result.uid == nil { // Проверяем, требуется ли 2FA
                            // Запрос 2FA кода через делегат или интерфейс
                            self.delegate?.requestTwoFactorCode { otpCode in
-                               self.totpService.authenticateTotp(otpCode, db: credentials.database) { totpResult in
+                               self.totpService?.authenticateTotp(otpCode, db: credentials.database) { totpResult in
                                    switch totpResult {
                                    case .success(let uid):
                                        userData.result.uid = uid // Обновляем uid после 2FA
@@ -140,7 +143,7 @@ public class AuthService: SessionServiceDelegate {
         }
         var params = credentials.asDictionary()
         params["otp"] = otp
-        client.sendAuthenticationRequest(endpoint: "/web/session/verify_otp", method: .post, params: params) { result in
+        client?.sendAuthenticationRequest(endpoint: "/web/session/verify_otp", method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
