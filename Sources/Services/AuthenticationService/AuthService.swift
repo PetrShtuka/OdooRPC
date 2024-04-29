@@ -103,24 +103,24 @@ public class AuthService: SessionServiceDelegate {
                case .success(let data):
                    do {
                        let decoder = JSONDecoder()
-                       var userData = try decoder.decode(UserData.self, from: data)
-                       if userData.uid == nil { // Проверяем, требуется ли 2FA
+                       var userData = try decoder.decode(ResponseWrapper.self, from: data)
+                       if userData.result.uid == nil { // Проверяем, требуется ли 2FA
                            // Запрос 2FA кода через делегат или интерфейс
                            self.delegate?.requestTwoFactorCode { otpCode in
                                self.totpService.authenticateTotp(otpCode, db: credentials.database) { totpResult in
                                    switch totpResult {
                                    case .success(let uid):
-                                       userData.uid = uid // Обновляем uid после 2FA
-                                       self.userData = userData
-                                       completion(.success(userData))
+                                       userData.result.uid = uid // Обновляем uid после 2FA
+                                       self.userData =  userData.result
+                                       completion(.success( userData.result))
                                    case .failure(let error):
                                        completion(.failure(error))
                                    }
                                }
                            }
                        } else {
-                           self.userData = userData
-                           completion(.success(userData))
+                           self.userData =  userData.result
+                           completion(.success(userData.result))
                        }
                    } catch {
                        completion(.failure(error))
