@@ -9,17 +9,17 @@ import Foundation
 
 // Decodable structure to decode user data from JSON response
 public struct ResponseWrapper: Decodable {
-    var result: UserData
+    public var result: UserData
 }
 
 public struct UserData: Decodable {
-    var uid: Int?
-    var name: String?
-    var sessionToken: String?
-    var isSuperuser: Bool?
-    var language: String?
-    var timezone: String?
-    var partnerID: Int?
+    public var uid: Int?
+    public var name: String?
+    public var sessionToken: String?
+    public var isSuperuser: Bool?
+    public var language: String?
+    public var timezone: String?
+    public var partnerID: Int?
 
     private enum CodingKeys: String, CodingKey {
         case uid
