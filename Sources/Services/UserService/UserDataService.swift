@@ -25,7 +25,7 @@ public class UserDataService {
             ]
         ]
 
-        rpcClient.sendRPCRequest(endpoint: "/web/dataset/call_kw", method: .post, params: params) { result in
+        rpcClient.sendAuthenticationRequest(endpoint: "/web/dataset/call_kw", method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
