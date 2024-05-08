@@ -23,8 +23,8 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let decoder = JSONDecoder()
-                    let messages = try decoder.decode([MessageModel].self, from: data)
-                    completion(.success(messages))
+                    let messageResponse = try decoder.decode(MessageResponse.self, from: data)
+                    completion(.success(messageResponse.records))
                 } catch {
                     completion(.failure(error))
                 }
