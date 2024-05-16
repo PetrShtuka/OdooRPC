@@ -31,6 +31,16 @@ public struct UserData: Decodable {
         case partnerID = "partner_id"
     }
 
+    public init(uid: Int?, name: String?, sessionToken: String?, isSuperuser: Bool?, language: String?, timezone: String?, partnerID: Int?) {
+        self.uid = uid
+        self.name = name
+        self.sessionToken = sessionToken
+        self.isSuperuser = isSuperuser
+        self.language = language
+        self.timezone = timezone
+        self.partnerID = partnerID
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         uid = try container.decodeIfPresent(Int.self, forKey: .uid)
