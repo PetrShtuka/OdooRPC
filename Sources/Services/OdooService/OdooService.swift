@@ -18,7 +18,7 @@ public class OdooService {
         let endpoint = "/web/webclient/version_info"  // Confirm this endpoint with your server setup.
         
         // Use the provided URL directly in the RPCClient request
-        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: [:]) { result in
+        rpcClient.sendAuthenticationRequest(endpoint: endpoint, method: .post, params: [:]) { result in
             switch result {
             case .success(let data):
                 do {
