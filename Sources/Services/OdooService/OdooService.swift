@@ -23,7 +23,8 @@ public class OdooService {
             case .success(let data):
                 do {
                     if let jsonData = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                       let versionString = jsonData["server_serie"] as? String,
+                       let resultDict = jsonData["result"] as? [String: Any],
+                       let versionString = resultDict["server_serie"] as? String,
                        let serverVersion = Double(versionString) {
                         completion(.success(serverVersion))
                     } else {
