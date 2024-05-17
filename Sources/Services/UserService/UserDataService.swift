@@ -31,8 +31,8 @@ public class UserDataService {
                 do {
                     if let jsonData = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                         if let result = jsonData["result"] as? [[String: Any]], !result.isEmpty {
-                            let userData = try JSONDecoder().decode(ResponseWrapper.self, from: JSONSerialization.data(withJSONObject: result.first!))
-                            completion(.success(userData.result))
+                            let userData = try JSONDecoder().decode(UserData.self, from: JSONSerialization.data(withJSONObject: result.first!))
+                            completion(.success(userData))
                         } else {
                             completion(.failure(NSError(domain: "ParseError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid JSON structure"])))
                         }
