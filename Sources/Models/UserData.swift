@@ -19,7 +19,7 @@ public struct UserData: Decodable {
     public var isSuperuser: Bool?
     public var language: String?
     public var timezone: String?
-    public var partnerID: Int?
+    public var partnerID: PartnerID?
     
     private enum CodingKeys: String, CodingKey {
         case uid
@@ -31,7 +31,7 @@ public struct UserData: Decodable {
         case partnerID = "partner_id"
     }
     
-    public init(uid: Int?, name: String?, sessionToken: String?, isSuperuser: Bool?, language: String?, timezone: String?, partnerID: Int?) {
+    public init(uid: Int?, name: String?, sessionToken: String?, isSuperuser: Bool?, language: String?, timezone: String?, partnerID: PartnerID?) {
         self.uid = uid
         self.name = name
         self.sessionToken = sessionToken
@@ -49,21 +49,15 @@ public struct UserData: Decodable {
         isSuperuser = try container.decodeIfPresent(Bool.self, forKey: .isSuperuser)
         language = try container.decodeIfPresent(String.self, forKey: .language)
         timezone = try container.decodeIfPresent(String.self, forKey: .timezone)
-        
-        if let partnerArray = try? container.decodeIfPresent([PartnerID].self, forKey: .partnerID),
-           let partnerID = partnerArray.first?.id {
-            self.partnerID = partnerID
-        } else {
-            self.partnerID = try container.decodeIfPresent(Int.self, forKey: .partnerID)
-        }
+        partnerID = try container.decodeIfPresent(PartnerID.self, forKey: .partnerID)
     }
 }
 
-struct PartnerID: Decodable {
+public struct PartnerID: Decodable {
     var id: Int?
     var name: String?
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
         id = try container.decodeIfPresent(Int.self)
         name = try container.decodeIfPresent(String.self)
