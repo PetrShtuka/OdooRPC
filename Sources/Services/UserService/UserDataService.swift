@@ -18,10 +18,10 @@ public class UserDataService {
         let params: [String: Any] = [
             "model": "res.users",
             "method": "search_read",
-            "args": [[]],  // empty array for args as specific criteria passed in kwargs
+            "args": [],  // пустой массив для args, так как критерии передаются в kwargs
             "kwargs": [
                 "domain": [["id", "=", uid]],
-                "fields": ["name", "email", "lang", "tz", "partner_id", "avatar_128"]
+                "fields": ["id", "name", "email", "lang", "tz", "partner_id", "avatar_128"]
             ]
         ]
 
@@ -29,11 +29,13 @@ public class UserDataService {
             switch result {
             case .success(let data):
                 do {
-                    if let jsonData = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                       let result = jsonData["result"] as? [[String: Any]],
-                       !result.isEmpty {
-                        let userData = try JSONDecoder().decode(ResponseWrapper.self, from: JSONSerialization.data(withJSONObject: result.first!))
-                        completion(.success(userData.result))
+                    if let jsonData = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                        if let result = jsonData["result"] as? [[String: Any]], !result.isEmpty {
+                            let userData = try JSONDecoder().decode(ResponseWrapper.self, from: JSONSerialization.data(withJSONObject: result.first!))
+                            completion(.success(userData.result))
+                        } else {
+                            completion(.failure(NSError(domain: "ParseError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid JSON structure"])))
+                        }
                     } else {
                         completion(.failure(NSError(domain: "ParseError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid JSON structure"])))
                     }
