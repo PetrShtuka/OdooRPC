@@ -56,7 +56,12 @@ public struct UserData: Decodable {
 public struct PartnerID: Decodable {
     public var id: Int?
     public var name: String?
-    
+
+    public init(id: Int?, name: String?) {
+        self.id = id
+        self.name = name
+    }
+
     public init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
         id = try container.decodeIfPresent(Int.self)
