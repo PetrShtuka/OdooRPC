@@ -88,15 +88,15 @@ public enum MessageField: String, CaseIterable {
 }
 
 public struct MessageFetchRequest {
-    var operation: MailboxOperation
-    var messageId: Int
-    var limit: Int
-    var comparisonOperator: String = ">"
-    var partnerUserId: Int?
-    var requestText: String?
-    var localMessagesID: [Int]?
-    var selectedFields: Set<MessageField> = Set(MessageField.allCases)
-    var language: String
-    var timeZone: String
-    var uid: Int
+   public var operation: MailboxOperation
+   public var messageId: Int
+   public var limit: Int
+   public var comparisonOperator: String = ">"
+   public var partnerUserId: Int?
+   public var requestText: String?
+   public var localMessagesID: [Int]?
+   public var selectedFields: Set<MessageField> = Set(MessageField.allCases)
+   public var language: String
+   public var timeZone: String
+   public var uid: Int
 }

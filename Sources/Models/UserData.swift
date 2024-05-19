@@ -50,42 +50,42 @@ public struct UserData: Decodable {
         language = try container.decodeIfPresent(String.self, forKey: .language)
         timezone = try container.decodeIfPresent(String.self, forKey: .timezone)
         if let partnerIDArray = try? container.decodeIfPresent([AnyDecodable].self, forKey: .partnerID), let firstElement = partnerIDArray.first?.value as? Int {
-                 partnerID = PartnerID(id: firstElement, name: partnerIDArray.dropFirst().first?.value as? String)
-             } else if let partnerIDInt = try? container.decodeIfPresent(Int.self, forKey: .partnerID) {
-                 partnerID = PartnerID(id: partnerIDInt, name: nil)
-             } else {
-                 partnerID = nil
-             }
-         }
-     }
+            partnerID = PartnerID(id: firstElement, name: partnerIDArray.dropFirst().first?.value as? String)
+        } else if let partnerIDInt = try? container.decodeIfPresent(Int.self, forKey: .partnerID) {
+            partnerID = PartnerID(id: partnerIDInt, name: nil)
+        } else {
+            partnerID = nil
+        }
+    }
+}
 
-     public struct PartnerID: Decodable {
-         public var id: Int?
-         public var name: String?
-         
-         public init(id: Int?, name: String?) {
-             self.id = id
-             self.name = name
-         }
-     }
+public struct PartnerID: Decodable {
+    public var id: Int?
+    public var name: String?
+    
+    public init(id: Int?, name: String?) {
+        self.id = id
+        self.name = name
+    }
+}
 
-     // Helper struct for decoding heterogeneous arrays
-     public struct AnyDecodable: Decodable {
-         public let value: Any
-
-         public init(from decoder: Decoder) throws {
-             if let int = try? decoder.singleValueContainer().decode(Int.self) {
-                 self.value = int
-             } else if let string = try? decoder.singleValueContainer().decode(String.self) {
-                 self.value = string
-             } else {
-                 throw DecodingError.typeMismatch(
-                     AnyDecodable.self,
-                     DecodingError.Context(
-                         codingPath: decoder.codingPath,
-                         debugDescription: "Not an int or string"
-                     )
-                 )
-             }
-         }
-     }
+// Helper struct for decoding heterogeneous arrays
+public struct AnyDecodable: Decodable {
+    public let value: Any
+    
+    public init(from decoder: Decoder) throws {
+        if let int = try? decoder.singleValueContainer().decode(Int.self) {
+            self.value = int
+        } else if let string = try? decoder.singleValueContainer().decode(String.self) {
+            self.value = string
+        } else {
+            throw DecodingError.typeMismatch(
+                AnyDecodable.self,
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Not an int or string"
+                )
+            )
+        }
+    }
+}
