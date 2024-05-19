@@ -99,4 +99,18 @@ public struct MessageFetchRequest {
    public var language: String
    public var timeZone: String
    public var uid: Int
+    
+    public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int) {
+        self.operation = operation
+        self.messageId = messageId
+        self.limit = limit
+        self.comparisonOperator = comparisonOperator
+        self.partnerUserId = partnerUserId
+        self.requestText = requestText
+        self.localMessagesID = localMessagesID
+        self.selectedFields = selectedFields
+        self.language = language
+        self.timeZone = timeZone
+        self.uid = uid
+    }
 }
