@@ -9,7 +9,7 @@ import Foundation
 
 public protocol SessionServiceDelegate {
     func refreshSession(completion: @escaping (Result<UserData, Error>) -> Void)
-    func isSessionValid(baseURL: URL, sessionId: String, completion: @escaping (Result<Bool, Error>) -> Void)
+    func isSessionValid(baseURL: URL, completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
 public class AuthService: SessionServiceDelegate {
@@ -68,14 +68,13 @@ public class AuthService: SessionServiceDelegate {
         authenticate(credentials: credentials, completion: completion)
     }
 
-    public func isSessionValid(baseURL: URL, sessionId: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+    public func isSessionValid(baseURL: URL, completion: @escaping (Result<Bool, Error>) -> Void) {
         let url = baseURL.appendingPathComponent("/web/session/get_session_info")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let params = ["session_id": sessionId]  // Use the passed sessionId parameter
-        let requestBody = ["jsonrpc": "2.0", "method": "call", "params": params, "id": "r1"] as [String : Any]
+        let requestBody = ["jsonrpc": "2.0", "method": "call", "params": [:], "id": "r1"] as [String : Any]
         
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])

@@ -15,12 +15,10 @@ public class ContactsService {
     }
     
     public func loadContacts(action: ContactAction, searchParameters: ContactParameters, completion: @escaping (Result<[ContactsModel], Error>) -> Void) {
+        let endpoint = (action == .fetch) ? "/web/dataset/call_kw" : "/web/dataset/search_read"
+        let parameters = buildParameters(for: action, searchParameters: searchParameters)
         
-        let endpoint = (action == .fetch) ? "/web/dataset/call_kw" : "/web/dataset/search_read"// Confirm this is the correct endpoint for your API
-        let parameters = buildParameters(for: action,
-                                         searchParameters: searchParameters)
-        
-        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: parameters, sessionId: searchParameters.sessionId) { result in
+        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: parameters) { result in
             switch result {
             case .success(let data):
                 do {
@@ -100,7 +98,6 @@ public class ContactsService {
         }
         
         return parameters
-        
     }
     
     private func determineAvatarField(serverVersion: Double) -> String {

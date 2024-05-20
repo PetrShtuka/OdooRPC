@@ -22,7 +22,7 @@ public class RPCClient {
     }
     
     @discardableResult
-    public func sendRPCRequest(endpoint: String, method: HTTPMethod, params: [String: Any], sessionId: String, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask? {
+    public func sendRPCRequest(endpoint: String, method: HTTPMethod, params: [String: Any], completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask? {
         let url = baseURL.appendingPathComponent(endpoint)
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
@@ -37,7 +37,7 @@ public class RPCClient {
         }
         
         var task: URLSessionDataTask?
-        self.isSessionValid(sessionId: sessionId) { [self] isValid in
+        self.isSessionValid { [self] isValid in
             if isValid {
                 // Session is valid; proceed with the actual network request
                 task = self.executeNetworkRequest(request: request, completion: completion)
@@ -121,13 +121,13 @@ public class RPCClient {
         }
     }
 
-    private func isSessionValid(sessionId: String, completion: @escaping (Bool) -> Void) {
+    private func isSessionValid(completion: @escaping (Bool) -> Void) {
         guard let sessionService = sessionService else {
             print("sessionService is nil during isSessionValid check")
             completion(false)
             return
         }
-        sessionService.isSessionValid(baseURL: baseURL, sessionId: sessionId, completion: { result in
+        sessionService.isSessionValid(baseURL: baseURL, completion: { result in
             switch result {
             case .success(let isValid):
                 completion(isValid)
