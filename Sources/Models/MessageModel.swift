@@ -23,7 +23,7 @@ public struct MessageModel: Decodable {
     public let partnerIDs: [Int]
     public let parentID: IDNamePair?
     public let body: String
-    public let recordName: String
+    public let recordName: String?
     public let emailFrom: String
     public let displayName: String
     public let deleteUID: Bool
@@ -91,7 +91,16 @@ public struct MessageModel: Decodable {
         }
 
         body = try container.decode(String.self, forKey: .body)
-        recordName = try container.decode(String.self, forKey: .recordName)
+        
+        // Handle optional recordName that can be either String or Bool
+        if let recordNameString = try? container.decode(String.self, forKey: .recordName) {
+            recordName = recordNameString
+        } else if let _ = try? container.decode(Bool.self, forKey: .recordName) {
+            recordName = nil
+        } else {
+            recordName = nil
+        }
+
         emailFrom = try container.decode(String.self, forKey: .emailFrom)
         displayName = try container.decode(String.self, forKey: .displayName)
         deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
@@ -113,6 +122,7 @@ public struct MessageModel: Decodable {
         subtypeID = try container.decodeIfPresent([Int?].self, forKey: .subtypeID) ?? []
     }
 }
+
 
 public struct IDNamePair: Decodable {
     public let id: Int
