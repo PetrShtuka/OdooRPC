@@ -20,7 +20,7 @@ public class ContactsService {
         let parameters = buildParameters(for: action,
                                          searchParameters: searchParameters)
         
-        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: parameters) { result in
+        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: parameters, sessionId: searchParameters.sessionId) { result in
             switch result {
             case .success(let data):
                 do {

@@ -18,7 +18,7 @@ public class MessagesServer {
         let endpoint = "/web/dataset/search_read"
         let params = buildParams(for: request)
         
-        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params, sessionId: request.sessionId) { result in
             switch result {
             case .success(let data):
                 do {
@@ -99,8 +99,9 @@ public struct MessageFetchRequest {
    public var language: String
    public var timeZone: String
    public var uid: Int
+    public var sessionId: String
     
-    public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int) {
+    public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int, sessionId: String) {
         self.operation = operation
         self.messageId = messageId
         self.limit = limit
@@ -112,5 +113,6 @@ public struct MessageFetchRequest {
         self.language = language
         self.timeZone = timeZone
         self.uid = uid
+        self.sessionId = sessionId
     }
 }

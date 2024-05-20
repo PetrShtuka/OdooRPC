@@ -19,4 +19,5 @@ public struct ContactParameters {
     var lastContactId: Int? = nil
     var customFields: [String]?
     var additionalParams: [String: Any]?
+    var sessionId: String
 }

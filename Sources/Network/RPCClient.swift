@@ -15,14 +15,14 @@ public class RPCClient {
     private let taskAccessQueue = DispatchQueue(label: "com.odooRPC.RPCClient.TaskAccessQueue")
     private var isRefreshingSession = false
     private var pendingRequests: [(Int, URLRequest, (Result<Data, Error>) -> Void)] = []
-    
+
     public init(baseURL: URL) {
         self.baseURL = baseURL
         self.session = URLSession(configuration: .default)
     }
     
     @discardableResult
-    public func sendRPCRequest(endpoint: String, method: HTTPMethod, params: [String: Any], completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask? {
+    public func sendRPCRequest(endpoint: String, method: HTTPMethod, params: [String: Any], sessionId: String, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask? {
         let url = baseURL.appendingPathComponent(endpoint)
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
@@ -37,7 +37,7 @@ public class RPCClient {
         }
         
         var task: URLSessionDataTask?
-        self.isSessionValid { [self] isValid in
+        self.isSessionValid(sessionId: sessionId) { [self] isValid in
             if isValid {
                 // Session is valid; proceed with the actual network request
                 task = self.executeNetworkRequest(request: request, completion: completion)
@@ -55,7 +55,7 @@ public class RPCClient {
         }
         return task
     }
-    
+
     @discardableResult
     public func sendAuthenticationRequest(endpoint: String, method: HTTPMethod, params: [String: Any], completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask? {
         let url = baseURL.appendingPathComponent(endpoint)
@@ -74,7 +74,6 @@ public class RPCClient {
         return executeNetworkRequest(request: request, completion: completion)
     }
 
-    
     private func executeNetworkRequest(request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask {
         let task = session.dataTask(with: request) { data, response, error in
             if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
@@ -98,7 +97,7 @@ public class RPCClient {
         task.resume()
         return task
     }
-    
+
     private func refreshSession(completion: @escaping (Bool) -> Void) {
         guard !isRefreshingSession else {
             completion(false)
@@ -121,14 +120,14 @@ public class RPCClient {
             }
         }
     }
-    
-    private func isSessionValid(completion: @escaping (Bool) -> Void) {
+
+    private func isSessionValid(sessionId: String, completion: @escaping (Bool) -> Void) {
         guard let sessionService = sessionService else {
             print("sessionService is nil during isSessionValid check")
             completion(false)
             return
         }
-        sessionService.isSessionValid(baseURL: baseURL, completion: { result in
+        sessionService.isSessionValid(baseURL: baseURL, sessionId: sessionId, completion: { result in
             switch result {
             case .success(let isValid):
                 completion(isValid)
@@ -137,7 +136,7 @@ public class RPCClient {
             }
         })
     }
-    
+
     public func updateSessionService(_ service: SessionServiceDelegate) {
         print("Updating session service...")
         self.sessionService = service
