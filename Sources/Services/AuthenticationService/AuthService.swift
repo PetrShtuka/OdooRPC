@@ -12,8 +12,6 @@ public protocol SessionServiceDelegate {
     func isSessionValid(baseURL: URL, completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
-import Foundation
-
 public class AuthService: SessionServiceDelegate {
     public var client: RPCClient
     private var userData: UserData?
@@ -30,6 +28,7 @@ public class AuthService: SessionServiceDelegate {
         self.client = client
         self.totpService = AuthenticationServiceTotp(rpcClient: client)
         self.client.updateSessionService(self)  // Assign AuthService as the session service
+        print("AuthService initialized and sessionService set.")
     }
     
     public func setDelegate(_ delegate: AuthServiceDelegate) {
@@ -96,6 +95,7 @@ public class AuthService: SessionServiceDelegate {
         task.resume()
     }
 }
+
 
 public extension Notification.Name {
     static let requireTwoFactorAuthentication = Notification.Name("requireTwoFactorAuthentication")

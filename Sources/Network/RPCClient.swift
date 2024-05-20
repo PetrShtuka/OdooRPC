@@ -7,6 +7,8 @@
 
 import Foundation
 
+import Foundation
+
 public class RPCClient {
     private let session: URLSession
     private let baseURL: URL
@@ -139,6 +141,8 @@ public class RPCClient {
     }
     
     public func updateSessionService(_ service: SessionServiceDelegate) {
+        print("Updating session service...")
         self.sessionService = service
+        print("Session service updated to: \(String(describing: self.sessionService))")
     }
 }
