@@ -13,17 +13,17 @@ public struct MessageResponse: Decodable {
 
 public struct MessageModel: Decodable {
     public let authorDisplay: String
-    public let needaction: Int
-    public let active: Int
+    public let needaction: Bool
+    public let active: Bool
     public let parentID: ParentID?
-    public let subject: String
+    public let subject: String?
     public let emailFrom: String
     public let authorID: [AuthorID]
     public let id: Int
     public let date: String
-    public let deleteUID: Int
+    public let deleteUID: Bool
     public let authorAvatar: String?
-    public let starred: Int
+    public let starred: Bool
     public let body: String
     public let attachmentIDs: [Int]
     public let model: String
@@ -33,30 +33,6 @@ public struct MessageModel: Decodable {
     public let subtypeID: [Int?]
     public let recordName: String
     public let resID: Int
-    
-    init(authorDisplay: String, needaction: Int, active: Int, parentID: ParentID?, subject: String, emailFrom: String, authorID: [AuthorID], id: Int, date: String, deleteUID: Int, authorAvatar: String?, starred: Int, body: String, attachmentIDs: [Int], model: String, partnerIDs: [Int], refPartnerIDs: [Int], displayName: String, subtypeID: [Int?], recordName: String, resID: Int) {
-        self.authorDisplay = authorDisplay
-        self.needaction = needaction
-        self.active = active
-        self.parentID = parentID
-        self.subject = subject
-        self.emailFrom = emailFrom
-        self.authorID = authorID
-        self.id = id
-        self.date = date
-        self.deleteUID = deleteUID
-        self.authorAvatar = authorAvatar
-        self.starred = starred
-        self.body = body
-        self.attachmentIDs = attachmentIDs
-        self.model = model
-        self.partnerIDs = partnerIDs
-        self.refPartnerIDs = refPartnerIDs
-        self.displayName = displayName
-        self.subtypeID = subtypeID
-        self.recordName = recordName
-        self.resID = resID
-    }
 
     enum CodingKeys: String, CodingKey {
         case authorDisplay = "author_display"
