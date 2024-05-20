@@ -15,10 +15,10 @@ public struct MessageModel: Decodable {
     public let authorDisplay: String
     public let needaction: Bool
     public let active: Bool
-    public let parentID: ParentID?
+    public let parentID: IDNamePair?
     public let subject: String?
     public let emailFrom: String
-    public let authorID: [AuthorID]
+    public let authorID: [IDNamePair]
     public let id: Int
     public let date: String
     public let deleteUID: Bool
@@ -59,22 +59,13 @@ public struct MessageModel: Decodable {
     }
 }
 
-public struct ParentID: Decodable {
-    public let id: Int?
-    public let name: String?
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case name
-    }
-}
-
-public struct AuthorID: Decodable {
+public struct IDNamePair: Decodable {
     public let id: Int
     public let name: String
 
-    enum CodingKeys: String, CodingKey {
-        case id
-        case name
+    public init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        id = try container.decode(Int.self)
+        name = try container.decode(String.self)
     }
 }
