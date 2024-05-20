@@ -5,6 +5,13 @@
 //  Created by Peter on 13.04.2024.
 //
 
+//
+//  MessagesModule.swift
+//  OdooRPC
+//
+//  Created by Peter on 13.04.2024.
+//
+
 import Foundation
 
 public class MessagesServer {
@@ -23,8 +30,8 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let decoder = JSONDecoder()
-                    let messageResponse = try decoder.decode(MessageResponse.self, from: data)
-                    completion(.success(messageResponse.records))
+                    let response = try decoder.decode(OdooResponse<MessageResponse>.self, from: data)
+                    completion(.success(response.result.records))
                 } catch {
                     completion(.failure(error))
                 }
@@ -54,7 +61,7 @@ public class MessagesServer {
     }
     
     private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
-        let domain: [[Any]] = [["message_type", "in", ["email", "comment"]]]
+        var domain: [[Any]] = [["message_type", "in", ["email", "comment"]]]
         // Include domain logic based on the request type
         return domain
     }
@@ -88,17 +95,17 @@ public enum MessageField: String, CaseIterable {
 }
 
 public struct MessageFetchRequest {
-   public var operation: MailboxOperation
-   public var messageId: Int
-   public var limit: Int
-   public var comparisonOperator: String = ">"
-   public var partnerUserId: Int?
-   public var requestText: String?
-   public var localMessagesID: [Int]?
-   public var selectedFields: Set<MessageField> = Set(MessageField.allCases)
-   public var language: String
-   public var timeZone: String
-   public var uid: Int
+    public var operation: MailboxOperation
+    public var messageId: Int
+    public var limit: Int
+    public var comparisonOperator: String = ">"
+    public var partnerUserId: Int?
+    public var requestText: String?
+    public var localMessagesID: [Int]?
+    public var selectedFields: Set<MessageField> = Set(MessageField.allCases)
+    public var language: String
+    public var timeZone: String
+    public var uid: Int
     
     public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int) {
         self.operation = operation
@@ -113,4 +120,11 @@ public struct MessageFetchRequest {
         self.timeZone = timeZone
         self.uid = uid
     }
+}
+
+// Models for decoding the response
+public struct OdooResponse<T: Decodable>: Decodable {
+    let jsonrpc: String
+    let id: Int
+    let result: T
 }
