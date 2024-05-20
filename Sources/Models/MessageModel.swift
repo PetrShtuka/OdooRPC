@@ -8,13 +8,7 @@
 import Foundation
 
 public struct MessageResponse: Decodable {
-//    let length: Int
     let records: [MessageModel]
-
-    enum CodingKeys: String, CodingKey {
-//        case length
-        case records
-    }
 }
 
 public struct MessageModel: Decodable {
