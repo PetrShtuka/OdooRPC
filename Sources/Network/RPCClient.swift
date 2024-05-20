@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Foundation
 
 public class RPCClient {
     private let session: URLSession
@@ -105,8 +104,13 @@ public class RPCClient {
             completion(false)
             return
         }
+        guard let sessionService = sessionService else {
+            print("sessionService is nil during refreshSession")
+            completion(false)
+            return
+        }
         isRefreshingSession = true
-        sessionService?.refreshSession { [weak self] result in
+        sessionService.refreshSession { [weak self] result in
             guard let self = self else { return }
             self.isRefreshingSession = false
             switch result {
@@ -119,7 +123,12 @@ public class RPCClient {
     }
     
     private func isSessionValid(completion: @escaping (Bool) -> Void) {
-        sessionService?.isSessionValid(baseURL: baseURL, completion: { result in
+        guard let sessionService = sessionService else {
+            print("sessionService is nil during isSessionValid check")
+            completion(false)
+            return
+        }
+        sessionService.isSessionValid(baseURL: baseURL, completion: { result in
             switch result {
             case .success(let isValid):
                 completion(isValid)
