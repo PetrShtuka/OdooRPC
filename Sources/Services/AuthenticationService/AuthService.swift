@@ -12,6 +12,8 @@ public protocol SessionServiceDelegate {
     func isSessionValid(baseURL: URL, completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
+import Foundation
+
 public class AuthService: SessionServiceDelegate {
     public var client: RPCClient
     private var userData: UserData?
@@ -95,7 +97,6 @@ public class AuthService: SessionServiceDelegate {
         task.resume()
     }
 }
-
 
 public extension Notification.Name {
     static let requireTwoFactorAuthentication = Notification.Name("requireTwoFactorAuthentication")

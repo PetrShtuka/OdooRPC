@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 public class RPCClient {
     private let session: URLSession
     private let baseURL: URL

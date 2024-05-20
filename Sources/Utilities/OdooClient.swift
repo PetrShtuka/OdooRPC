@@ -9,23 +9,21 @@ import Foundation
 
 public class OdooClient {
     private var rpcClient: RPCClient
-    private lazy var _authService: AuthService = {
-        let service = AuthService(client: rpcClient)
-        rpcClient.updateSessionService(service)
-        return service
-    }()
-    
+    private var _authService: AuthService
+
     public var authService: AuthService {
         return _authService
     }
 
     private let baseURL: URL
-    
+
     public init(baseURL: URL) {
         self.baseURL = baseURL
         self.rpcClient = RPCClient(baseURL: baseURL)
+        self._authService = AuthService(client: rpcClient)
+        self.rpcClient.updateSessionService(_authService)  
     }
-    
+
     // Остальные сервисы
     public lazy var messagesService: MessagesServer = MessagesServer(rpcClient: rpcClient)
     public lazy var userDataService: UserDataService = UserDataService(rpcClient: rpcClient)
