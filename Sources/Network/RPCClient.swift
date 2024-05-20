@@ -38,8 +38,7 @@ public class RPCClient {
         }
         
         var task: URLSessionDataTask?
-        self.isSessionValid { [weak self] isValid in
-            guard let self = self else { return }
+        self.isSessionValid { [self] isValid in
             if isValid {
                 // Session is valid; proceed with the actual network request
                 task = self.executeNetworkRequest(request: request, completion: completion)
