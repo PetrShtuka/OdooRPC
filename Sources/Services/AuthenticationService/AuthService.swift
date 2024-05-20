@@ -95,8 +95,11 @@ public class AuthService: SessionServiceDelegate {
             }
             
             if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-               let sessionValid = json["session_valid"] as? Bool {
-                completion(.success(sessionValid))
+               let result = json["result"] as? [String: Any],
+               let uid = result["uid"] as? Int,
+               let sessionId = result["session_id"] as? String {
+                // If we have a valid uid and session_id, we assume the session is valid
+                completion(.success(true))
             } else {
                 completion(.success(false))
             }
@@ -104,6 +107,7 @@ public class AuthService: SessionServiceDelegate {
         task.resume()
     }
 }
+
 
 
 public extension Notification.Name {
