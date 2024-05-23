@@ -91,7 +91,6 @@ public enum MessageField: String, CaseIterable {
     case subject
     case authorDisplay = "author_display"
     case isError = "is_error"
-    case mailMailIDInt = "mail_mail_id_int"
 }
 
 public struct MessageFetchRequest {
