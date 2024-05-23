@@ -159,11 +159,8 @@ public class MessagesServer {
                         let decoder = JSONDecoder()
                         
                         // Decode the response with or without the length field
-                        if let response = try? decoder.decode(OdooResponse.self, from: data) {
-                            completion(.success(response.result.records))
-                        } else {
-                            completion(.failure(NSError(domain: "ParseError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid JSON structure"])))
-                        }
+                        let response = try decoder.decode(OdooResponse.self, from: data)
+                        completion(.success(response.result.records))
                     }
                 } catch {
                     completion(.failure(error))
@@ -253,6 +250,7 @@ public struct MessageFetchRequest {
     }
 }
 
+// Models for decoding the response
 public struct OdooResponse: Decodable {
     let jsonrpc: String
     let id: Int

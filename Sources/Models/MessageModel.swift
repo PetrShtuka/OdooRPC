@@ -7,10 +7,6 @@
 
 import Foundation
 
-public struct MessageResponse: Decodable {
-    let records: [MessageModel]
-}
-
 public struct MessageModel: Decodable {
     public let id: Int
     public let authorDisplay: String
@@ -123,12 +119,11 @@ public struct MessageModel: Decodable {
     }
 }
 
-
 public struct IDNamePair: Decodable {
     public let id: Int
     public let name: String
 
-    init(id: Int, name: String) {
+    public init(id: Int, name: String) {
         self.id = id
         self.name = name
     }
