@@ -66,7 +66,6 @@ public struct MessageModel: Decodable {
         needaction = try container.decode(Bool.self, forKey: .needaction)
         active = try container.decode(Bool.self, forKey: .active)
         
-        // Handle optional subject that can be either String or Bool
         if let subjectString = try? container.decode(String.self, forKey: .subject) {
             subject = subjectString
         } else if let _ = try? container.decode(Bool.self, forKey: .subject) {
@@ -77,7 +76,6 @@ public struct MessageModel: Decodable {
 
         partnerIDs = try container.decode([Int].self, forKey: .partnerIDs)
         
-        // Handle optional parentID that can be array
         if var parentArrayContainer = try? container.nestedUnkeyedContainer(forKey: .parentID) {
             let id = try parentArrayContainer.decode(Int.self)
             let name = try parentArrayContainer.decode(String.self)
@@ -88,7 +86,6 @@ public struct MessageModel: Decodable {
 
         body = try container.decode(String.self, forKey: .body)
         
-        // Handle optional recordName that can be either String or Bool
         if let recordNameString = try? container.decode(String.self, forKey: .recordName) {
             recordName = recordNameString
         } else if let _ = try? container.decode(Bool.self, forKey: .recordName) {
@@ -103,7 +100,6 @@ public struct MessageModel: Decodable {
         model = try container.decode(String.self, forKey: .model)
         isError = try container.decode(Bool.self, forKey: .isError)
         
-        // Handle optional authorAvatar that can be either String or Bool
         if let authorAvatarString = try? container.decode(String.self, forKey: .authorAvatar) {
             authorAvatar = authorAvatarString
         } else if let _ = try? container.decode(Bool.self, forKey: .authorAvatar) {
@@ -132,5 +128,16 @@ public struct IDNamePair: Decodable {
         var container = try decoder.unkeyedContainer()
         id = try container.decode(Int.self)
         name = try container.decode(String.self)
+    }
+}
+
+struct ApiResponse: Decodable {
+    let id: Int
+    let jsonrpc: String
+    let result: Result
+    
+    struct Result: Decodable {
+        let length: Int
+        let records: [MessageModel]
     }
 }

@@ -158,9 +158,15 @@ public class MessagesServer {
                     } else {
                         let decoder = JSONDecoder()
                         
-                        // Decode the response with or without the length field
-                        let response = try decoder.decode(OdooResponse.self, from: data)
-                        completion(.success(response.result.records))
+                        // Try to decode with length first
+                        do {
+                            let response = try decoder.decode(OdooResponse<MessageResponseDataWithLength>.self, from: data)
+                            completion(.success(response.result.records))
+                        } catch {
+                            // If failed, try to decode without length
+                            let response = try decoder.decode(OdooResponse<MessageResponseDataWithoutLength>.self, from: data)
+                            completion(.success(response.result.records))
+                        }
                     }
                 } catch {
                     completion(.failure(error))
@@ -251,13 +257,21 @@ public struct MessageFetchRequest {
 }
 
 // Models for decoding the response
-public struct OdooResponse: Decodable {
+public struct OdooResponse<T: Decodable>: Decodable {
     let jsonrpc: String
     let id: Int
-    let result: MessageResponseData
+    let result: T
 }
 
-public struct MessageResponseData: Decodable {
-    let length: Int?
+import Foundation
+
+public struct MessageResponseDataWithoutLength: Decodable {
+    let records: [MessageModel]
+}
+
+import Foundation
+
+public struct MessageResponseDataWithLength: Decodable {
+    let length: Int
     let records: [MessageModel]
 }
