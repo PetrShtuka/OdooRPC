@@ -96,8 +96,7 @@ public class AuthService: SessionServiceDelegate {
             
             if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                let result = json["result"] as? [String: Any],
-               let uid = result["uid"] as? Int,
-               let sessionId = result["session_id"] as? String {
+               let uid = result["uid"] as? Int {
                 // If we have a valid uid and session_id, we assume the session is valid
                 completion(.success(true))
             } else {
