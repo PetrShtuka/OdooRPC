@@ -31,9 +31,8 @@ public class CetmixCommunicatorService {
                         if let dbValue = jsonData["result"] as? String {
                             // Handle the original structure
                             completion(.success(dbValue))
-                        } else if let resultArray = jsonData["result"] as? [[String: Any]],
-                                  let firstResult = resultArray.first,
-                                  let dbValue = firstResult["db"] as? String {
+                        } else if let resultArray = jsonData["result"] as? [String: Any],
+                                  let dbValue = resultArray["db"] as? String {
                             // Handle the new structure
                             completion(.success(dbValue))
                         } else {
