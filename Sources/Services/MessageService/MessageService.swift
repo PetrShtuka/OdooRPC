@@ -144,8 +144,12 @@ public class MessagesServer {
             switch result {
             case .success(let data):
                 do {
-                    if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                       let errorData = jsonResponse["error"] as? [String: Any] {
+                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                    
+                    // Debug log for JSON response
+                    print("JSON Response: \(jsonResponse)")
+                    
+                    if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         // Handle the error structure
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -154,16 +158,10 @@ public class MessagesServer {
                     } else {
                         let decoder = JSONDecoder()
                         
-                        // Try to decode the first successful response type
-                        if let response = try? decoder.decode(OdooResponseWithLength.self, from: data) {
+                        // Decode the response with or without the length field
+                        if let response = try? decoder.decode(OdooResponse.self, from: data) {
                             completion(.success(response.result.records))
-                        }
-                        // If the first type fails, try to decode the second successful response type
-                        else if let response = try? decoder.decode(OdooResponseWithoutLength.self, from: data) {
-                            completion(.success(response.result.records))
-                        }
-                        // If both decodings fail, return a parsing error
-                        else {
+                        } else {
                             completion(.failure(NSError(domain: "ParseError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid JSON structure"])))
                         }
                     }
@@ -255,24 +253,13 @@ public struct MessageFetchRequest {
     }
 }
 
-// Models for decoding the response
-public struct OdooResponseWithLength: Decodable {
+public struct OdooResponse: Decodable {
     let jsonrpc: String
     let id: Int
-    let result: MessageResponseWithLength
+    let result: MessageResponseData
 }
 
-public struct MessageResponseWithLength: Decodable {
-    let length: Int
-    let records: [MessageModel]
-}
-
-public struct OdooResponseWithoutLength: Decodable {
-    let jsonrpc: String
-    let id: Int
-    let result: MessageResponseWithoutLength
-}
-
-public struct MessageResponseWithoutLength: Decodable {
+public struct MessageResponseData: Decodable {
+    let length: Int?
     let records: [MessageModel]
 }
