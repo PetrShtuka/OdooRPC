@@ -225,8 +225,6 @@ public enum MessageField: String, CaseIterable {
     case id
     case subject
     case authorDisplay = "author_display"
-    //case isError = "is_error" // Удалено недопустимое поле
-    case mailMailIDInt = "mail_mail_id_int"
 }
 
 public struct MessageFetchRequest {
