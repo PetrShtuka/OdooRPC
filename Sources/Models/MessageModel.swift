@@ -24,7 +24,6 @@ public struct MessageModel: Decodable {
     public let displayName: String
     public let deleteUID: Bool
     public let model: String
-    public let isError: Bool
     public let authorAvatar: String?
     public let starred: Bool
     public var attachmentIDs: [Int]
@@ -48,7 +47,6 @@ public struct MessageModel: Decodable {
         case displayName = "display_name"
         case deleteUID = "delete_uid"
         case model
-        case isError = "is_error"
         case authorAvatar = "author_avatar"
         case starred
         case attachmentIDs = "attachment_ids"
@@ -98,7 +96,6 @@ public struct MessageModel: Decodable {
         displayName = try container.decode(String.self, forKey: .displayName)
         deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
         model = try container.decode(String.self, forKey: .model)
-        isError = try container.decode(Bool.self, forKey: .isError)
         
         if let authorAvatarString = try? container.decode(String.self, forKey: .authorAvatar) {
             authorAvatar = authorAvatarString
