@@ -76,25 +76,20 @@ public class MessagesServer {
         domain.append(messageType)
         domain.append(idNotInLocalIds)
 
-        // Добавляем условие по типу операций
-        switch request.operation {
-        case .sharedInbox:
-            domain.append(["shared_inbox", "=", true])
-        case .outbox:
-            domain.append(["author_id", "in", [request.partnerUserId ?? request.uid]])
-        default:
-            domain.append(["author_id", "in", [request.uid]])
-        }
-
-        // Добавляем условия для поиска
         if let requestText = request.requestText, !requestText.isEmpty {
-            domain.append(["|", "|", "|", "|"])
-            domain.append(["body", "ilike", requestText])
-            domain.append(["subject", "ilike", requestText])
-            domain.append(["author_id.display_name", "ilike", requestText])
-            domain.append(["partner_ids.display_name", "ilike", requestText])
-        }
-
+                 switch request.selectFilter {
+                 case .subject:
+                     domain.append(["subject", "ilike", requestText])
+                 case .content:
+                     domain.append(["body", "ilike", requestText])
+                 case .author:
+                     domain.append(["author_id", "ilike", requestText])
+                 case .recipients:
+                     domain.append(["partner_ids", "ilike", requestText])
+                 case .none:
+                     break
+                 }
+             }
         return domain
     }
 }
@@ -136,6 +131,7 @@ public struct MessageFetchRequest {
     public var language: String
     public var timeZone: String
     public var uid: Int
+    public var selectFilter: FilterTypeMessage = .none
 
     public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int) {
         self.operation = operation
@@ -166,4 +162,8 @@ public struct MessageResponseDataWithoutLength: Decodable {
 public struct MessageResponseDataWithLength: Decodable {
     let length: Int
     let records: [MessageModel]
+}
+
+public enum FilterTypeMessage {
+    case subject, content, author, recipients, none
 }
