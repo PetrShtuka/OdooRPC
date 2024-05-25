@@ -10,7 +10,7 @@ import Foundation
 public struct MessageModel: Decodable {
     public let id: Int
     public let authorDisplay: String
-    public let authorID: IDNamePair
+    public let authorID: IDNamePair?
     public let date: String
     public let resID: Int
     public let needaction: Bool
@@ -29,6 +29,9 @@ public struct MessageModel: Decodable {
     public var attachmentIDs: [Int]
     public var refPartnerIDs: [Int]
     public var subtypeID: [Int?]
+    
+    // Новое поле для хранения информации о типе authorID
+    public let isAuthorIDBool: Bool
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -58,37 +61,39 @@ public struct MessageModel: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)
         authorDisplay = try container.decode(String.self, forKey: .authorDisplay)
-        authorID = try container.decode(IDNamePair.self, forKey: .authorID)
         date = try container.decode(String.self, forKey: .date)
         resID = try container.decode(Int.self, forKey: .resID)
         needaction = try container.decode(Bool.self, forKey: .needaction)
         active = try container.decode(Bool.self, forKey: .active)
         
-        if let subjectString = try? container.decode(String.self, forKey: .subject) {
-            subject = subjectString
-        } else if let _ = try? container.decode(Bool.self, forKey: .subject) {
-            subject = nil
-        } else {
+        // Попытка декодирования subject
+        do {
+            subject = try container.decodeIfPresent(String.self, forKey: .subject)
+        } catch DecodingError.typeMismatch {
             subject = nil
         }
         
         partnerIDs = try container.decode([Int].self, forKey: .partnerIDs)
         
-        if var parentArrayContainer = try? container.nestedUnkeyedContainer(forKey: .parentID) {
-            let id = try parentArrayContainer.decode(Int.self)
-            let name = try parentArrayContainer.decode(String.self)
-            parentID = IDNamePair(id: id, name: name)
-        } else {
+        // Попытка декодирования parentID
+        do {
+            if var parentArrayContainer = try? container.nestedUnkeyedContainer(forKey: .parentID) {
+                let id = try parentArrayContainer.decode(Int.self)
+                let name = try parentArrayContainer.decode(String.self)
+                parentID = IDNamePair(id: id, name: name)
+            } else {
+                parentID = nil
+            }
+        } catch {
             parentID = nil
         }
         
         body = try container.decode(String.self, forKey: .body)
         
-        if let recordNameString = try? container.decode(String.self, forKey: .recordName) {
-            recordName = recordNameString
-        } else if let _ = try? container.decode(Bool.self, forKey: .recordName) {
-            recordName = nil
-        } else {
+        // Попытка декодирования recordName
+        do {
+            recordName = try container.decodeIfPresent(String.self, forKey: .recordName)
+        } catch DecodingError.typeMismatch {
             recordName = nil
         }
         
@@ -97,11 +102,10 @@ public struct MessageModel: Decodable {
         deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
         model = try container.decode(String.self, forKey: .model)
         
-        if let authorAvatarString = try? container.decode(String.self, forKey: .authorAvatar) {
-            authorAvatar = authorAvatarString
-        } else if let _ = try? container.decode(Bool.self, forKey: .authorAvatar) {
-            authorAvatar = nil
-        } else {
+        // Попытка декодирования authorAvatar
+        do {
+            authorAvatar = try container.decodeIfPresent(String.self, forKey: .authorAvatar)
+        } catch DecodingError.typeMismatch {
             authorAvatar = nil
         }
         
@@ -109,6 +113,15 @@ public struct MessageModel: Decodable {
         attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
         refPartnerIDs = try container.decodeIfPresent([Int].self, forKey: .refPartnerIDs) ?? []
         subtypeID = try container.decodeIfPresent([Int?].self, forKey: .subtypeID) ?? []
+        
+        // Попытка декодирования authorID с учетом возможного типа Bool
+        do {
+            authorID = try container.decode(IDNamePair.self, forKey: .authorID)
+            isAuthorIDBool = false
+        } catch DecodingError.typeMismatch {
+            isAuthorIDBool = (try container.decodeIfPresent(Bool.self, forKey: .authorID)) ?? false
+            authorID = nil
+        }
     }
 }
 
@@ -125,16 +138,5 @@ public struct IDNamePair: Decodable {
         var container = try decoder.unkeyedContainer()
         id = try container.decode(Int.self)
         name = try container.decode(String.self)
-    }
-}
-
-struct ApiResponse: Decodable {
-    let id: Int
-    let jsonrpc: String
-    let result: Result
-    
-    struct Result: Decodable {
-        let length: Int
-        let records: [MessageModel]
     }
 }
