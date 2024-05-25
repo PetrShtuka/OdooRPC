@@ -1,32 +1,25 @@
-//
-//  MessagesModule.swift
-//  OdooRPC
-//
-//  Created by Peter on 13.04.2024.
-//
-
 import Foundation
 
 public class MessagesServer {
     private var rpcClient: RPCClient
-    
+
     init(rpcClient: RPCClient) {
         self.rpcClient = rpcClient
     }
-    
+
     public func fetchMessages(request: MessageFetchRequest, completion: @escaping (Result<[MessageModel], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
         let params = buildParams(for: request)
-        
+
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    
+
                     // Debug log for JSON response
                     print("JSON Response: \(jsonResponse)")
-                    
+
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         // Handle the error structure
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
@@ -35,7 +28,7 @@ public class MessagesServer {
                         completion(.failure(error))
                     } else {
                         let decoder = JSONDecoder()
-                        
+
                         // Try to decode with length first
                         do {
                             let response = try decoder.decode(OdooResponse<MessageResponseDataWithLength>.self, from: data)
@@ -54,11 +47,11 @@ public class MessagesServer {
             }
         }
     }
-    
+
     private func buildParams(for request: MessageFetchRequest) -> [String: Any] {
         let domain = createDomain(for: request)
         let fields = request.selectedFields.map { $0.rawValue }.filter { $0 != "is_error" } // Исключаем недопустимое поле
-        
+
         return [
             "model": "mail.message",
             "domain": domain,
@@ -73,26 +66,35 @@ public class MessagesServer {
             ]
         ]
     }
-    
+
     private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
-        var domain: [[Any]] = [["message_type", "in", ["email", "comment"]]]
+        var domain: [[Any]] = []
         
-        // Добавляем условие по id, если comparisonOperator не равен "not in"
-        if request.comparisonOperator != "not in" {
-            domain.append(["id", request.comparisonOperator, request.messageId])
+        let messageType: [Any] = ["message_type", "in", ["email", "comment"]]
+        let idNotInLocalIds: [Any] = ["id", "not in", request.localMessagesID ?? []]
+
+        domain.append(messageType)
+        domain.append(idNotInLocalIds)
+
+        // Добавляем условие по типу операций
+        switch request.operation {
+        case .sharedInbox:
+            domain.append(["shared_inbox", "=", true])
+        case .outbox:
+            domain.append(["author_id", "in", [request.partnerUserId ?? request.uid]])
+        default:
+            domain.append(["author_id", "in", [request.uid]])
         }
-        
+
         // Добавляем условия для поиска
         if let requestText = request.requestText, !requestText.isEmpty {
-            let searchConditions: [[Any]] = [
-                ["body", "ilike", requestText],
-                ["subject", "ilike", requestText],
-                ["author_id", "ilike", requestText],
-                ["partner_ids", "ilike", requestText]
-            ]
-            domain.append(contentsOf: searchConditions.flatMap { [["|"]] + $0 })
+            domain.append(["|", "|", "|", "|"])
+            domain.append(["body", "ilike", requestText])
+            domain.append(["subject", "ilike", requestText])
+            domain.append(["author_id.display_name", "ilike", requestText])
+            domain.append(["partner_ids.display_name", "ilike", requestText])
         }
-        
+
         return domain
     }
 }
@@ -134,7 +136,7 @@ public struct MessageFetchRequest {
     public var language: String
     public var timeZone: String
     public var uid: Int
-    
+
     public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int) {
         self.operation = operation
         self.messageId = messageId
