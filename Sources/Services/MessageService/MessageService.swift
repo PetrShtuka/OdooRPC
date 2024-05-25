@@ -133,7 +133,7 @@ public struct MessageFetchRequest {
     public var uid: Int
     public var selectFilter: FilterTypeMessage = .none
 
-    public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int) {
+    public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int, selectFilter: FilterTypeMessage = .none) {
         self.operation = operation
         self.messageId = messageId
         self.limit = limit
@@ -145,6 +145,7 @@ public struct MessageFetchRequest {
         self.language = language
         self.timeZone = timeZone
         self.uid = uid
+        self.selectFilter = selectFilter
     }
 }
 
