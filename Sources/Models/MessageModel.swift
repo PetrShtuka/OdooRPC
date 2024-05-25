@@ -29,7 +29,7 @@ public struct MessageModel: Decodable {
     public var attachmentIDs: [Int]
     public var refPartnerIDs: [Int]
     public var subtypeID: [Int?]
-
+    
     enum CodingKeys: String, CodingKey {
         case id
         case authorDisplay = "author_display"
@@ -53,7 +53,7 @@ public struct MessageModel: Decodable {
         case refPartnerIDs = "ref_partner_ids"
         case subtypeID = "subtype_id"
     }
-
+    
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)
@@ -71,7 +71,7 @@ public struct MessageModel: Decodable {
         } else {
             subject = nil
         }
-
+        
         partnerIDs = try container.decode([Int].self, forKey: .partnerIDs)
         
         if var parentArrayContainer = try? container.nestedUnkeyedContainer(forKey: .parentID) {
@@ -81,7 +81,7 @@ public struct MessageModel: Decodable {
         } else {
             parentID = nil
         }
-
+        
         body = try container.decode(String.self, forKey: .body)
         
         if let recordNameString = try? container.decode(String.self, forKey: .recordName) {
@@ -91,7 +91,7 @@ public struct MessageModel: Decodable {
         } else {
             recordName = nil
         }
-
+        
         emailFrom = try container.decode(String.self, forKey: .emailFrom)
         displayName = try container.decode(String.self, forKey: .displayName)
         deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
@@ -104,7 +104,7 @@ public struct MessageModel: Decodable {
         } else {
             authorAvatar = nil
         }
-
+        
         starred = try container.decode(Bool.self, forKey: .starred)
         attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
         refPartnerIDs = try container.decodeIfPresent([Int].self, forKey: .refPartnerIDs) ?? []
@@ -115,12 +115,12 @@ public struct MessageModel: Decodable {
 public struct IDNamePair: Decodable {
     public let id: Int
     public let name: String
-
+    
     public init(id: Int, name: String) {
         self.id = id
         self.name = name
     }
-
+    
     public init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
         id = try container.decode(Int.self)

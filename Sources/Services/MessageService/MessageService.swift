@@ -198,7 +198,12 @@ public class MessagesServer {
     
     private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
         var domain: [[Any]] = [["message_type", "in", ["email", "comment"]]]
-        // Include domain logic based on the request type
+        
+        // Добавляем условие по id, если comparisonOperator не равен "not in"
+        if request.comparisonOperator != "not in" {
+            domain.append(["id", request.comparisonOperator, request.messageId])
+        }
+        
         return domain
     }
 }
@@ -263,13 +268,9 @@ public struct OdooResponse<T: Decodable>: Decodable {
     let result: T
 }
 
-import Foundation
-
 public struct MessageResponseDataWithoutLength: Decodable {
     let records: [MessageModel]
 }
-
-import Foundation
 
 public struct MessageResponseDataWithLength: Decodable {
     let length: Int
