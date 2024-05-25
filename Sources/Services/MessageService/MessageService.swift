@@ -84,12 +84,13 @@ public class MessagesServer {
         
         // Добавляем условия для поиска
         if let requestText = request.requestText, !requestText.isEmpty {
-            domain.append(["|", "|", "|",
-                           ["body", "ilike", requestText],
-                           ["subject", "ilike", requestText],
-                           ["author_id.display_name", "ilike", requestText],
-                           ["partner_ids.display_name", "ilike", requestText]
-            ])
+            let searchConditions: [[Any]] = [
+                ["body", "ilike", requestText],
+                ["subject", "ilike", requestText],
+                ["author_id", "ilike", requestText],
+                ["partner_ids", "ilike", requestText]
+            ]
+            domain.append(contentsOf: searchConditions.flatMap { [["|"]] + $0 })
         }
         
         return domain
