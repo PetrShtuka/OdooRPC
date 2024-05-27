@@ -16,25 +16,19 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-
-                    // Debug log for JSON response
                     print("JSON Response: \(jsonResponse)")
 
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
-                        // Handle the error structure
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
                         let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
                         completion(.failure(error))
                     } else {
                         let decoder = JSONDecoder()
-
-                        // Try to decode with length first
                         do {
                             let response = try decoder.decode(OdooResponse<MessageResponseDataWithLength>.self, from: data)
                             completion(.success(response.result.records))
                         } catch {
-                            // If failed, try to decode without length
                             let response = try decoder.decode(OdooResponse<MessageResponseDataWithoutLength>.self, from: data)
                             completion(.success(response.result.records))
                         }
@@ -48,10 +42,46 @@ public class MessagesServer {
         }
     }
 
+    public func fetchExistingMessageIDs(localMessagesID: [Int], completion: @escaping (Result<[Int], Error>) -> Void) {
+        let endpoint = "/web/dataset/search_read"
+        let params: [String: Any] = [
+            "model": "mail.message",
+            "domain": [["id", "in", localMessagesID]],
+            "fields": ["id"]
+        ]
+
+        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                    print("JSON Response: \(jsonResponse)")
+
+                    if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
+                        let errorMessage = errorData["message"] as? String ?? "Unknown error"
+                        let errorCode = errorData["code"] as? Int ?? -1
+                        let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+                        completion(.failure(error))
+                    } else if let jsonResponse = jsonResponse as? [String: Any], let records = jsonResponse["records"] as? [[String: Any]] {
+                        let ids = records.compactMap { $0["id"] as? Int }
+                        completion(.success(ids))
+                    } else {
+                        completion(.failure(NSError(domain: "InvalidResponse", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response from server"])))
+                    }
+                } catch {
+                    completion(.failure(error))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+}
+    
     private func buildParams(for request: MessageFetchRequest) -> [String: Any] {
         let domain = createDomain(for: request)
         let fields = request.selectedFields.map { $0.rawValue }.filter { $0 != "is_error" } // Исключаем недопустимое поле
-
+        
         return [
             "model": "mail.message",
             "domain": domain,
@@ -66,33 +96,33 @@ public class MessagesServer {
             ]
         ]
     }
-
+    
     private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
         var domain: [[Any]] = []
         
         let messageType: [Any] = ["message_type", "in", ["email", "comment"]]
         let idNotInLocalIds: [Any] = ["id", "not in", request.localMessagesID ?? []]
-
+        
         domain.append(messageType)
         domain.append(idNotInLocalIds)
-
+        
         if let requestText = request.requestText, !requestText.isEmpty {
-                 switch request.selectFilter {
-                 case .subject:
-                     domain.append(["subject", "ilike", requestText])
-                 case .content:
-                     domain.append(["body", "ilike", requestText])
-                 case .author:
-                     domain.append(["author_id", "ilike", requestText])
-                 case .recipients:
-                     domain.append(["partner_ids", "ilike", requestText])
-                 case .none:
-                     break
-                 }
-             }
+            switch request.selectFilter {
+            case .subject:
+                domain.append(["subject", "ilike", requestText])
+            case .content:
+                domain.append(["body", "ilike", requestText])
+            case .author:
+                domain.append(["author_id", "ilike", requestText])
+            case .recipients:
+                domain.append(["partner_ids", "ilike", requestText])
+            case .none:
+                break
+            }
+        }
         return domain
     }
-}
+
 
 public enum MailboxOperation {
     case sharedInbox, search, archive, bin, outbox
@@ -132,7 +162,7 @@ public struct MessageFetchRequest {
     public var timeZone: String
     public var uid: Int
     public var selectFilter: FilterTypeMessage = .none
-
+    
     public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int, selectFilter: FilterTypeMessage = .none) {
         self.operation = operation
         self.messageId = messageId
