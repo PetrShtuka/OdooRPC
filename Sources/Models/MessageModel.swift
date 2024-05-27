@@ -57,6 +57,32 @@ public struct MessageModel: Decodable {
         case subtypeID = "subtype_id"
     }
     
+    public init(id: Int, authorDisplay: String, authorID: IDNamePair?, date: String, resID: Int, needaction: Bool, active: Bool, subject: String?, partnerIDs: [Int], parentID: IDNamePair?, body: String, recordName: String?, emailFrom: String, displayName: String, deleteUID: Bool, model: String, authorAvatar: String?, starred: Bool, attachmentIDs: [Int], refPartnerIDs: [Int], subtypeID: [Int?], isAuthorIDBool: Bool) {
+           self.id = id
+           self.authorDisplay = authorDisplay
+           self.authorID = authorID
+           self.date = date
+           self.resID = resID
+           self.needaction = needaction
+           self.active = active
+           self.subject = subject
+           self.partnerIDs = partnerIDs
+           self.parentID = parentID
+           self.body = body
+           self.recordName = recordName
+           self.emailFrom = emailFrom
+           self.displayName = displayName
+           self.deleteUID = deleteUID
+           self.model = model
+           self.authorAvatar = authorAvatar
+           self.starred = starred
+           self.attachmentIDs = attachmentIDs
+           self.refPartnerIDs = refPartnerIDs
+           self.subtypeID = subtypeID
+           self.isAuthorIDBool = isAuthorIDBool
+       }
+       
+    
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)
