@@ -62,7 +62,9 @@ public class MessagesServer {
                         let errorCode = errorData["code"] as? Int ?? -1
                         let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
                         completion(.failure(error))
-                    } else if let jsonResponse = jsonResponse as? [String: Any], let records = jsonResponse["records"] as? [[String: Any]] {
+                    } else if let jsonResponse = jsonResponse as? [String: Any],
+                              let result = jsonResponse["result"] as? [String: Any],
+                              let records = result["records"] as? [[String: Any]] {
                         let ids = records.compactMap { $0["id"] as? Int }
                         completion(.success(ids))
                     } else {
@@ -76,6 +78,7 @@ public class MessagesServer {
             }
         }
     }
+
 }
     
     private func buildParams(for request: MessageFetchRequest) -> [String: Any] {
