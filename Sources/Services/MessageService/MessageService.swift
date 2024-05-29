@@ -41,6 +41,40 @@ public class MessagesServer {
             }
         }
     }
+    
+    public func deleteMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
+           let endpoint = "/web/dataset/call_kw"
+           let method = type == .bin ? "undelete" : "unlink_pro"
+           let params: [String: Any] = [
+               "model": "mail.message",
+               "method": method,
+               "args": [messageIDs],
+               "kwargs": ["context": [Any]()]
+           ]
+
+           rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+               switch result {
+               case .success(let data):
+                   do {
+                       let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                       print("JSON Response: \(jsonResponse)")
+
+                       if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
+                           let errorMessage = errorData["message"] as? String ?? "Unknown error"
+                           let errorCode = errorData["code"] as? Int ?? -1
+                           let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+                           completion(.failure(error))
+                       } else {
+                           completion(.success(true))
+                       }
+                   } catch {
+                       completion(.failure(error))
+                   }
+               case .failure(let error):
+                   completion(.failure(error))
+               }
+           }
+       }
 
     public func fetchExistingMessageIDs(localMessagesID: [Int], completion: @escaping (Result<[Int], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
