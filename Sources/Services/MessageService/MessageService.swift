@@ -78,10 +78,9 @@ public class MessagesServer {
     
     public func archiveMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
            let endpoint = "/web/dataset/call_kw"
-           let method = type == .archive ? "archive" : "archive"
            let params: [String: Any] = [
                "model": "mail.message",
-               "method": method,
+               "method": "archive",
                "args": [messageIDs],
                "kwargs": ["context": [Any]()]
            ]
