@@ -7,6 +7,23 @@
 
 import Foundation
 
+public enum SubtypeID: Decodable {
+    case int(Int)
+    case string(String)
+    case none
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let intValue = try? container.decode(Int.self) {
+            self = .int(intValue)
+        } else if let stringValue = try? container.decode(String.self) {
+            self = .string(stringValue)
+        } else {
+            self = .none
+        }
+    }
+}
+
 public struct MessageModel: Decodable {
     public let id: Int
     public let authorDisplay: String
@@ -28,9 +45,8 @@ public struct MessageModel: Decodable {
     public let starred: Bool
     public var attachmentIDs: [Int]
     public var refPartnerIDs: [Int]
-    public var subtypeID: [Int?]
+    public var subtypeID: [SubtypeID] // Обновлено поле
     
-    // Новое поле для хранения информации о типе authorID
     public let isAuthorIDBool: Bool
     
     enum CodingKeys: String, CodingKey {
@@ -57,7 +73,7 @@ public struct MessageModel: Decodable {
         case subtypeID = "subtype_id"
     }
     
-    public init(id: Int, authorDisplay: String, authorID: IDNamePair?, date: String, resID: Int, needaction: Bool, active: Bool, subject: String?, partnerIDs: [Int], parentID: IDNamePair?, body: String, recordName: String?, emailFrom: String, displayName: String, deleteUID: Bool, model: String, authorAvatar: String?, starred: Bool, attachmentIDs: [Int], refPartnerIDs: [Int], subtypeID: [Int?], isAuthorIDBool: Bool) {
+    public init(id: Int, authorDisplay: String, authorID: IDNamePair?, date: String, resID: Int, needaction: Bool, active: Bool, subject: String?, partnerIDs: [Int], parentID: IDNamePair?, body: String, recordName: String?, emailFrom: String, displayName: String, deleteUID: Bool, model: String, authorAvatar: String?, starred: Bool, attachmentIDs: [Int], refPartnerIDs: [Int], subtypeID: [SubtypeID], isAuthorIDBool: Bool) {
            self.id = id
            self.authorDisplay = authorDisplay
            self.authorID = authorID
@@ -81,7 +97,6 @@ public struct MessageModel: Decodable {
            self.subtypeID = subtypeID
            self.isAuthorIDBool = isAuthorIDBool
        }
-       
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -138,7 +153,7 @@ public struct MessageModel: Decodable {
         starred = try container.decode(Bool.self, forKey: .starred)
         attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
         refPartnerIDs = try container.decodeIfPresent([Int].self, forKey: .refPartnerIDs) ?? []
-        subtypeID = try container.decodeIfPresent([Int?].self, forKey: .subtypeID) ?? []
+        subtypeID = try container.decodeIfPresent([SubtypeID].self, forKey: .subtypeID) ?? []
         
         // Попытка декодирования authorID с учетом возможного типа Bool
         do {
