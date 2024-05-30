@@ -250,6 +250,7 @@ public enum MessageField: String, CaseIterable {
     case id
     case subject
     case authorDisplay = "author_display"
+    case subtypeID = "subtype_id"
 }
 
 public struct MessageFetchRequest {
