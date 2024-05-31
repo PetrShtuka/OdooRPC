@@ -4,6 +4,7 @@
 //
 //  Created by Peter on 13.04.2024.
 //
+
 import Foundation
 
 public struct IDNamePair: Decodable {
@@ -119,8 +120,9 @@ public struct MessageModel: Decodable {
 
         // Декодирование subtypeID с учетом отсутствия или неправильного формата
         if var subtypeIDContainer = try? container.nestedUnkeyedContainer(forKey: .subtypeID) {
-            if let id = try? subtypeIDContainer.decode(Int.self),
-               let name = try? subtypeIDContainer.decode(String.self) {
+            let id = try? subtypeIDContainer.decode(Int.self)
+            let name = try? subtypeIDContainer.decode(String.self)
+            if let id = id, let name = name {
                 subtypeID = (id, name)
             } else {
                 subtypeID = nil
