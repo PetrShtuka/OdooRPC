@@ -104,7 +104,15 @@ public struct MessageModel: Decodable {
         resID = try container.decode(Int.self, forKey: .resID)
         needaction = try container.decode(Bool.self, forKey: .needaction)
         active = try container.decode(Bool.self, forKey: .active)
-        subject = try container.decodeIfPresent(String.self, forKey: .subject)
+        
+        // Декодирование поля subject
+        do {
+            subject = try container.decodeIfPresent(String.self, forKey: .subject)
+        } catch {
+            print("Ошибка декодирования subject: \(error.localizedDescription), path: \(container.codingPath)")
+            throw error
+        }
+        
         partnerIDs = try container.decode([Int].self, forKey: .partnerIDs)
         parentID = try? container.decode(IDNamePair.self, forKey: .parentID)
         body = try container.decode(String.self, forKey: .body)
