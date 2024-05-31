@@ -4,23 +4,21 @@
 //
 //  Created by Peter on 13.04.2024.
 //
-
 import Foundation
 
-public enum SubtypeID: Decodable {
-    case int(Int)
-    case string(String)
-    case none
-    
+public struct IDNamePair: Decodable {
+    public let id: Int
+    public let name: String
+
+    public init(id: Int, name: String) {
+        self.id = id
+        self.name = name
+    }
+
     public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        if let intValue = try? container.decode(Int.self) {
-            self = .int(intValue)
-        } else if let stringValue = try? container.decode(String.self) {
-            self = .string(stringValue)
-        } else {
-            self = .none
-        }
+        var container = try decoder.unkeyedContainer()
+        id = try container.decode(Int.self)
+        name = try container.decode(String.self)
     }
 }
 
@@ -45,10 +43,9 @@ public struct MessageModel: Decodable {
     public let starred: Bool
     public var attachmentIDs: [Int]
     public var refPartnerIDs: [Int]
-    public var subtypeID: [SubtypeID] // Обновлено поле
-    
+    public var subtypeID: (Int, String)?
     public let isAuthorIDBool: Bool
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case authorDisplay = "author_display"
@@ -72,32 +69,32 @@ public struct MessageModel: Decodable {
         case refPartnerIDs = "ref_partner_ids"
         case subtypeID = "subtype_id"
     }
-    
-    public init(id: Int, authorDisplay: String, authorID: IDNamePair?, date: String, resID: Int, needaction: Bool, active: Bool, subject: String?, partnerIDs: [Int], parentID: IDNamePair?, body: String, recordName: String?, emailFrom: String, displayName: String, deleteUID: Bool, model: String, authorAvatar: String?, starred: Bool, attachmentIDs: [Int], refPartnerIDs: [Int], subtypeID: [SubtypeID], isAuthorIDBool: Bool) {
-           self.id = id
-           self.authorDisplay = authorDisplay
-           self.authorID = authorID
-           self.date = date
-           self.resID = resID
-           self.needaction = needaction
-           self.active = active
-           self.subject = subject
-           self.partnerIDs = partnerIDs
-           self.parentID = parentID
-           self.body = body
-           self.recordName = recordName
-           self.emailFrom = emailFrom
-           self.displayName = displayName
-           self.deleteUID = deleteUID
-           self.model = model
-           self.authorAvatar = authorAvatar
-           self.starred = starred
-           self.attachmentIDs = attachmentIDs
-           self.refPartnerIDs = refPartnerIDs
-           self.subtypeID = subtypeID
-           self.isAuthorIDBool = isAuthorIDBool
-       }
-    
+
+    public init(id: Int, authorDisplay: String, authorID: IDNamePair?, date: String, resID: Int, needaction: Bool, active: Bool, subject: String?, partnerIDs: [Int], parentID: IDNamePair?, body: String, recordName: String?, emailFrom: String, displayName: String, deleteUID: Bool, model: String, authorAvatar: String?, starred: Bool, attachmentIDs: [Int], refPartnerIDs: [Int], subtypeID: (Int, String)?, isAuthorIDBool: Bool) {
+        self.id = id
+        self.authorDisplay = authorDisplay
+        self.authorID = authorID
+        self.date = date
+        self.resID = resID
+        self.needaction = needaction
+        self.active = active
+        self.subject = subject
+        self.partnerIDs = partnerIDs
+        self.parentID = parentID
+        self.body = body
+        self.recordName = recordName
+        self.emailFrom = emailFrom
+        self.displayName = displayName
+        self.deleteUID = deleteUID
+        self.model = model
+        self.authorAvatar = authorAvatar
+        self.starred = starred
+        self.attachmentIDs = attachmentIDs
+        self.refPartnerIDs = refPartnerIDs
+        self.subtypeID = subtypeID
+        self.isAuthorIDBool = isAuthorIDBool
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)
@@ -106,55 +103,32 @@ public struct MessageModel: Decodable {
         resID = try container.decode(Int.self, forKey: .resID)
         needaction = try container.decode(Bool.self, forKey: .needaction)
         active = try container.decode(Bool.self, forKey: .active)
-        
-        // Попытка декодирования subject
-        do {
-            subject = try container.decodeIfPresent(String.self, forKey: .subject)
-        } catch DecodingError.typeMismatch {
-            subject = nil
-        }
-        
+        subject = try container.decodeIfPresent(String.self, forKey: .subject)
         partnerIDs = try container.decode([Int].self, forKey: .partnerIDs)
-        
-        // Попытка декодирования parentID
-        do {
-            if var parentArrayContainer = try? container.nestedUnkeyedContainer(forKey: .parentID) {
-                let id = try parentArrayContainer.decode(Int.self)
-                let name = try parentArrayContainer.decode(String.self)
-                parentID = IDNamePair(id: id, name: name)
-            } else {
-                parentID = nil
-            }
-        } catch {
-            parentID = nil
-        }
-        
+        parentID = try? container.decode(IDNamePair.self, forKey: .parentID)
         body = try container.decode(String.self, forKey: .body)
-        
-        // Попытка декодирования recordName
-        do {
-            recordName = try container.decodeIfPresent(String.self, forKey: .recordName)
-        } catch DecodingError.typeMismatch {
-            recordName = nil
-        }
-        
+        recordName = try container.decodeIfPresent(String.self, forKey: .recordName)
         emailFrom = try container.decode(String.self, forKey: .emailFrom)
         displayName = try container.decode(String.self, forKey: .displayName)
         deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
         model = try container.decode(String.self, forKey: .model)
-        
-        // Попытка декодирования authorAvatar
-        do {
-            authorAvatar = try container.decodeIfPresent(String.self, forKey: .authorAvatar)
-        } catch DecodingError.typeMismatch {
-            authorAvatar = nil
-        }
-        
+        authorAvatar = try container.decodeIfPresent(String.self, forKey: .authorAvatar)
         starred = try container.decode(Bool.self, forKey: .starred)
         attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
         refPartnerIDs = try container.decodeIfPresent([Int].self, forKey: .refPartnerIDs) ?? []
-        subtypeID = try container.decodeIfPresent([SubtypeID].self, forKey: .subtypeID) ?? []
-        
+
+        // Декодирование subtypeID с учетом отсутствия или неправильного формата
+        if var subtypeIDContainer = try? container.nestedUnkeyedContainer(forKey: .subtypeID) {
+            if let id = try? subtypeIDContainer.decode(Int.self),
+               let name = try? subtypeIDContainer.decode(String.self) {
+                subtypeID = (id, name)
+            } else {
+                subtypeID = nil
+            }
+        } else {
+            subtypeID = nil
+        }
+
         // Попытка декодирования authorID с учетом возможного типа Bool
         do {
             authorID = try container.decode(IDNamePair.self, forKey: .authorID)
@@ -163,21 +137,5 @@ public struct MessageModel: Decodable {
             isAuthorIDBool = (try container.decodeIfPresent(Bool.self, forKey: .authorID)) ?? false
             authorID = nil
         }
-    }
-}
-
-public struct IDNamePair: Decodable {
-    public let id: Int
-    public let name: String
-    
-    public init(id: Int, name: String) {
-        self.id = id
-        self.name = name
-    }
-    
-    public init(from decoder: Decoder) throws {
-        var container = try decoder.unkeyedContainer()
-        id = try container.decode(Int.self)
-        name = try container.decode(String.self)
     }
 }
