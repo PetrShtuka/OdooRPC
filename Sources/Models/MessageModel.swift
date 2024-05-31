@@ -95,6 +95,10 @@ public struct MessageModel: Decodable {
         self.subtypeID = subtypeID
         self.isAuthorIDBool = isAuthorIDBool
     }
+    
+    static func == (lhs: MessageModel, rhs: MessageModel) -> Bool {
+          return lhs.id == rhs.id
+      }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
