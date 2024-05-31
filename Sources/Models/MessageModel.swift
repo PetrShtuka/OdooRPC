@@ -105,12 +105,13 @@ public struct MessageModel: Decodable {
         needaction = try container.decode(Bool.self, forKey: .needaction)
         active = try container.decode(Bool.self, forKey: .active)
         
-        // Декодирование поля subject
-        do {
-            subject = try container.decodeIfPresent(String.self, forKey: .subject)
-        } catch {
-            print("Ошибка декодирования subject: \(error.localizedDescription), path: \(container.codingPath)")
-            throw error
+        // Декодирование поля subject с обработкой типа Bool
+        if let stringSubject = try? container.decode(String.self, forKey: .subject) {
+            subject = stringSubject
+        } else if let boolSubject = try? container.decode(Bool.self, forKey: .subject) {
+            subject = boolSubject ? "true" : "false"
+        } else {
+            subject = nil
         }
         
         partnerIDs = try container.decode([Int].self, forKey: .partnerIDs)
