@@ -23,7 +23,7 @@ public struct IDNamePair: Decodable {
     }
 }
 
-public struct MessageModel: Decodable {
+public struct MessageModel: Decodable, Equatable {
     public let id: Int
     public let authorDisplay: String
     public let authorID: IDNamePair?
@@ -96,7 +96,7 @@ public struct MessageModel: Decodable {
         self.isAuthorIDBool = isAuthorIDBool
     }
     
-    static func == (lhs: MessageModel, rhs: MessageModel) -> Bool {
+    public static func == (lhs: MessageModel, rhs: MessageModel) -> Bool {
           return lhs.id == rhs.id
       }
 
