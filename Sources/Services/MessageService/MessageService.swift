@@ -235,9 +235,7 @@ private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
     return domain
 }
 
-
-
-public enum MailboxOperation {
+public enum MailboxOperation: String {
     case sharedInbox, search, archive, bin, outbox
 }
 
