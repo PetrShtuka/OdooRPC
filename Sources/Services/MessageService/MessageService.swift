@@ -200,31 +200,41 @@ public class MessagesServer {
         ]
     }
     
-    private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
-        var domain: [[Any]] = []
-        
-        let messageType: [Any] = ["message_type", "in", ["email", "comment"]]
-        let idNotInLocalIds: [Any] = ["id", "not in", request.localMessagesID ?? []]
-        
-        domain.append(messageType)
-        domain.append(idNotInLocalIds)
-        
-        if let requestText = request.requestText, !requestText.isEmpty {
-            switch request.selectFilter {
-            case .subject:
-                domain.append(["subject", "ilike", requestText])
-            case .content:
-                domain.append(["body", "ilike", requestText])
-            case .author:
-                domain.append(["author_id", "ilike", requestText])
-            case .recipients:
-                domain.append(["partner_ids", "ilike", requestText])
-            case .none:
-                break
-            }
-        }
-        return domain
+private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
+    var domain: [[Any]] = []
+    
+    let messageType: [Any] = ["message_type", "in", ["email", "comment"]]
+    let idNotInLocalIds: [Any] = ["id", "not in", request.localMessagesID ?? []]
+    
+    domain.append(messageType)
+    domain.append(idNotInLocalIds)
+    
+    if let isActive = request.isActive {
+        domain.append(["active", "=", isActive])
     }
+    
+    if let isNotDeleted = request.isNotDeleted {
+        domain.append(["delete_uid", "!=", isNotDeleted])
+    }
+    
+    if let requestText = request.requestText, !requestText.isEmpty {
+        switch request.selectFilter {
+        case .subject:
+            domain.append(["subject", "ilike", requestText])
+        case .content:
+            domain.append(["body", "ilike", requestText])
+        case .author:
+            domain.append(["author_id", "ilike", requestText])
+        case .recipients:
+            domain.append(["partner_ids", "ilike", requestText])
+        case .none:
+            break
+        }
+    }
+    
+    return domain
+}
+
 
 
 public enum MailboxOperation {
@@ -266,8 +276,10 @@ public struct MessageFetchRequest {
     public var timeZone: String
     public var uid: Int
     public var selectFilter: FilterTypeMessage = .none
+    public var isActive: Bool?
+    public var isNotDeleted: Bool?
     
-    public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int, selectFilter: FilterTypeMessage = .none) {
+    public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int, selectFilter: FilterTypeMessage = .none, isActive: Bool? = nil, isNotDeleted: Bool? = nil) {
         self.operation = operation
         self.messageId = messageId
         self.limit = limit
@@ -280,6 +292,8 @@ public struct MessageFetchRequest {
         self.timeZone = timeZone
         self.uid = uid
         self.selectFilter = selectFilter
+        self.isActive = isActive
+        self.isNotDeleted = isNotDeleted
     }
 }
 
