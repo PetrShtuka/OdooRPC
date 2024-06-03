@@ -156,7 +156,7 @@ public struct MessageModel: Decodable, Equatable {
 }
 
 extension MessageModel {
-    func withDeleteUID(_ deleteUID: Bool) -> MessageModel {
+    public func withDeleteUID(_ deleteUID: Bool) -> MessageModel {
         return MessageModel(
             id: self.id,
             authorDisplay: self.authorDisplay,
@@ -183,7 +183,7 @@ extension MessageModel {
         )
     }
     
-    func withActive(_ active: Bool) -> MessageModel {
+    public func withActive(_ active: Bool) -> MessageModel {
         return MessageModel(
             id: self.id,
             authorDisplay: self.authorDisplay,
