@@ -8,13 +8,17 @@
 import Foundation
 
 public struct ModelOdoo: Decodable {
-    public let userId: Int
     public let modelId: Int
     public let model: String
     public let name: String
     
+    public init(userId: Int, modelId: Int, model: String, name: String) {
+        self.modelId = modelId
+        self.model = model
+        self.name = name
+    }
+    
     enum CodingKeys: String, CodingKey {
-        case userId = "user_id"
         case modelId = "id"
         case model
         case name
