@@ -8,10 +8,10 @@
 import Foundation
 
 public struct ModelOdoo: Decodable {
-    let userId: Int
-    let modelId: Int
-    let model: String
-    let name: String
+    public let userId: Int
+    public let modelId: Int
+    public let model: String
+    public let name: String
     
     enum CodingKeys: String, CodingKey {
         case userId = "user_id"
