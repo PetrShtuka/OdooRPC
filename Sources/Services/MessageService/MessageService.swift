@@ -53,13 +53,14 @@ public class MessagesServer {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
                     print("JSON Response: \(jsonResponse)")
                     
-                    if let moduleNames = jsonResponse as? [String] {
-                        // Создаем модели для каждого имени модуля
+                    if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                       let moduleNames = jsonResponse["result"] as? [String] {
                         let modules = moduleNames.map { ModelOdoo(name: $0) }
                         completion(.success(modules))
                     } else {
                         completion(.failure(NSError(domain: "InvalidResponse", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response from server"])))
                     }
+
                 } catch {
                     completion(.failure(error))
                 }
