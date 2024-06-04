@@ -12,7 +12,7 @@ public struct ModelOdoo: Decodable {
     public let model: String
     public let name: String
     
-    public init(userId: Int, modelId: Int, model: String, name: String) {
+    public init(modelId: Int, model: String, name: String) {
         self.modelId = modelId
         self.model = model
         self.name = name
