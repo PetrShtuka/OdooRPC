@@ -42,6 +42,37 @@ public class MessagesServer {
         }
     }
     
+    public func fetchModules(request: MessageFetchRequest, completion: @escaping (Result<[ModelOdoo], Error>) -> Void) {
+            let endpoint = "/web/session/modules"
+            let params: [String: Any] = [:]
+
+            rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+                switch result {
+                case .success(let data):
+                    do {
+                        let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                        print("JSON Response: \(jsonResponse)")
+
+                        if let jsonResponse = jsonResponse as? [String: Any],
+                           let results = jsonResponse["records"] as? [[String: Any]] {
+                            
+                            let jsonData = try JSONSerialization.data(withJSONObject: results, options: [])
+                            let decoder = JSONDecoder()
+                            let modules = try decoder.decode([ModelOdoo].self, from: jsonData)
+                            
+                            completion(.success(modules))
+                        } else {
+                            completion(.failure(NSError(domain: "InvalidResponse", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response from server"])))
+                        }
+                    } catch {
+                        completion(.failure(error))
+                    }
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        }
+    
     public func deleteMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
            let endpoint = "/web/dataset/call_kw"
            let method = type == .bin ? "undelete" : "unlink_pro"
