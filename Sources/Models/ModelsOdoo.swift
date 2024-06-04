@@ -7,20 +7,20 @@
 
 import Foundation
 
-public struct ModelOdoo: Decodable {
-    public let modelId: Int
-    public let model: String
+public struct ModelOdoo {
     public let name: String
     
-    public init(modelId: Int, model: String, name: String) {
-        self.modelId = modelId
-        self.model = model
+    public init(name: String) {
         self.name = name
     }
     
-    enum CodingKeys: String, CodingKey {
-        case modelId = "id"
-        case model
-        case name
-    }
+//    enum CodingKeys: String, CodingKey {
+//        case modelId = "id"
+//        case model
+//        case name
+//    }
+}
+
+struct ModulesResponse: Decodable {
+    let result: [String]
 }
