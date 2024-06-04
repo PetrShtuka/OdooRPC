@@ -42,7 +42,7 @@ public class MessagesServer {
         }
     }
     
-    public func fetchModules(request: MessageFetchRequest, completion: @escaping (Result<[ModelOdoo], Error>) -> Void) {
+    public func fetchModules(completion: @escaping (Result<[ModelOdoo], Error>) -> Void) {
             let endpoint = "/web/session/modules"
             let params: [String: Any] = [:]
 
