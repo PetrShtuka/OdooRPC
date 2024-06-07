@@ -13,12 +13,6 @@ public struct ModelOdoo {
     public init(name: String) {
         self.name = name
     }
-    
-//    enum CodingKeys: String, CodingKey {
-//        case modelId = "id"
-//        case model
-//        case name
-//    }
 }
 
 struct ModulesResponse: Decodable {

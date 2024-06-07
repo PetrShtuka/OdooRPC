@@ -24,28 +24,28 @@ public struct IDNamePair: Decodable {
 }
 
 public struct MessageModel: Decodable, Equatable {
-    public let id: Int
-    public let authorDisplay: String
-    public let authorID: IDNamePair?
-    public let date: String
-    public let resID: Int
-    public let needaction: Bool
-    public let active: Bool
-    public let subject: String?
-    public let partnerIDs: [Int]
-    public let parentID: IDNamePair?
-    public let body: String
-    public let recordName: String?
-    public let emailFrom: String
-    public let displayName: String
-    public let deleteUID: Bool
-    public let model: String
-    public let authorAvatar: String?
-    public let starred: Bool
+    public var id: Int
+    public var authorDisplay: String
+    public var authorID: IDNamePair?
+    public var date: String
+    public var resID: Int
+    public var needaction: Bool
+    public var active: Bool
+    public var subject: String?
+    public var partnerIDs: [Int]
+    public var parentID: IDNamePair?
+    public var body: String
+    public var recordName: String?
+    public var emailFrom: String
+    public var displayName: String
+    public var deleteUID: Bool
+    public var model: String
+    public var authorAvatar: String?
+    public var starred: Bool
     public var attachmentIDs: [Int]
     public var refPartnerIDs: [Int]
     public var subtypeID: (Int, String)?
-    public let isAuthorIDBool: Bool
+    public var isAuthorIDBool: Bool
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -97,8 +97,8 @@ public struct MessageModel: Decodable, Equatable {
     }
     
     public static func == (lhs: MessageModel, rhs: MessageModel) -> Bool {
-          return lhs.id == rhs.id
-      }
+        return lhs.id == rhs.id
+    }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -109,7 +109,6 @@ public struct MessageModel: Decodable, Equatable {
         needaction = try container.decode(Bool.self, forKey: .needaction)
         active = try container.decode(Bool.self, forKey: .active)
         
-        // Декодирование поля subject с обработкой типа Bool
         if let stringSubject = try? container.decode(String.self, forKey: .subject) {
             subject = stringSubject
         } else if let boolSubject = try? container.decode(Bool.self, forKey: .subject) {
@@ -131,7 +130,6 @@ public struct MessageModel: Decodable, Equatable {
         attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
         refPartnerIDs = try container.decodeIfPresent([Int].self, forKey: .refPartnerIDs) ?? []
 
-        // Декодирование subtypeID с учетом отсутствия или неправильного формата
         if var subtypeIDContainer = try? container.nestedUnkeyedContainer(forKey: .subtypeID) {
             let id = try? subtypeIDContainer.decode(Int.self)
             let name = try? subtypeIDContainer.decode(String.self)
@@ -144,7 +142,6 @@ public struct MessageModel: Decodable, Equatable {
             subtypeID = nil
         }
 
-        // Попытка декодирования authorID с учетом возможного типа Bool
         do {
             authorID = try container.decode(IDNamePair.self, forKey: .authorID)
             isAuthorIDBool = false
