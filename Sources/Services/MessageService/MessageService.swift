@@ -287,6 +287,7 @@ public enum MessageField: String, CaseIterable {
     case subject
     case authorDisplay = "author_display"
     case subtypeID = "subtype_id"
+    case attachmentIDs = "attachment_ids"
 }
 
 public struct MessageFetchRequest {
