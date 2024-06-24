@@ -12,7 +12,14 @@ public struct ResponseWrapper: Decodable {
     public var result: UserData
 }
 
-public struct UserData: Decodable {
+public struct UserData: Equatable, Decodable {
+    
+    public static func == (lhs: UserData, rhs: UserData) -> Bool {
+        return lhs.uid == rhs.uid &&
+               lhs.name == rhs.name &&
+        lhs.partnerID?.id == rhs.partnerID?.id
+    }
+    
     public var uid: Int?
     public var name: String?
     public var sessionToken: String?
