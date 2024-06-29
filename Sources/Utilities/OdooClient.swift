@@ -32,4 +32,5 @@ public class OdooClient {
     public lazy var databaseService: DatabaseService = DatabaseService(rpcClient: rpcClient)
     public lazy var databaseServiceCetmixCommunicator: CetmixCommunicatorService = CetmixCommunicatorService(rpcClient: rpcClient)
     public lazy var moduleServiceOdoo: ModuleService = ModuleService(rpcClient: rpcClient)
+    public lazy var contactsService: ContactsService = ContactsService(rpcClient: rpcClient)
 }
