@@ -7,28 +7,28 @@
 
 import Foundation
 
-struct PartnerModel: Decodable {
-    let id: Int
-    let avatar: String?
-    let displayName: String
-    let email: String?
-    let country: String?
-    let street: String?
-    let zip: Int?
-    let city: String?
-    let mobile: String?
-    let phone: String?
-    let updateDate: String?
-    let localUserId: Int?
-    let isCompany: Bool
-    let parentId: Int?
-    let childIds: [Int]?
-    let note: String?
-    let name: String
-    let type: String?
-    let street2: String?
+public struct PartnerModel: Decodable {
+   public let id: Int
+   public let avatar: String?
+   public let displayName: String
+   public let email: String?
+   public let country: String?
+   public let street: String?
+   public let zip: Int?
+   public let city: String?
+   public let mobile: String?
+   public let phone: String?
+   public let updateDate: String?
+   public let localUserId: Int?
+   public let isCompany: Bool
+   public let parentId: Int?
+   public let childIds: [Int]?
+   public let note: String?
+   public let name: String
+   public let type: String?
+   public let street2: String?
     
-    enum CodingKeys: String, CodingKey {
+    public enum CodingKeys: String, CodingKey {
         case id = "id"
         case avatar = "avatar_128" // Assuming the key from the server is 'avatar_128'
         case displayName = "display_name"
