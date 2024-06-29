@@ -8,6 +8,6 @@
 import Foundation
 
 public enum ContactAction {
-    public case fetch
-    public case search
+    case fetch
+    case search
 }
