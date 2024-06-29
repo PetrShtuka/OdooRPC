@@ -8,16 +8,16 @@
 import Foundation
 
 public struct ContactParameters {
-    var searchName: String = ""
-    var searchEmail: String = ""
-    var idFilter: IDFilterType?
-    var uid: Int
-    var timeZone: String = ""
-    var language: String = ""
-    var limit: Int = 100
-    var serverVersion: Double = 0.0
-    var lastContactId: Int? = nil
-    var customFields: [String]?
-    var additionalParams: [String: Any]?
-    var sessionId: String
+    public var searchName: String = ""
+    public var searchEmail: String = ""
+    public var idFilter: IDFilterType?
+    public var uid: Int
+    public var timeZone: String = ""
+    public var language: String = ""
+    public var limit: Int = 100
+    public var serverVersion: Double = 0.0
+    public var lastContactId: Int? = nil
+    public var customFields: [String]?
+    public var additionalParams: [String: Any]?
+    public var sessionId: String
 }

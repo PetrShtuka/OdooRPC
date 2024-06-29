@@ -8,10 +8,10 @@
 import Foundation
 
 enum IDFilterType {
-    case inFilter([Int])
-    case notInFilter([Int])
+    public case inFilter([Int])
+    public case notInFilter([Int])
     
-    func asDomain() -> [Any] {
+    public func asDomain() -> [Any] {
         switch self {
         case .inFilter(let ids):
             return ["id", "in", ids]
