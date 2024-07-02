@@ -27,7 +27,7 @@ public struct ContactsModel: Codable {
     public var name: String?
     public var lastUpdate: String?  // "__last_update"
 
-    init(id: Int, street: String? = nil, street2: String? = nil, mobile: String? = nil, phone: String? = nil, zip: String? = nil, city: String? = nil, countryId: [Int : String]? = nil, displayName: String? = nil, isCompany: Bool? = nil, parentId: Int? = nil, type: String? = nil, childIds: [Int]? = nil, comment: String? = nil, email: String? = nil, avatar: String? = nil, name: String? = nil, lastUpdate: String? = nil) {
+    public init(id: Int, street: String? = nil, street2: String? = nil, mobile: String? = nil, phone: String? = nil, zip: String? = nil, city: String? = nil, countryId: [Int : String]? = nil, displayName: String? = nil, isCompany: Bool? = nil, parentId: Int? = nil, type: String? = nil, childIds: [Int]? = nil, comment: String? = nil, email: String? = nil, avatar: String? = nil, name: String? = nil, lastUpdate: String? = nil) {
         self.id = id
         self.street = street
         self.street2 = street2
