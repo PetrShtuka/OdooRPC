@@ -10,7 +10,7 @@ import Foundation
 public struct ContactParameters {
     public var searchName: String = ""
     public var searchEmail: String = ""
-    var idFilter: IDFilterType?
+    public var idFilter: IDFilterType?
     public var uid: Int
     public var timeZone: String = ""
     public var language: String = ""

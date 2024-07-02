@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum IDFilterType {
+public enum IDFilterType {
     case inFilter([Int])
     case notInFilter([Int])
     
