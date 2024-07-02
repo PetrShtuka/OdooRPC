@@ -20,4 +20,19 @@ public struct ContactParameters {
     public var customFields: [String]?
     public var additionalParams: [String: Any]?
     public var sessionId: String
+    
+    public init(searchName: String, searchEmail: String, idFilter: IDFilterType? = nil, uid: Int, timeZone: String, language: String, limit: Int, serverVersion: Double, lastContactId: Int? = nil, customFields: [String]? = nil, additionalParams: [String : Any]? = nil, sessionId: String) {
+        self.searchName = searchName
+        self.searchEmail = searchEmail
+        self.idFilter = idFilter
+        self.uid = uid
+        self.timeZone = timeZone
+        self.language = language
+        self.limit = limit
+        self.serverVersion = serverVersion
+        self.lastContactId = lastContactId
+        self.customFields = customFields
+        self.additionalParams = additionalParams
+        self.sessionId = sessionId
+    }
 }
