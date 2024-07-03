@@ -22,8 +22,13 @@ public class ContactsService {
             switch result {
             case .success(let data):
                 do {
-                    let contacts = try JSONDecoder().decode([ContactsModel].self, from: data)
-                    completion(.success(contacts))
+                    // Decode the result array properly
+                    let decodedResult = try JSONDecoder().decode(RPCResponse<[ContactsModel]>.self, from: data)
+                    if let contactsArray = decodedResult.result {
+                        completion(.success(contactsArray))
+                    } else {
+                        completion(.failure(NSError(domain: "No contacts found", code: -1, userInfo: nil)))
+                    }
                 } catch {
                     completion(.failure(error))
                 }
@@ -66,7 +71,6 @@ public class ContactsService {
             "email",
             "name",
             "__last_update",
-            "type",
             determineAvatarField(serverVersion: searchParameters.serverVersion)
         ]
         
@@ -103,4 +107,10 @@ public class ContactsService {
     private func determineAvatarField(serverVersion: Double) -> String {
         return serverVersion >= 15 ? "avatar_128" : "image_small"
     }
+}
+
+struct RPCResponse<T: Decodable>: Decodable {
+    let jsonrpc: String
+    let id: Int
+    let result: T?
 }
