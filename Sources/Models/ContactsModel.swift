@@ -72,12 +72,12 @@ public struct ContactsModel: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)
-        street = try? decodeStringOrBool(container: container, key: .street)
-        street2 = try? decodeStringOrBool(container: container, key: .street2)
-        mobile = try? decodeStringOrBool(container: container, key: .mobile)
-        phone = try? decodeStringOrBool(container: container, key: .phone)
-        zip = try? decodeStringOrBool(container: container, key: .zip)
-        city = try? decodeStringOrBool(container: container, key: .city)
+        street = try decodeStringBoolOrNil(container: container, key: .street)
+        street2 = try decodeStringBoolOrNil(container: container, key: .street2)
+        mobile = try decodeStringBoolOrNil(container: container, key: .mobile)
+        phone = try decodeStringBoolOrNil(container: container, key: .phone)
+        zip = try decodeStringBoolOrNil(container: container, key: .zip)
+        city = try decodeStringBoolOrNil(container: container, key: .city)
         
         if let countryArray = try container.decodeIfPresent([JSONAny].self, forKey: .countryId), countryArray.count == 2, let id = countryArray[0].value as? Int, let name = countryArray[1].value as? String {
             countryId = CountryId(id: id, name: name)
@@ -85,7 +85,7 @@ public struct ContactsModel: Codable {
             countryId = nil
         }
         
-        displayName = try? decodeStringOrBool(container: container, key: .displayName)
+        displayName = try decodeStringBoolOrNil(container: container, key: .displayName)
         isCompany = try container.decodeIfPresent(Bool.self, forKey: .isCompany)
         
         if let parentArray = try container.decodeIfPresent([JSONAny].self, forKey: .parentId), parentArray.count == 2, let id = parentArray[0].value as? Int, let name = parentArray[1].value as? String {
@@ -94,16 +94,16 @@ public struct ContactsModel: Codable {
             parentId = nil
         }
         
-        type = try? decodeStringOrBool(container: container, key: .type)
+        type = try decodeStringBoolOrNil(container: container, key: .type)
         childIds = try container.decodeIfPresent([Int].self, forKey: .childIds)
-        comment = try? decodeStringOrBool(container: container, key: .comment)
-        email = try? decodeStringOrBool(container: container, key: .email)
-        avatar = try? decodeStringOrBool(container: container, key: .avatar)
-        name = try? decodeStringOrBool(container: container, key: .name)
-        lastUpdate = try? decodeStringOrBool(container: container, key: .lastUpdate)
+        comment = try decodeStringBoolOrNil(container: container, key: .comment)
+        email = try decodeStringBoolOrNil(container: container, key: .email)
+        avatar = try decodeStringBoolOrNil(container: container, key: .avatar)
+        name = try decodeStringBoolOrNil(container: container, key: .name)
+        lastUpdate = try decodeStringBoolOrNil(container: container, key: .lastUpdate)
     }
 
-    private func decodeStringOrBool(container: KeyedDecodingContainer<CodingKeys>, key: CodingKeys) throws -> String? {
+    private func decodeStringBoolOrNil(container: KeyedDecodingContainer<CodingKeys>, key: CodingKeys) throws -> String? {
         if let stringValue = try? container.decodeIfPresent(String.self, forKey: key) {
             return stringValue
         } else if let boolValue = try? container.decodeIfPresent(Bool.self, forKey: key) {
