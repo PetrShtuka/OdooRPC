@@ -90,6 +90,8 @@ public struct ContactsModel: Codable {
         
         if let parentArray = try container.decodeIfPresent([JSONAny].self, forKey: .parentId), parentArray.count == 2, let id = parentArray[0].value as? Int, let name = parentArray[1].value as? String {
             parentId = ParentId(id: id, name: name)
+        } else if let parentBool = try? container.decodeIfPresent(Bool.self, forKey: .parentId) {
+            parentId = parentBool ? ParentId(id: 1, name: "true") : ParentId(id: 0, name: "false")
         } else {
             parentId = nil
         }
@@ -108,6 +110,8 @@ public struct ContactsModel: Codable {
             return stringValue
         } else if let boolValue = try? container.decodeIfPresent(Bool.self, forKey: key) {
             return boolValue ? "true" : "false"
+        } else if let arrayValue = try? container.decodeIfPresent([JSONAny].self, forKey: key), arrayValue.count == 2, let id = arrayValue[0].value as? Int, let name = arrayValue[1].value as? String {
+            return "\(id), \(name)"
         }
         return nil
     }
