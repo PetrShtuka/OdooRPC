@@ -73,7 +73,16 @@ public struct ContactsModel: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)
         street = try container.decodeIfPresent(String.self, forKey: .street)
-        street2 = try container.decodeIfPresent(String.self, forKey: .street2)
+        
+        // Custom decoding to handle different types for street2
+        if let street2String = try? container.decodeIfPresent(String.self, forKey: .street2) {
+            street2 = street2String
+        } else if let street2Bool = try? container.decodeIfPresent(Bool.self, forKey: .street2) {
+            street2 = street2Bool ? "true" : "false"
+        } else {
+            street2 = nil
+        }
+        
         mobile = try container.decodeIfPresent(String.self, forKey: .mobile)
         phone = try container.decodeIfPresent(String.self, forKey: .phone)
         zip = try container.decodeIfPresent(String.self, forKey: .zip)
