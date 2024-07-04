@@ -22,9 +22,9 @@ public class ContactsService {
             switch result {
             case .success(let data):
                 do {
-                    // Decode the result array properly
-                    let decodedResult = try JSONDecoder().decode(RPCResponse<[ContactsModel]>.self, from: data)
-                    if let contactsArray = decodedResult.result {
+                    // Decode the result properly
+                    let decodedResponse = try JSONDecoder().decode(RPCResponse<ContactsResult>.self, from: data)
+                    if let contactsArray = decodedResponse.result?.contacts {
                         completion(.success(contactsArray))
                     } else {
                         completion(.failure(NSError(domain: "No contacts found", code: -1, userInfo: nil)))
@@ -109,8 +109,12 @@ public class ContactsService {
     }
 }
 
-struct RPCResponse<T: Decodable>: Decodable {
+struct RPCResponse<ResultType: Decodable>: Decodable {
     let jsonrpc: String
-    let id: Int
-    let result: T?
+    let id: Int?
+    let result: ResultType?
+}
+
+struct ContactsResult: Decodable {
+    let contacts: [ContactsModel]
 }
