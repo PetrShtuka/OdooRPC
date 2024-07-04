@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 public struct ContactsModel: Codable {
     public var id: Int
     public var street: String?
@@ -74,38 +72,33 @@ public struct ContactsModel: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)
-        street = try decodeStringOrBool(container: container, key: .street)
-        street2 = try decodeStringOrBool(container: container, key: .street2)
-        mobile = try decodeStringOrBool(container: container, key: .mobile)
-        phone = try decodeStringOrBool(container: container, key: .phone)
-        zip = try decodeStringOrBool(container: container, key: .zip)
-        city = try decodeStringOrBool(container: container, key: .city)
+        street = try decodeSafe(container: container, key: .street)
+        street2 = try decodeSafe(container: container, key: .street2)
+        mobile = try decodeSafe(container: container, key: .mobile)
+        phone = try decodeSafe(container: container, key: .phone)
+        zip = try decodeSafe(container: container, key: .zip)
+        city = try decodeSafe(container: container, key: .city)
         
-        if let countryArray = try container.decodeIfPresent([JSONAny].self, forKey: .countryId), countryArray.count == 2, let id = countryArray[0].value as? Int, let name = countryArray[1].value as? String {
+        if let countryArray = try? container.decode([JSONAny].self, forKey: .countryId), countryArray.count == 2, let id = countryArray[0].value as? Int, let name = countryArray[1].value as? String {
             countryId = CountryId(id: id, name: name)
         } else {
             countryId = nil
         }
         
-        displayName = try decodeStringOrBool(container: container, key: .displayName)
+        displayName = try decodeSafe(container: container, key: .displayName)
         isCompany = try container.decodeIfPresent(Bool.self, forKey: .isCompany)
         parentId = try container.decodeIfPresent(ParentIdOrBool.self, forKey: .parentId)
-        type = try decodeStringOrBool(container: container, key: .type)
+        type = try decodeSafe(container: container, key: .type)
         childIds = try container.decodeIfPresent([Int].self, forKey: .childIds)
-        comment = try decodeStringOrBool(container: container, key: .comment)
-        email = try decodeStringOrBool(container: container, key: .email)
-        avatar = try decodeStringOrBool(container: container, key: .avatar)
-        name = try decodeStringOrBool(container: container, key: .name)
-        lastUpdate = try decodeStringOrBool(container: container, key: .lastUpdate)
+        comment = try decodeSafe(container: container, key: .comment)
+        email = try decodeSafe(container: container, key: .email)
+        avatar = try decodeSafe(container: container, key: .avatar)
+        name = try decodeSafe(container: container, key: .name)
+        lastUpdate = try decodeSafe(container: container, key: .lastUpdate)
     }
 
-    private func decodeStringOrBool(container: KeyedDecodingContainer<CodingKeys>, key: CodingKeys) throws -> String? {
-        if let stringValue = try? container.decodeIfPresent(String.self, forKey: key) {
-            return stringValue
-        } else if let boolValue = try? container.decodeIfPresent(Bool.self, forKey: key) {
-            return boolValue ? "true" : "false"
-        }
-        return nil
+    private func decodeSafe<T: Decodable>(container: KeyedDecodingContainer<CodingKeys>, key: CodingKeys) throws -> T? {
+        return try? container.decodeIfPresent(T.self, forKey: key)
     }
 }
 
@@ -128,8 +121,8 @@ public enum ParentIdOrBool: Codable {
         var container = encoder.singleValueContainer()
         switch self {
         case .parentId(let parentId):
-            let encodedArray: [Any] = [parentId.id, parentId.name]
-            try container.encode(encodedArray.map { JSONAny($0) })
+            let encodedArray: [JSONAny] = [JSONAny(parentId.id), JSONAny(parentId.name)]
+            try container.encode(encodedArray)
         case .bool(let boolValue):
             try container.encode(boolValue)
         }
