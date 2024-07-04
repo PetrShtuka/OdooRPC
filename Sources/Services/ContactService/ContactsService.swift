@@ -14,6 +14,29 @@ public class ContactsService {
         self.rpcClient = rpcClient
     }
     
+//    public func loadContacts(action: ContactAction, searchParameters: ContactParameters, completion: @escaping (Result<[ContactsModel], Error>) -> Void) {
+//        let endpoint = (action == .fetch) ? "/web/dataset/call_kw" : "/web/dataset/search_read"
+//        let parameters = buildParameters(for: action, searchParameters: searchParameters)
+//        
+//        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: parameters) { result in
+//            switch result {
+//            case .success(let data):
+//                do {
+//                    // Decode the result array properly
+//                    let decodedResult = try JSONDecoder().decode(RPCResponse<[ContactsModel]>.self, from: data)
+//                    if let contactsArray = decodedResult.result {
+//                        completion(.success(contactsArray))
+//                    } else {
+//                        completion(.failure(NSError(domain: "No contacts found", code: -1, userInfo: nil)))
+//                    }
+//                } catch {
+//                    completion(.failure(error))
+//                }
+//            case .failure(let error):
+//                completion(.failure(error))
+//            }
+//        }
+//    }
     public func loadContacts(action: ContactAction, searchParameters: ContactParameters, completion: @escaping (Result<[ContactsModel], Error>) -> Void) {
         let endpoint = (action == .fetch) ? "/web/dataset/call_kw" : "/web/dataset/search_read"
         let parameters = buildParameters(for: action, searchParameters: searchParameters)
@@ -22,21 +45,37 @@ public class ContactsService {
             switch result {
             case .success(let data):
                 do {
-                    // Decode the result properly
-                    let decodedResponse = try JSONDecoder().decode(RPCResponse<ContactsResult>.self, from: data)
-                    if let contactsArray = decodedResponse.result?.contacts {
+                    // Попытка декодировать как массив
+                    let decodedArrayResponse = try JSONDecoder().decode(RPCResponseArray<ContactsModel>.self, from: data)
+                    if let contactsArray = decodedArrayResponse.result {
                         completion(.success(contactsArray))
-                    } else {
-                        completion(.failure(NSError(domain: "No contacts found", code: -1, userInfo: nil)))
+                        return
                     }
                 } catch {
+                    // Игнорируем ошибку и попробуем декодировать как объект
+                }
+                
+                do {
+                    // Попытка декодировать как объект
+                    let decodedObjectResponse = try JSONDecoder().decode(RPCResponseObject<ContactsResult>.self, from: data)
+                    if let contactsResult = decodedObjectResponse.result?.contacts {
+                        completion(.success(contactsResult))
+                        return
+                    }
+                } catch {
+                    // Если обе попытки декодирования не удались, возвращаем ошибку
                     completion(.failure(error))
                 }
+                
+                // Если ни один из вариантов не удался
+                completion(.failure(NSError(domain: "Invalid response format", code: -1, userInfo: nil)))
+                
             case .failure(let error):
                 completion(.failure(error))
             }
         }
     }
+
     
     private func buildParameters(for action: ContactAction, searchParameters: ContactParameters) -> [String: Any] {
         var domain: [[Any]] = []
@@ -109,7 +148,19 @@ public class ContactsService {
     }
 }
 
-struct RPCResponse<ResultType: Decodable>: Decodable {
+struct RPCResponse<T: Decodable>: Decodable {
+    let jsonrpc: String
+    let id: Int
+    let result: T?
+}
+
+struct RPCResponseArray<ResultType: Decodable>: Decodable {
+    let jsonrpc: String
+    let id: Int?
+    let result: [ResultType]?
+}
+
+struct RPCResponseObject<ResultType: Decodable>: Decodable {
     let jsonrpc: String
     let id: Int?
     let result: ResultType?
