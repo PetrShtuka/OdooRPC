@@ -45,18 +45,30 @@ public class ContactsService {
             switch result {
             case .success(let data):
                 do {
-                    // Попытка декодировать как объект с результатом
-                    let decodedResponse = try JSONDecoder().decode(RPCResponse<ContactsResult>.self, from: data)
-                    if let contactsResult = decodedResponse.result?.records {
-                        completion(.success(contactsResult))
-                    } else {
-                        // Обработка случая, если результат пустой или отсутствует
-                        completion(.failure(NSError(domain: "No contacts found", code: -1, userInfo: nil)))
+                    // Попытка декодировать как объект с массивом результатов
+                    let decodedArrayResponse = try JSONDecoder().decode(RPCArrayResponse<ContactsModel>.self, from: data)
+                    if let contactsArray = decodedArrayResponse.result {
+                        completion(.success(contactsArray))
+                        return
                     }
                 } catch {
-                    // Обработка ошибки декодирования
+                    // Игнорируем ошибку и попробуем декодировать как объект с вложенным массивом
+                }
+                
+                do {
+                    // Попытка декодировать как объект с вложенным массивом результатов
+                    let decodedObjectResponse = try JSONDecoder().decode(RPCResponse<ContactsResult>.self, from: data)
+                    if let contactsResult = decodedObjectResponse.result?.records {
+                        completion(.success(contactsResult))
+                        return
+                    }
+                } catch {
+                    // Если обе попытки декодирования не удались, возвращаем ошибку
                     completion(.failure(error))
                 }
+                
+                // Если ни один из вариантов не удался
+                completion(.failure(NSError(domain: "Invalid response format", code: -1, userInfo: nil)))
                 
             case .failure(let error):
                 completion(.failure(error))
@@ -144,4 +156,10 @@ struct RPCResponse<ResultType: Decodable>: Decodable {
 struct ContactsResult: Decodable {
     let length: Int
     let records: [ContactsModel]
+}
+
+struct RPCArrayResponse<ResultType: Decodable>: Decodable {
+    let jsonrpc: String
+    let id: Int?
+    let result: [ResultType]?
 }
