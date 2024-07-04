@@ -45,30 +45,18 @@ public class ContactsService {
             switch result {
             case .success(let data):
                 do {
-                    // Попытка декодировать как массив
-                    let decodedArrayResponse = try JSONDecoder().decode(RPCResponseArray<ContactsModel>.self, from: data)
-                    if let contactsArray = decodedArrayResponse.result {
-                        completion(.success(contactsArray))
-                        return
-                    }
-                } catch {
-                    // Игнорируем ошибку и попробуем декодировать как объект
-                }
-                
-                do {
-                    // Попытка декодировать как объект
-                    let decodedObjectResponse = try JSONDecoder().decode(RPCResponseObject<ContactsResult>.self, from: data)
-                    if let contactsResult = decodedObjectResponse.result?.contacts {
+                    // Попытка декодировать как объект с результатом
+                    let decodedResponse = try JSONDecoder().decode(RPCResponse<ContactsResult>.self, from: data)
+                    if let contactsResult = decodedResponse.result?.records {
                         completion(.success(contactsResult))
-                        return
+                    } else {
+                        // Обработка случая, если результат пустой или отсутствует
+                        completion(.failure(NSError(domain: "No contacts found", code: -1, userInfo: nil)))
                     }
                 } catch {
-                    // Если обе попытки декодирования не удались, возвращаем ошибку
+                    // Обработка ошибки декодирования
                     completion(.failure(error))
                 }
-                
-                // Если ни один из вариантов не удался
-                completion(.failure(NSError(domain: "Invalid response format", code: -1, userInfo: nil)))
                 
             case .failure(let error):
                 completion(.failure(error))
@@ -76,7 +64,6 @@ public class ContactsService {
         }
     }
 
-    
     private func buildParameters(for action: ContactAction, searchParameters: ContactParameters) -> [String: Any] {
         var domain: [[Any]] = []
         
@@ -148,24 +135,13 @@ public class ContactsService {
     }
 }
 
-struct RPCResponse<T: Decodable>: Decodable {
-    let jsonrpc: String
-    let id: Int
-    let result: T?
-}
-
-struct RPCResponseArray<ResultType: Decodable>: Decodable {
-    let jsonrpc: String
-    let id: Int?
-    let result: [ResultType]?
-}
-
-struct RPCResponseObject<ResultType: Decodable>: Decodable {
+struct RPCResponse<ResultType: Decodable>: Decodable {
     let jsonrpc: String
     let id: Int?
     let result: ResultType?
 }
 
 struct ContactsResult: Decodable {
-    let contacts: [ContactsModel]
+    let length: Int
+    let records: [ContactsModel]
 }
