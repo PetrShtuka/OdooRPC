@@ -118,19 +118,15 @@ public class ContactsService {
             "uid": searchParameters.uid
         ]
         
-        let kwargs: [String: Any] = [
+        return [
+            "model": "res.partner",
             "domain": domain,
             "fields": fields,
             "limit": searchParameters.limit,
             "context": context
         ]
-        
-        return [
-            "model": "res.partner",
-            "method": "search_read",
-            "kwargs": kwargs
-        ]
     }
+
 
     
     private func determineAvatarField(serverVersion: Double) -> String {
