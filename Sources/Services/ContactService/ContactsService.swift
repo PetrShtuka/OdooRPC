@@ -112,23 +112,22 @@ public class ContactsService {
             "__last_update"
         ]
         
-        let kwargs: [String: Any] = [
-            "domain": domain,
-            "fields": fields,
-            "limit": searchParameters.limit,
-            "context": [
-                "lang": searchParameters.language,
-                "tz": searchParameters.timeZone,
-                "uid": searchParameters.uid
-            ]
+        let context: [String: Any] = [
+            "lang": searchParameters.language,
+            "tz": searchParameters.timeZone,
+            "uid": searchParameters.uid
         ]
         
         return [
             "model": "res.partner",
             "method": "search_read",
-            "kwargs": kwargs
+            "args": [domain],
+            "fields": fields,
+            "limit": searchParameters.limit,
+            "context": context
         ]
     }
+
     
     private func determineAvatarField(serverVersion: Double) -> String {
         return serverVersion >= 15 ? "avatar_128" : "image_small"
