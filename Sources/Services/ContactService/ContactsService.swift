@@ -87,7 +87,7 @@ public class ContactsService {
             domain += [["display_name", "ilike", searchParameters.searchName]]
         }
         
-        if (!searchParameters.searchEmail.isEmpty) {
+        if !searchParameters.searchEmail.isEmpty {
             domain += [["email", "ilike", searchParameters.searchEmail]]
         }
         
@@ -128,10 +128,10 @@ public class ContactsService {
         return [
             "model": "res.partner",
             "method": "search_read",
-            "args": [],
             "kwargs": kwargs
         ]
     }
+
     
     private func determineAvatarField(serverVersion: Double) -> String {
         return serverVersion >= 15 ? "avatar_128" : "image_small"
