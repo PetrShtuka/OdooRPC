@@ -107,27 +107,39 @@ public class ContactsService {
             "child_ids",
             "comment",
             "email",
-            determineAvatarField(serverVersion: searchParameters.serverVersion),
             "name",
-            "__last_update"
+            "__last_update",
+            determineAvatarField(serverVersion: searchParameters.serverVersion)
         ]
         
-        let context: [String: Any] = [
-            "lang": searchParameters.language,
-            "tz": searchParameters.timeZone,
-            "uid": searchParameters.uid
-        ]
-        
-        return [
-            "model": "res.partner",
+        var kwargs: [String: Any] = [
             "domain": domain,
             "fields": fields,
             "limit": searchParameters.limit,
-            "context": context
+            "context": [
+                "lang": searchParameters.language,
+                "tz": searchParameters.timeZone,
+                "uid": searchParameters.uid
+            ]
         ]
+        
+        if let additionalParams = searchParameters.additionalParams {
+            for (key, value) in additionalParams {
+                kwargs[key] = value
+            }
+        }
+        
+        var parameters: [String: Any] = [
+            "model": "res.partner",
+            "kwargs": kwargs
+        ]
+        
+        if action == .fetch {
+            parameters["method"] = "search_read"
+        }
+        
+        return parameters
     }
-
-
     
     private func determineAvatarField(serverVersion: Double) -> String {
         return serverVersion >= 15 ? "avatar_128" : "image_small"
