@@ -107,36 +107,26 @@ public class ContactsService {
             "child_ids",
             "comment",
             "email",
+            determineAvatarField(serverVersion: searchParameters.serverVersion),
             "name",
-            "__last_update",
-            determineAvatarField(serverVersion: searchParameters.serverVersion)
+            "__last_update"
         ]
         
-        var kwargs: [String: Any] = [
-            "domain": domain,
-            "fields": fields,
-            "limit": searchParameters.limit,
+        let parameters: [String: Any] = [
+            "model": "res.partner",
+            "method": "search_read",
+            "args": [],  // Можно оставить пустым, если нет других аргументов
+            "kwargs": [
+                "domain": domain,
+                "fields": fields,
+                "limit": searchParameters.limit
+            ],
             "context": [
+                "uid": searchParameters.uid,
                 "lang": searchParameters.language,
-                "tz": searchParameters.timeZone,
-                "uid": searchParameters.uid
+                "tz": searchParameters.timeZone
             ]
         ]
-        
-        if let additionalParams = searchParameters.additionalParams {
-            for (key, value) in additionalParams {
-                kwargs[key] = value
-            }
-        }
-        
-        var parameters: [String: Any] = [
-            "model": "res.partner",
-            "kwargs": kwargs
-        ]
-        
-        if action == .fetch {
-            parameters["method"] = "search_read"
-        }
         
         return parameters
     }
