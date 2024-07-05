@@ -112,23 +112,22 @@ public class ContactsService {
             "__last_update"
         ]
         
-        let parameters: [String: Any] = [
-            "model": "res.partner",
-            "method": "search_read",
-            "args": [],  // Можно оставить пустым, если нет других аргументов
-            "kwargs": [
-                "domain": domain,
-                "fields": fields,
-                "limit": searchParameters.limit
-            ],
+        let kwargs: [String: Any] = [
+            "domain": domain,
+            "fields": fields,
+            "limit": searchParameters.limit,
             "context": [
-                "uid": searchParameters.uid,
                 "lang": searchParameters.language,
-                "tz": searchParameters.timeZone
+                "tz": searchParameters.timeZone,
+                "uid": searchParameters.uid
             ]
         ]
         
-        return parameters
+        return [
+            "model": "res.partner",
+            "method": "search_read",
+            "kwargs": kwargs
+        ]
     }
     
     private func determineAvatarField(serverVersion: Double) -> String {
