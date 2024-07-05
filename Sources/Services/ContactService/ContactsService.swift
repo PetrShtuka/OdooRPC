@@ -131,7 +131,6 @@ public class ContactsService {
         
         var parameters: [String: Any] = [
             "model": "res.partner",
-            "args": [],
             "kwargs": kwargs
         ]
         
