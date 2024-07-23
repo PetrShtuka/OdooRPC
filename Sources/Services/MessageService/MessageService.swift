@@ -647,9 +647,9 @@ public struct MessageFetchRequest {
     public var selectFilter: FilterTypeMessage = .none
     public var isActive: Bool?
     public var isNotDeleted: Bool?
-    public var inboxType: InboxType
+    public var inboxType: MailboxOperation
     
-    public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int, selectFilter: FilterTypeMessage = .none, isActive: Bool? = nil, isNotDeleted: Bool? = nil, inboxType: InboxType) {
+    public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int, selectFilter: FilterTypeMessage = .none, isActive: Bool? = nil, isNotDeleted: Bool? = nil, inboxType: MailboxOperation) {
         self.operation = operation
         self.messageId = messageId
         self.limit = limit
