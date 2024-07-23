@@ -9,7 +9,7 @@ import Foundation
 
 public struct IDNamePair: Decodable {
     public let id: Int
-    public let name: String
+    public var name: String
 
     public init(id: Int, name: String) {
         self.id = id
@@ -120,12 +120,28 @@ public struct MessageModel: Decodable, Equatable {
         partnerIDs = try container.decode([Int].self, forKey: .partnerIDs)
         parentID = try? container.decode(IDNamePair.self, forKey: .parentID)
         body = try container.decode(String.self, forKey: .body)
-        recordName = try container.decodeIfPresent(String.self, forKey: .recordName)
+        
+        // Handle recordName as String or Bool
+        do {
+            recordName = try container.decodeIfPresent(String.self, forKey: .recordName)
+        } catch DecodingError.typeMismatch {
+            _ = try container.decodeIfPresent(Bool.self, forKey: .recordName)
+            recordName = nil
+        }
+        
         emailFrom = try container.decode(String.self, forKey: .emailFrom)
         displayName = try container.decode(String.self, forKey: .displayName)
         deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
         model = try container.decode(String.self, forKey: .model)
-        authorAvatar = try container.decodeIfPresent(String.self, forKey: .authorAvatar)
+        
+        // Handle authorAvatar as String or Bool
+        do {
+            authorAvatar = try container.decodeIfPresent(String.self, forKey: .authorAvatar)
+        } catch DecodingError.typeMismatch {
+            _ = try container.decodeIfPresent(Bool.self, forKey: .authorAvatar)
+            authorAvatar = nil
+        }
+        
         starred = try container.decode(Bool.self, forKey: .starred)
         attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
         refPartnerIDs = try container.decodeIfPresent([Int].self, forKey: .refPartnerIDs) ?? []
