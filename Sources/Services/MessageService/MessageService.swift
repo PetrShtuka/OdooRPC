@@ -347,6 +347,372 @@ public enum MessageField: String, CaseIterable {
 
 import Foundation
 
+//public class MessagesServer {
+//    private var rpcClient: RPCClient
+//
+//    init(rpcClient: RPCClient) {
+//        self.rpcClient = rpcClient
+//    }
+//
+//    public func fetchMessages(request: MessageFetchRequest, completion: @escaping (Result<[MessageModel], Error>) -> Void) {
+//        let endpoint = "/web/dataset/search_read"
+//        let params = buildParams(for: request)
+//
+//        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+//            switch result {
+//            case .success(let data):
+//                do {
+//                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+//                    print("JSON Response: \(jsonResponse)")
+//
+//                    if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
+//                        let errorMessage = errorData["message"] as? String ?? "Unknown error"
+//                        let errorCode = errorData["code"] as? Int ?? -1
+//                        let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+//                        completion(.failure(error))
+//                    } else {
+//                        let decoder = JSONDecoder()
+//                        do {
+//                            let response = try decoder.decode(OdooResponse<MessageResponseDataWithLength>.self, from: data)
+//                            completion(.success(response.result.records))
+//                        } catch {
+//                            let response = try decoder.decode(OdooResponse<MessageResponseDataWithoutLength>.self, from: data)
+//                            completion(.success(response.result.records))
+//                        }
+//                    }
+//                } catch {
+//                    completion(.failure(error))
+//                }
+//            case .failure(let error):
+//                completion(.failure(error))
+//            }
+//        }
+//    }
+//    
+//    public func fetchModules(completion: @escaping (Result<[ModelOdoo], Error>) -> Void) {
+//        let endpoint = "/web/session/modules"
+//        let params: [String: Any] = [:]
+//        
+//        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+//            switch result {
+//            case .success(let data):
+//                do {
+//                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+//                    print("JSON Response: \(jsonResponse)")
+//                    
+//                    if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+//                       let moduleNames = jsonResponse["result"] as? [String] {
+//                        let modules = moduleNames.map { ModelOdoo(name: $0) }
+//                        completion(.success(modules))
+//                    } else {
+//                        completion(.failure(NSError(domain: "InvalidResponse", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response from server"])))
+//                    }
+//
+//                } catch {
+//                    completion(.failure(error))
+//                }
+//            case .failure(let error):
+//                completion(.failure(error))
+//            }
+//        }
+//    }
+//    
+//    public func deleteMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
+//        let endpoint = "/web/dataset/call_kw"
+//        let method = type == .bin ? "undelete" : "unlink_pro"
+//        let params: [String: Any] = [
+//            "model": "mail.message",
+//            "method": method,
+//            "args": [messageIDs],
+//            "kwargs": ["context": [Any]()]
+//        ]
+//
+//        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+//            switch result {
+//            case .success(let data):
+//                do {
+//                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+//                    print("JSON Response: \(jsonResponse)")
+//
+//                    if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
+//                        let errorMessage = errorData["message"] as? String ?? "Unknown error"
+//                        let errorCode = errorData["code"] as? Int ?? -1
+//                        let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+//                        completion(.failure(error))
+//                    } else {
+//                        completion(.success(true))
+//                    }
+//                } catch {
+//                    completion(.failure(error))
+//                }
+//            case .failure(let error):
+//                completion(.failure(error))
+//            }
+//        }
+//    }
+//    
+//    public func archiveMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
+//        let endpoint = "/web/dataset/call_kw"
+//        let params: [String: Any] = [
+//            "model": "mail.message",
+//            "method": "archive",
+//            "args": [messageIDs],
+//            "kwargs": ["context": [Any]()]
+//        ]
+//
+//        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+//            switch result {
+//            case .success(let data):
+//                do {
+//                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+//                    print("JSON Response: \(jsonResponse)")
+//
+//                    if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
+//                        let errorMessage = errorData["message"] as? String ?? "Unknown error"
+//                        let errorCode = errorData["code"] as? Int ?? -1
+//                        let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+//                        completion(.failure(error))
+//                    } else {
+//                        completion(.success(true))
+//                    }
+//                } catch {
+//                    completion(.failure(error))
+//                }
+//            case .failure(let error):
+//                completion(.failure(error))
+//            }
+//        }
+//    }
+//    
+//    public func markReadMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
+//        let endpoint = "/web/dataset/call_kw"
+//        let params: [String: Any] = [
+//            "model": "mail.message",
+//            "method": "mark_read_multi",
+//            "args": [messageIDs],
+//            "kwargs": ["context": [Any]()]
+//        ]
+//
+//        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+//            switch result {
+//            case .success(let data):
+//                do {
+//                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+//                    print("JSON Response: \(jsonResponse)")
+//
+//                    if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
+//                        let errorMessage = errorData["message"] as? String ?? "Unknown error"
+//                        let errorCode = errorData["code"] as? Int ?? -1
+//                        let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+//                        completion(.failure(error))
+//                    } else {
+//                        completion(.success(true))
+//                    }
+//                } catch {
+//                    completion(.failure(error))
+//                }
+//            case .failure(let error):
+//                completion(.failure(error))
+//            }
+//        }
+//    }
+//
+//    public func fetchExistingMessageIDs(localMessagesID: [Int], completion: @escaping (Result<[Int], Error>) -> Void) {
+//        let endpoint = "/web/dataset/search_read"
+//        let params: [String: Any] = [
+//            "model": "mail.message",
+//            "domain": [["id", "in", localMessagesID]],
+//            "fields": ["id"]
+//        ]
+//
+//        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+//            switch result {
+//            case .success(let data):
+//                do {
+//                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+//                    print("JSON Response: \(jsonResponse)")
+//
+//                    if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
+//                        let errorMessage = errorData["message"] as? String ?? "Unknown error"
+//                        let errorCode = errorData["code"] as? Int ?? -1
+//                        let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+//                        completion(.failure(error))
+//                    } else if let jsonResponse = jsonResponse as? [String: Any],
+//                              let result = jsonResponse["result"] as? [String: Any],
+//                              let records = result["records"] as? [[String: Any]] {
+//                        let ids = records.compactMap { $0["id"] as? Int }
+//                        completion(.success(ids))
+//                    } else {
+//                        completion(.failure(NSError(domain: "InvalidResponse", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response from server"])))
+//                    }
+//                } catch {
+//                    completion(.failure(error))
+//                }
+//            case .failure(let error):
+//                completion(.failure(error))
+//            }
+//        }
+//    }
+//    
+//    private func buildParams(for request: MessageFetchRequest) -> [String: Any] {
+//        let domain = createDomain(for: request)
+//        let fields = request.selectedFields.map { $0.rawValue }.filter { $0 != "is_error" }
+//        
+//        return [
+//            "model": "mail.message",
+//            "domain": domain,
+//            "fields": fields,
+//            "limit": request.limit,
+//            "sort": "id DESC",
+//            "context": [
+//                "lang": request.language,
+//                "tz": request.timeZone,
+//                "uid": request.uid,
+//                "check_messages_access": true
+//            ]
+//        ]
+//    }
+//
+//    private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
+//        var domain: [[Any]] = request.operation.domain(for: request.uid)
+//        
+//        if let requestText = request.requestText, !requestText.isEmpty {
+//            switch request.selectFilter {
+//            case .subject:
+//                domain.append(["subject", "ilike", requestText])
+//            case .content:
+//                domain.append(["body", "ilike", requestText])
+//            case .author:
+//                domain.append(["author_id", "ilike", requestText])
+//            case .recipients:
+//                domain.append(["partner_ids", "ilike", requestText])
+//            case .none:
+//                break
+//            }
+//        }
+//        
+//        return domain
+//    }
+//}
+//
+//// Enumeration for inbox types
+//public enum InboxType {
+//    case active
+//    case archive
+//    case bin
+//    case shared
+//    case sent(odooPartnerUserId: Int)
+//    
+//    var domain: [[Any]] {
+//        switch self {
+//        case .active:
+//            return [
+//                ["active", "=", false],
+//                ["delete_uid", "=", false]
+//            ]
+//        case .archive:
+//            return [
+//                ["active", "=", false],
+//                ["delete_uid", "=", false]
+//            ]
+//        case .bin:
+//            return [
+//                ["active", "=", false],
+//                ["delete_uid", "!=", false]
+//            ]
+//        case .shared:
+//            return [
+//                ["shared_inbox", "=", true]
+//            ]
+//        case .sent(let odooPartnerUserId):
+//            return [
+//                ["author_id", "=", odooPartnerUserId]
+//            ]
+//        }
+//    }
+//}
+//
+//public struct MessageFetchRequest {
+//    public var operation: MailboxOperation
+//    public var messageId: Int
+//    public var limit: Int
+//    public var comparisonOperator: String = ">"
+//    public var partnerUserId: Int?
+//    public var requestText: String?
+//    public var localMessagesID: [Int]?
+//    public var selectedFields: Set<MessageField> = Set(MessageField.allCases)
+//    public var language: String
+//    public var timeZone: String
+//    public var uid: Int
+//    public var selectFilter: FilterTypeMessage = .none
+//    public var isActive: Bool?
+//    public var isNotDeleted: Bool?
+//    public var inboxType: MailboxOperation
+//    
+//    public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int, selectFilter: FilterTypeMessage = .none, isActive: Bool? = nil, isNotDeleted: Bool? = nil, inboxType: MailboxOperation) {
+//        self.operation = operation
+//        self.messageId = messageId
+//        self.limit = limit
+//        self.comparisonOperator = comparisonOperator
+//        self.partnerUserId = partnerUserId
+//        self.requestText = requestText
+//        self.localMessagesID = localMessagesID
+//        self.selectedFields = selectedFields
+//        self.language = language
+//        self.timeZone = timeZone
+//        self.uid = uid
+//        self.selectFilter = selectFilter
+//        self.isActive = isActive
+//        self.isNotDeleted = isNotDeleted
+//        self.inboxType = inboxType
+//    }
+//}
+//
+//// Models for decoding the response
+//public struct OdooResponse<T: Decodable>: Decodable {
+//    let jsonrpc: String
+//    let id: Int
+//    let result: T
+//}
+//
+//public struct MessageResponseDataWithoutLength: Decodable {
+//    let records: [MessageModel]
+//}
+//
+//public struct MessageResponseDataWithLength: Decodable {
+//    let length: Int
+//    let records: [MessageModel]
+//}
+//
+//public enum FilterTypeMessage {
+//    case subject, content, author, recipients, none
+//}
+//
+//public enum MailboxOperation: String {
+//    case sharedInbox = "sharedInbox"
+//    case privateInbox = "privateInbox"
+//    case sent = "sent"
+//    case archive = "archive"
+//    case bin = "bin"
+//    
+//    func domain(for userID: Int) -> [[Any]] {
+//        switch self {
+//        case .sharedInbox:
+//            return [["shared_inbox", "=", true], ["active", "=", true], ["delete_uid", "=", false]]
+//        case .privateInbox:
+//            return [["partner_ids", "in", [userID]], ["active", "=", true], ["delete_uid", "=", false]]
+//        case .sent:
+//            return [["author_id", "=", userID], ["active", "=", true], ["delete_uid", "=", false]]
+//        case .archive:
+//            return [["active", "=", false], ["delete_uid", "=", true]]
+//        case .bin:
+//            return [["active", "=", false], ["delete_uid", "!=", false]]
+//        }
+//    }
+//}
+
+import Foundation
+
 public class MessagesServer {
     private var rpcClient: RPCClient
 
@@ -388,18 +754,22 @@ public class MessagesServer {
             }
         }
     }
-    
+
+    public func searchMessages(request: MessageFetchRequest, completion: @escaping (Result<[MessageModel], Error>) -> Void) {
+        fetchMessages(request: request, completion: completion)
+    }
+
     public func fetchModules(completion: @escaping (Result<[ModelOdoo], Error>) -> Void) {
         let endpoint = "/web/session/modules"
         let params: [String: Any] = [:]
-        
+
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
                     print("JSON Response: \(jsonResponse)")
-                    
+
                     if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                        let moduleNames = jsonResponse["result"] as? [String] {
                         let modules = moduleNames.map { ModelOdoo(name: $0) }
@@ -416,7 +786,7 @@ public class MessagesServer {
             }
         }
     }
-    
+
     public func deleteMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let method = type == .bin ? "undelete" : "unlink_pro"
@@ -450,7 +820,7 @@ public class MessagesServer {
             }
         }
     }
-    
+
     public func archiveMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let params: [String: Any] = [
@@ -483,7 +853,7 @@ public class MessagesServer {
             }
         }
     }
-    
+
     public func markReadMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let params: [String: Any] = [
@@ -710,3 +1080,4 @@ public enum MailboxOperation: String {
         }
     }
 }
+
