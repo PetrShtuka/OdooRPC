@@ -556,7 +556,7 @@ public class MessagesServer {
     
     private func buildParams(for request: MessageFetchRequest) -> [String: Any] {
         let domain = createDomain(for: request)
-        let fields = request.selectedFields.map { $0.rawValue }.filter { $0 != "is_error" } // Исключаем недопустимое поле
+        let fields = request.selectedFields.map { $0.rawValue }.filter { $0 != "is_error" }
         
         return [
             "model": "mail.message",
@@ -572,23 +572,9 @@ public class MessagesServer {
             ]
         ]
     }
-    
+
     private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
-        var domain: [[Any]] = []
-        
-        let messageType: [Any] = ["message_type", "in", ["email", "comment"]]
-        let idNotInLocalIds: [Any] = ["id", "not in", request.localMessagesID ?? []]
-        
-        domain.append(messageType)
-        domain.append(idNotInLocalIds)
-        
-        if let isActive = request.isActive {
-            domain.append(["active", "=", isActive])
-        }
-        
-        if let isNotDeleted = request.isNotDeleted {
-            domain.append(["delete_uid", "!=", isNotDeleted])
-        }
+        var domain: [[Any]] = request.operation.domain(for: request.uid)
         
         if let requestText = request.requestText, !requestText.isEmpty {
             switch request.selectFilter {
@@ -605,11 +591,8 @@ public class MessagesServer {
             }
         }
         
-        domain.append(contentsOf: request.inboxType.domain)
-        
         return domain
     }
-
 }
 
 // Enumeration for inbox types
@@ -707,8 +690,23 @@ public enum FilterTypeMessage {
 
 public enum MailboxOperation: String {
     case sharedInbox = "sharedInbox"
-    case search = "search"
+    case privateInbox = "privateInbox"
+    case sent = "sent"
     case archive = "archive"
     case bin = "bin"
-    case outbox = "outbox"
+    
+    func domain(for userID: Int) -> [[Any]] {
+        switch self {
+        case .sharedInbox:
+            return [["shared_inbox", "=", true], ["active", "=", true], ["delete_uid", "=", false]]
+        case .privateInbox:
+            return [["partner_ids", "in", [userID]], ["active", "=", true], ["delete_uid", "=", false]]
+        case .sent:
+            return [["author_id", "=", userID], ["active", "=", true], ["delete_uid", "=", false]]
+        case .archive:
+            return [["active", "=", false], ["delete_uid", "=", true]]
+        case .bin:
+            return [["active", "=", false], ["delete_uid", "!=", false]]
+        }
+    }
 }
