@@ -234,8 +234,8 @@ public class MessagesServer {
     private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
         var domain: [[Any]] = request.operation.domain(for: request.uid)
         
-        if let comparisonOperator = request.comparisonOperator, !comparisonOperator.isEmpty {
-            domain.append(["id", comparisonOperator, request.messageId])
+        if !request.comparisonOperator.isEmpty {
+            domain.append(["id", request.comparisonOperator, request.messageId])
         }
 
         if let requestText = request.requestText, !requestText.isEmpty {
