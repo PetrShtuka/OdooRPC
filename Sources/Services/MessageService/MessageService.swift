@@ -350,12 +350,12 @@ public enum FilterTypeMessage {
     case subject, content, author, recipients, none
 }
 
-public enum MailboxOperation: String {
-    case sharedInbox = "sharedInbox"
-    case privateInbox = "privateInbox"
-    case sent = "sent"
-    case archive = "archive"
-    case bin = "bin"
+public enum MailboxOperation: Equatable {
+    case sharedInbox
+    case privateInbox
+    case sent(odooPartnerUserId: Int)
+    case archive
+    case bin
     
     func domain(for userID: Int) -> [[Any]] {
         switch self {
@@ -363,15 +363,30 @@ public enum MailboxOperation: String {
             return [["shared_inbox", "=", true], ["active", "=", true], ["delete_uid", "=", false]]
         case .privateInbox:
             return [["partner_ids", "in", [userID]], ["active", "=", true], ["delete_uid", "=", false]]
-        case .sent:
-            return [["author_id", "=", userID], ["active", "=", true], ["delete_uid", "=", false]]
+        case .sent(let odooPartnerUserId):
+            return [["author_id", "=", odooPartnerUserId], ["active", "=", true], ["delete_uid", "=", false]]
         case .archive:
             return [["active", "=", false], ["delete_uid", "=", true]]
         case .bin:
             return [["active", "=", false], ["delete_uid", "!=", false]]
         }
     }
+
+    public static func ==(lhs: MailboxOperation, rhs: MailboxOperation) -> Bool {
+        switch (lhs, rhs) {
+        case (.sharedInbox, .sharedInbox),
+             (.privateInbox, .privateInbox),
+             (.archive, .archive),
+             (.bin, .bin):
+            return true
+        case (.sent(let lhsUserId), .sent(let rhsUserId)):
+            return lhsUserId == rhsUserId
+        default:
+            return false
+        }
+    }
 }
+
 
 public enum MessageField: String, CaseIterable {
     case deleteUID = "delete_uid"
