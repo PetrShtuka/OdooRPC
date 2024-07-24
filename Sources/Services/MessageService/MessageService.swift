@@ -17,8 +17,7 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    print("JSON Response: \(jsonResponse)")
-                    
+
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -56,7 +55,6 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    print("JSON Response: \(jsonResponse)")
                     
                     if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                        let moduleNames = jsonResponse["result"] as? [String] {
@@ -90,8 +88,7 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    print("JSON Response: \(jsonResponse)")
-                    
+          
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -123,8 +120,7 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    print("JSON Response: \(jsonResponse)")
-                    
+                  
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -156,8 +152,7 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    print("JSON Response: \(jsonResponse)")
-                    
+                 
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -188,8 +183,7 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    print("JSON Response: \(jsonResponse)")
-                    
+               
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1

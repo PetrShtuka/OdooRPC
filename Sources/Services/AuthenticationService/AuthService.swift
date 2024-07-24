@@ -28,7 +28,6 @@ public class AuthService: SessionServiceDelegate {
         self.client = client
         self.totpService = AuthenticationServiceTotp(rpcClient: client)
         self.client.updateSessionService(self)  // Assign AuthService as the session service
-        print("AuthService initialized and sessionService set.")
     }
 
     public func setDelegate(_ delegate: AuthServiceDelegate) {
