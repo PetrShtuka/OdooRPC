@@ -225,3 +225,33 @@ public struct MessageModel: Decodable, Equatable {
         return String(text[..<endIndex]) + "..."
     }
 }
+
+extension MessageModel {
+    public func withDeleteUID(_ deleteUID: Bool) -> MessageModel {
+        return MessageModel(
+            id: self.id,
+            authorDisplay: self.authorDisplay,
+            authorID: self.authorID,
+            date: self.date,
+            resID: self.resID,
+            needaction: self.needaction,
+            active: self.active,
+            subject: self.subject,
+            partnerIDs: self.partnerIDs,
+            parentID: self.parentID,
+            body: self.body,
+            recordName: self.recordName,
+            emailFrom: self.emailFrom,
+            displayName: self.displayName,
+            deleteUID: deleteUID,
+            model: self.model,
+            authorAvatar: self.authorAvatar,
+            starred: self.starred,
+            attachmentIDs: self.attachmentIDs,
+            refPartnerIDs: self.refPartnerIDs,
+            subtypeID: self.subtypeID,
+            isAuthorIDBool: self.isAuthorIDBool
+        )
+    }
+    
+}
