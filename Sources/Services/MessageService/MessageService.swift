@@ -3,22 +3,22 @@ import Foundation
 
 public class MessagesServer {
     private var rpcClient: RPCClient
-
+    
     init(rpcClient: RPCClient) {
         self.rpcClient = rpcClient
     }
-
+    
     public func fetchMessages(request: MessageFetchRequest, completion: @escaping (Result<[MessageModel], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
         let params = buildParams(for: request)
-
+        
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
                     print("JSON Response: \(jsonResponse)")
-
+                    
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -42,22 +42,22 @@ public class MessagesServer {
             }
         }
     }
-
+    
     public func searchMessages(request: MessageFetchRequest, completion: @escaping (Result<[MessageModel], Error>) -> Void) {
         fetchMessages(request: request, completion: completion)
     }
-
+    
     public func fetchModules(completion: @escaping (Result<[ModelOdoo], Error>) -> Void) {
         let endpoint = "/web/session/modules"
         let params: [String: Any] = [:]
-
+        
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
                     print("JSON Response: \(jsonResponse)")
-
+                    
                     if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                        let moduleNames = jsonResponse["result"] as? [String] {
                         let modules = moduleNames.map { ModelOdoo(name: $0) }
@@ -65,7 +65,7 @@ public class MessagesServer {
                     } else {
                         completion(.failure(NSError(domain: "InvalidResponse", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response from server"])))
                     }
-
+                    
                 } catch {
                     completion(.failure(error))
                 }
@@ -74,7 +74,7 @@ public class MessagesServer {
             }
         }
     }
-
+    
     public func deleteMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let method = type == .bin ? "undelete" : "unlink_pro"
@@ -84,14 +84,14 @@ public class MessagesServer {
             "args": [messageIDs],
             "kwargs": ["context": [Any]()]
         ]
-
+        
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
                     print("JSON Response: \(jsonResponse)")
-
+                    
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -108,7 +108,7 @@ public class MessagesServer {
             }
         }
     }
-
+    
     public func archiveMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let params: [String: Any] = [
@@ -117,14 +117,14 @@ public class MessagesServer {
             "args": [messageIDs],
             "kwargs": ["context": [Any]()]
         ]
-
+        
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
                     print("JSON Response: \(jsonResponse)")
-
+                    
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -141,7 +141,7 @@ public class MessagesServer {
             }
         }
     }
-
+    
     public func markReadMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let params: [String: Any] = [
@@ -150,14 +150,14 @@ public class MessagesServer {
             "args": [messageIDs],
             "kwargs": ["context": [Any]()]
         ]
-
+        
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
                     print("JSON Response: \(jsonResponse)")
-
+                    
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -174,7 +174,7 @@ public class MessagesServer {
             }
         }
     }
-
+    
     public func fetchExistingMessageIDs(localMessagesID: [Int], completion: @escaping (Result<[Int], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
         let params: [String: Any] = [
@@ -182,14 +182,14 @@ public class MessagesServer {
             "domain": [["id", "in", localMessagesID]],
             "fields": ["id"]
         ]
-
+        
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
                     print("JSON Response: \(jsonResponse)")
-
+                    
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -211,10 +211,22 @@ public class MessagesServer {
             }
         }
     }
-
+    
     private func buildParams(for request: MessageFetchRequest) -> [String: Any] {
         let domain = createDomain(for: request)
         let fields = request.selectedFields.map { $0.rawValue }.filter { $0 != "is_error" }
+        
+        var context: [String: Any] = [
+            "lang": request.language,
+            "tz": request.timeZone,
+            "uid": request.uid,
+            "check_messages_access": true
+        ]
+        
+        // Add "active_test": 0 to context if the inbox type is archive or bin
+        if request.inboxType == .archive || request.inboxType == .bin {
+            context["active_test"] = 0
+        }
         
         return [
             "model": "mail.message",
@@ -222,21 +234,19 @@ public class MessagesServer {
             "fields": fields,
             "limit": request.limit,
             "sort": "id DESC",
-            "context": [
-                "lang": request.language,
-                "tz": request.timeZone,
-                "uid": request.uid,
-                "check_messages_access": true
-            ]
+            "context": context
         ]
     }
 
+    
     private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
         var domain: [[Any]] = request.operation.domain(for: request.uid)
         
         if !request.comparisonOperator.isEmpty && request.messageId != 0 {
             domain.append(["id", request.comparisonOperator, request.messageId])
         }
+        
+        
         
         domain.append(["message_type",
                         "in",
