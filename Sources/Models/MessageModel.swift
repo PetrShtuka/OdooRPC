@@ -169,9 +169,9 @@ public struct MessageModel: Decodable, Equatable {
             do {
                 deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
             } catch DecodingError.typeMismatch {
-                if let _ = try? container.decode([Int].self, forKey: .deleteUID) {
+                if let _ = try? container.decode([Int: String].self, forKey: .deleteUID) {
                     deleteUID = true
-                } else if let _ = try? container.decode([String].self, forKey: .deleteUID) {
+                } else if let _ = try? container.decode([String: Int].self, forKey: .deleteUID) {
                     deleteUID = true
                 } else {
                     deleteUID = false
