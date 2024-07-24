@@ -101,72 +101,84 @@ public struct MessageModel: Decodable, Equatable {
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(Int.self, forKey: .id)
-        authorDisplay = try container.decode(String.self, forKey: .authorDisplay)
-        date = try container.decode(String.self, forKey: .date)
-        resID = try container.decode(Int.self, forKey: .resID)
-        needaction = try container.decode(Bool.self, forKey: .needaction)
-        active = try container.decode(Bool.self, forKey: .active)
-        
-        if let stringSubject = try? container.decode(String.self, forKey: .subject) {
-            subject = stringSubject
-        } else if let boolSubject = try? container.decode(Bool.self, forKey: .subject) {
-            subject = boolSubject ? "true" : "false"
-        } else {
-            subject = nil
-        }
-        
-        partnerIDs = try container.decode([Int].self, forKey: .partnerIDs)
-        parentID = try? container.decode(IDNamePair.self, forKey: .parentID)
-        body = try container.decode(String.self, forKey: .body)
-        
-        // Handle recordName as String or Bool
-        do {
-            recordName = try container.decodeIfPresent(String.self, forKey: .recordName)
-        } catch DecodingError.typeMismatch {
-            _ = try container.decodeIfPresent(Bool.self, forKey: .recordName)
-            recordName = nil
-        }
-        
-        emailFrom = try container.decode(String.self, forKey: .emailFrom)
-        displayName = try container.decode(String.self, forKey: .displayName)
-        deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
-        model = try container.decode(String.self, forKey: .model)
-        
-        // Handle authorAvatar as String or Bool
-        do {
-            authorAvatar = try container.decodeIfPresent(String.self, forKey: .authorAvatar)
-        } catch DecodingError.typeMismatch {
-            _ = try container.decodeIfPresent(Bool.self, forKey: .authorAvatar)
-            authorAvatar = nil
-        }
-        
-        starred = try container.decode(Bool.self, forKey: .starred)
-        attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
-        refPartnerIDs = try container.decodeIfPresent([Int].self, forKey: .refPartnerIDs) ?? []
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            id = try container.decode(Int.self, forKey: .id)
+            authorDisplay = try container.decode(String.self, forKey: .authorDisplay)
+            date = try container.decode(String.self, forKey: .date)
+            resID = try container.decode(Int.self, forKey: .resID)
+            needaction = try container.decode(Bool.self, forKey: .needaction)
+            active = try container.decode(Bool.self, forKey: .active)
+            
+            if let stringSubject = try? container.decode(String.self, forKey: .subject) {
+                subject = stringSubject
+            } else if let boolSubject = try? container.decode(Bool.self, forKey: .subject) {
+                subject = boolSubject ? "true" : "false"
+            } else {
+                subject = nil
+            }
+            
+            partnerIDs = try container.decode([Int].self, forKey: .partnerIDs)
+            parentID = try? container.decode(IDNamePair.self, forKey: .parentID)
+            body = try container.decode(String.self, forKey: .body)
+            
+            // Handle recordName as String or Bool
+            do {
+                recordName = try container.decodeIfPresent(String.self, forKey: .recordName)
+            } catch DecodingError.typeMismatch {
+                _ = try container.decodeIfPresent(Bool.self, forKey: .recordName)
+                recordName = nil
+            }
+            
+            emailFrom = try container.decode(String.self, forKey: .emailFrom)
+            displayName = try container.decode(String.self, forKey: .displayName)
+            model = try container.decode(String.self, forKey: .model)
+            
+            // Handle authorAvatar as String or Bool
+            do {
+                authorAvatar = try container.decodeIfPresent(String.self, forKey: .authorAvatar)
+            } catch DecodingError.typeMismatch {
+                _ = try container.decodeIfPresent(Bool.self, forKey: .authorAvatar)
+                authorAvatar = nil
+            }
+            
+            starred = try container.decode(Bool.self, forKey: .starred)
+            attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
+            refPartnerIDs = try container.decodeIfPresent([Int].self, forKey: .refPartnerIDs) ?? []
 
-        if var subtypeIDContainer = try? container.nestedUnkeyedContainer(forKey: .subtypeID) {
-            let id = try? subtypeIDContainer.decode(Int.self)
-            let name = try? subtypeIDContainer.decode(String.self)
-            if let id = id, let name = name {
-                subtypeID = (id, name)
+            if var subtypeIDContainer = try? container.nestedUnkeyedContainer(forKey: .subtypeID) {
+                let id = try? subtypeIDContainer.decode(Int.self)
+                let name = try? subtypeIDContainer.decode(String.self)
+                if let id = id, let name = name {
+                    subtypeID = (id, name)
+                } else {
+                    subtypeID = nil
+                }
             } else {
                 subtypeID = nil
             }
-        } else {
-            subtypeID = nil
-        }
 
-        do {
-            authorID = try container.decode(IDNamePair.self, forKey: .authorID)
-            isAuthorIDBool = false
-        } catch DecodingError.typeMismatch {
-            isAuthorIDBool = (try container.decodeIfPresent(Bool.self, forKey: .authorID)) ?? false
-            authorID = nil
+            do {
+                authorID = try container.decode(IDNamePair.self, forKey: .authorID)
+                isAuthorIDBool = false
+            } catch DecodingError.typeMismatch {
+                isAuthorIDBool = (try container.decodeIfPresent(Bool.self, forKey: .authorID)) ?? false
+                authorID = nil
+            }
+
+            // Handle deleteUID which can be Bool or Array
+            do {
+                deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
+            } catch DecodingError.typeMismatch {
+                if let _ = try? container.decode([Int].self, forKey: .deleteUID) {
+                    deleteUID = true
+                } else if let _ = try? container.decode([String].self, forKey: .deleteUID) {
+                    deleteUID = true
+                } else {
+                    deleteUID = false
+                }
+            }
         }
     }
-}
 
 extension MessageModel {
     public func withDeleteUID(_ deleteUID: Bool) -> MessageModel {
