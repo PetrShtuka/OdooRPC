@@ -46,6 +46,7 @@ public struct MessageModel: Decodable, Equatable {
     public var refPartnerIDs: [Int]
     public var subtypeID: (Int, String)?
     public var isAuthorIDBool: Bool
+    public var truncatedBody: String
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -94,142 +95,105 @@ public struct MessageModel: Decodable, Equatable {
         self.refPartnerIDs = refPartnerIDs
         self.subtypeID = subtypeID
         self.isAuthorIDBool = isAuthorIDBool
+        self.truncatedBody = MessageModel.truncateText(MessageModel.removeHTMLTags(from: body), maxLength: 100)
     }
-    
+
     public static func == (lhs: MessageModel, rhs: MessageModel) -> Bool {
         return lhs.id == rhs.id
     }
 
     public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            id = try container.decode(Int.self, forKey: .id)
-            authorDisplay = try container.decode(String.self, forKey: .authorDisplay)
-            date = try container.decode(String.self, forKey: .date)
-            resID = try container.decode(Int.self, forKey: .resID)
-            needaction = try container.decode(Bool.self, forKey: .needaction)
-            active = try container.decode(Bool.self, forKey: .active)
-            
-            if let stringSubject = try? container.decode(String.self, forKey: .subject) {
-                subject = stringSubject
-            } else if let boolSubject = try? container.decode(Bool.self, forKey: .subject) {
-                subject = boolSubject ? "true" : "false"
-            } else {
-                subject = nil
-            }
-            
-            partnerIDs = try container.decode([Int].self, forKey: .partnerIDs)
-            parentID = try? container.decode(IDNamePair.self, forKey: .parentID)
-            body = try container.decode(String.self, forKey: .body)
-            
-            // Handle recordName as String or Bool
-            do {
-                recordName = try container.decodeIfPresent(String.self, forKey: .recordName)
-            } catch DecodingError.typeMismatch {
-                _ = try container.decodeIfPresent(Bool.self, forKey: .recordName)
-                recordName = nil
-            }
-            
-            emailFrom = try container.decode(String.self, forKey: .emailFrom)
-            displayName = try container.decode(String.self, forKey: .displayName)
-            model = try container.decode(String.self, forKey: .model)
-            
-            // Handle authorAvatar as String or Bool
-            do {
-                authorAvatar = try container.decodeIfPresent(String.self, forKey: .authorAvatar)
-            } catch DecodingError.typeMismatch {
-                _ = try container.decodeIfPresent(Bool.self, forKey: .authorAvatar)
-                authorAvatar = nil
-            }
-            
-            starred = try container.decode(Bool.self, forKey: .starred)
-            attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
-            refPartnerIDs = try container.decodeIfPresent([Int].self, forKey: .refPartnerIDs) ?? []
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(Int.self, forKey: .id)
+        authorDisplay = try container.decode(String.self, forKey: .authorDisplay)
+        date = try container.decode(String.self, forKey: .date)
+        resID = try container.decode(Int.self, forKey: .resID)
+        needaction = try container.decode(Bool.self, forKey: .needaction)
+        active = try container.decode(Bool.self, forKey: .active)
+        
+        if let stringSubject = try? container.decode(String.self, forKey: .subject) {
+            subject = stringSubject
+        } else if let boolSubject = try? container.decode(Bool.self, forKey: .subject) {
+            subject = boolSubject ? "true" : "false"
+        } else {
+            subject = nil
+        }
+        
+        partnerIDs = try container.decode([Int].self, forKey: .partnerIDs)
+        parentID = try? container.decode(IDNamePair.self, forKey: .parentID)
+        body = try container.decode(String.self, forKey: .body)
+        
+        // Handle recordName as String or Bool
+        do {
+            recordName = try container.decodeIfPresent(String.self, forKey: .recordName)
+        } catch DecodingError.typeMismatch {
+            _ = try container.decodeIfPresent(Bool.self, forKey: .recordName)
+            recordName = nil
+        }
+        
+        emailFrom = try container.decode(String.self, forKey: .emailFrom)
+        displayName = try container.decode(String.self, forKey: .displayName)
+        model = try container.decode(String.self, forKey: .model)
+        
+        // Handle authorAvatar as String or Bool
+        do {
+            authorAvatar = try container.decodeIfPresent(String.self, forKey: .authorAvatar)
+        } catch DecodingError.typeMismatch {
+            _ = try container.decodeIfPresent(Bool.self, forKey: .authorAvatar)
+            authorAvatar = nil
+        }
+        
+        starred = try container.decode(Bool.self, forKey: .starred)
+        attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
+        refPartnerIDs = try container.decodeIfPresent([Int].self, forKey: .refPartnerIDs) ?? []
 
-            if var subtypeIDContainer = try? container.nestedUnkeyedContainer(forKey: .subtypeID) {
-                let id = try? subtypeIDContainer.decode(Int.self)
-                let name = try? subtypeIDContainer.decode(String.self)
-                if let id = id, let name = name {
-                    subtypeID = (id, name)
-                } else {
-                    subtypeID = nil
-                }
+        if var subtypeIDContainer = try? container.nestedUnkeyedContainer(forKey: .subtypeID) {
+            let id = try? subtypeIDContainer.decode(Int.self)
+            let name = try? subtypeIDContainer.decode(String.self)
+            if let id = id, let name = name {
+                subtypeID = (id, name)
             } else {
                 subtypeID = nil
             }
-
-            do {
-                authorID = try container.decode(IDNamePair.self, forKey: .authorID)
-                isAuthorIDBool = false
-            } catch DecodingError.typeMismatch {
-                isAuthorIDBool = (try container.decodeIfPresent(Bool.self, forKey: .authorID)) ?? false
-                authorID = nil
-            }
+        } else {
+            subtypeID = nil
+        }
 
         do {
-                  deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
-              } catch DecodingError.typeMismatch {
-                  if let array = try? container.decode([AnyDecodable].self, forKey: .deleteUID) {
-                      // If it's an array, consider the message as deleted
-                      deleteUID = true
-                  } else {
-                      deleteUID = false
-                  }
-              }
-          }
-      }
+            authorID = try container.decode(IDNamePair.self, forKey: .authorID)
+            isAuthorIDBool = false
+        } catch DecodingError.typeMismatch {
+            isAuthorIDBool = (try container.decodeIfPresent(Bool.self, forKey: .authorID)) ?? false
+            authorID = nil
+        }
 
-extension MessageModel {
-    public func withDeleteUID(_ deleteUID: Bool) -> MessageModel {
-        return MessageModel(
-            id: self.id,
-            authorDisplay: self.authorDisplay,
-            authorID: self.authorID,
-            date: self.date,
-            resID: self.resID,
-            needaction: self.needaction,
-            active: self.active,
-            subject: self.subject,
-            partnerIDs: self.partnerIDs,
-            parentID: self.parentID,
-            body: self.body,
-            recordName: self.recordName,
-            emailFrom: self.emailFrom,
-            displayName: self.displayName,
-            deleteUID: deleteUID,
-            model: self.model,
-            authorAvatar: self.authorAvatar,
-            starred: self.starred,
-            attachmentIDs: self.attachmentIDs,
-            refPartnerIDs: self.refPartnerIDs,
-            subtypeID: self.subtypeID,
-            isAuthorIDBool: self.isAuthorIDBool
-        )
+        do {
+            deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
+        } catch DecodingError.typeMismatch {
+            if let array = try? container.decode([AnyDecodable].self, forKey: .deleteUID) {
+                // If it's an array, consider the message as deleted
+                deleteUID = true
+            } else {
+                deleteUID = false
+            }
+        }
+
+        self.truncatedBody = MessageModel.truncateText(MessageModel.removeHTMLTags(from: body), maxLength: 100)
     }
-    
-    public func withActive(_ active: Bool) -> MessageModel {
-        return MessageModel(
-            id: self.id,
-            authorDisplay: self.authorDisplay,
-            authorID: self.authorID,
-            date: self.date,
-            resID: self.resID,
-            needaction: self.needaction,
-            active: active,
-            subject: self.subject,
-            partnerIDs: self.partnerIDs,
-            parentID: self.parentID,
-            body: self.body,
-            recordName: self.recordName,
-            emailFrom: self.emailFrom,
-            displayName: self.displayName,
-            deleteUID: self.deleteUID,
-            model: self.model,
-            authorAvatar: self.authorAvatar,
-            starred: self.starred,
-            attachmentIDs: self.attachmentIDs,
-            refPartnerIDs: self.refPartnerIDs,
-            subtypeID: self.subtypeID,
-            isAuthorIDBool: self.isAuthorIDBool
-        )
+
+    // Метод для удаления HTML-тегов
+    private static func removeHTMLTags(from htmlString: String) -> String {
+        let regex = try! NSRegularExpression(pattern: "<.*?>", options: [])
+        let range = NSRange(location: 0, length: htmlString.utf16.count)
+        return regex.stringByReplacingMatches(in: htmlString, options: [], range: range, withTemplate: "")
+    }
+
+    // Метод для обрезки текста до указанного количества символов
+    private static func truncateText(_ text: String, maxLength: Int) -> String {
+        if text.count <= maxLength {
+            return text
+        }
+        let endIndex = text.index(text.startIndex, offsetBy: maxLength)
+        return String(text[..<endIndex]) + "..."
     }
 }
