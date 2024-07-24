@@ -165,20 +165,18 @@ public struct MessageModel: Decodable, Equatable {
                 authorID = nil
             }
 
-            // Handle deleteUID which can be Bool or Array
-            do {
-                deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
-            } catch DecodingError.typeMismatch {
-                if let _ = try? container.decode([Int: String].self, forKey: .deleteUID) {
-                    deleteUID = true
-                } else if let _ = try? container.decode([String: Int].self, forKey: .deleteUID) {
-                    deleteUID = true
-                } else {
-                    deleteUID = false
-                }
-            }
-        }
-    }
+        do {
+                  deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
+              } catch DecodingError.typeMismatch {
+                  if let array = try? container.decode([AnyDecodable].self, forKey: .deleteUID) {
+                      // If it's an array, consider the message as deleted
+                      deleteUID = true
+                  } else {
+                      deleteUID = false
+                  }
+              }
+          }
+      }
 
 extension MessageModel {
     public func withDeleteUID(_ deleteUID: Bool) -> MessageModel {
