@@ -234,9 +234,15 @@ public class MessagesServer {
     private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
         var domain: [[Any]] = request.operation.domain(for: request.uid)
         
-        if !request.comparisonOperator.isEmpty {
+        if !request.comparisonOperator.isEmpty && request.messageId != 0 {
             domain.append(["id", request.comparisonOperator, request.messageId])
         }
+        
+        domain.append(["message_type",
+                        "in",
+                        ["email", "comment"]])
+        
+        domain.append(["message_type", "!=", "notification"])
 
         if let requestText = request.requestText, !requestText.isEmpty {
             switch request.selectFilter {
