@@ -10,12 +10,12 @@ import Foundation
 public struct IDNamePair: Decodable {
     public let id: Int
     public var name: String
-
+    
     public init(id: Int, name: String) {
         self.id = id
         self.name = name
     }
-
+    
     public init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
         id = try container.decode(Int.self)
@@ -47,7 +47,7 @@ public struct MessageModel: Decodable, Equatable {
     public var subtypeID: (Int, String)?
     public var isAuthorIDBool: Bool
     public var truncatedBody: String
-
+    
     enum CodingKeys: String, CodingKey {
         case id
         case authorDisplay = "author_display"
@@ -71,7 +71,7 @@ public struct MessageModel: Decodable, Equatable {
         case refPartnerIDs = "ref_partner_ids"
         case subtypeID = "subtype_id"
     }
-
+    
     public init(id: Int, authorDisplay: String, authorID: IDNamePair?, date: String, resID: Int, needaction: Bool, active: Bool, subject: String?, partnerIDs: [Int], parentID: IDNamePair?, body: String, recordName: String?, emailFrom: String, displayName: String, deleteUID: Bool, model: String, authorAvatar: String?, starred: Bool, attachmentIDs: [Int], refPartnerIDs: [Int], subtypeID: (Int, String)?, isAuthorIDBool: Bool) {
         self.id = id
         self.authorDisplay = authorDisplay
@@ -97,11 +97,11 @@ public struct MessageModel: Decodable, Equatable {
         self.isAuthorIDBool = isAuthorIDBool
         self.truncatedBody = MessageModel.truncateText(MessageModel.removeHTMLTags(from: body), maxLength: 100)
     }
-
+    
     public static func == (lhs: MessageModel, rhs: MessageModel) -> Bool {
         return lhs.id == rhs.id
     }
-
+    
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)
@@ -146,7 +146,7 @@ public struct MessageModel: Decodable, Equatable {
         starred = try container.decode(Bool.self, forKey: .starred)
         attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
         refPartnerIDs = try container.decodeIfPresent([Int].self, forKey: .refPartnerIDs) ?? []
-
+        
         if var subtypeIDContainer = try? container.nestedUnkeyedContainer(forKey: .subtypeID) {
             let id = try? subtypeIDContainer.decode(Int.self)
             let name = try? subtypeIDContainer.decode(String.self)
@@ -158,7 +158,7 @@ public struct MessageModel: Decodable, Equatable {
         } else {
             subtypeID = nil
         }
-
+        
         do {
             authorID = try container.decode(IDNamePair.self, forKey: .authorID)
             isAuthorIDBool = false
@@ -166,7 +166,7 @@ public struct MessageModel: Decodable, Equatable {
             isAuthorIDBool = (try container.decodeIfPresent(Bool.self, forKey: .authorID)) ?? false
             authorID = nil
         }
-
+        
         do {
             deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
         } catch DecodingError.typeMismatch {
@@ -177,45 +177,45 @@ public struct MessageModel: Decodable, Equatable {
                 deleteUID = false
             }
         }
-
+        
         self.truncatedBody = MessageModel.truncateText(MessageModel.removeHTMLTags(from: body), maxLength: 100)
     }
     
     public func withActive(_ active: Bool) -> MessageModel {
-         return MessageModel(
-             id: self.id,
-             authorDisplay: self.authorDisplay,
-             authorID: self.authorID,
-             date: self.date,
-             resID: self.resID,
-             needaction: self.needaction,
-             active: active,
-             subject: self.subject,
-             partnerIDs: self.partnerIDs,
-             parentID: self.parentID,
-             body: self.body,
-             recordName: self.recordName,
-             emailFrom: self.emailFrom,
-             displayName: self.displayName,
-             deleteUID: self.deleteUID,
-             model: self.model,
-             authorAvatar: self.authorAvatar,
-             starred: self.starred,
-             attachmentIDs: self.attachmentIDs,
-             refPartnerIDs: self.refPartnerIDs,
-             subtypeID: self.subtypeID,
-             isAuthorIDBool: self.isAuthorIDBool
-         )
-     }
-
-
+        return MessageModel(
+            id: self.id,
+            authorDisplay: self.authorDisplay,
+            authorID: self.authorID,
+            date: self.date,
+            resID: self.resID,
+            needaction: self.needaction,
+            active: active,
+            subject: self.subject,
+            partnerIDs: self.partnerIDs,
+            parentID: self.parentID,
+            body: self.body,
+            recordName: self.recordName,
+            emailFrom: self.emailFrom,
+            displayName: self.displayName,
+            deleteUID: self.deleteUID,
+            model: self.model,
+            authorAvatar: self.authorAvatar,
+            starred: self.starred,
+            attachmentIDs: self.attachmentIDs,
+            refPartnerIDs: self.refPartnerIDs,
+            subtypeID: self.subtypeID,
+            isAuthorIDBool: self.isAuthorIDBool
+        )
+    }
+    
+    
     // Метод для удаления HTML-тегов
     private static func removeHTMLTags(from htmlString: String) -> String {
         let regex = try! NSRegularExpression(pattern: "<.*?>", options: [])
         let range = NSRange(location: 0, length: htmlString.utf16.count)
         return regex.stringByReplacingMatches(in: htmlString, options: [], range: range, withTemplate: "")
     }
-
+    
     // Метод для обрезки текста до указанного количества символов
     private static func truncateText(_ text: String, maxLength: Int) -> String {
         if text.count <= maxLength {

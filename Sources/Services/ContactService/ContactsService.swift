@@ -14,29 +14,6 @@ public class ContactsService {
         self.rpcClient = rpcClient
     }
     
-//    public func loadContacts(action: ContactAction, searchParameters: ContactParameters, completion: @escaping (Result<[ContactsModel], Error>) -> Void) {
-//        let endpoint = (action == .fetch) ? "/web/dataset/call_kw" : "/web/dataset/search_read"
-//        let parameters = buildParameters(for: action, searchParameters: searchParameters)
-//        
-//        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: parameters) { result in
-//            switch result {
-//            case .success(let data):
-//                do {
-//                    // Decode the result array properly
-//                    let decodedResult = try JSONDecoder().decode(RPCResponse<[ContactsModel]>.self, from: data)
-//                    if let contactsArray = decodedResult.result {
-//                        completion(.success(contactsArray))
-//                    } else {
-//                        completion(.failure(NSError(domain: "No contacts found", code: -1, userInfo: nil)))
-//                    }
-//                } catch {
-//                    completion(.failure(error))
-//                }
-//            case .failure(let error):
-//                completion(.failure(error))
-//            }
-//        }
-//    }
     public func loadContacts(action: ContactAction, searchParameters: ContactParameters, completion: @escaping (Result<[ContactsModel], Error>) -> Void) {
         let endpoint = (action == .fetch) ? "/web/dataset/call_kw" : "/web/dataset/search_read"
         let parameters = buildParameters(for: action, searchParameters: searchParameters)

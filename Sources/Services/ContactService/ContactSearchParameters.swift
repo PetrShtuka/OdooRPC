@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 public struct ContactParameters {
     public var searchName: String
     public var searchEmail: String
