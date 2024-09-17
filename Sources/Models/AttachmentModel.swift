@@ -7,6 +7,8 @@
 
 import Foundation
 
+import Foundation
+
 public struct AttachmentModel: Decodable, Equatable, Hashable {
     public var id: Int
     public var resModel: String?
@@ -14,12 +16,12 @@ public struct AttachmentModel: Decodable, Equatable, Hashable {
     public var resName: String?
     public var filename: String
     public var type: String?
-    public var data: Data? // Если данные скачаны
+    public var data: Data? 
     public var path: String?
     public var fileMimeType: String
     public var companyId: Int?
     public var localPath: String?
-    public var fileSize: String? // Размер файла, если данные не скачаны
+    public var fileSize: String?
     public var lastOpenedAt: String?
     public var fileExtension: FileExtension?
     public var state: AttachmentState?
@@ -68,7 +70,7 @@ public struct AttachmentModel: Decodable, Equatable, Hashable {
             self.fileSize = nil
         } else {
             self.data = nil
-            self.fileSize = try? container.decode(String.self, forKey: .data) 
+            self.fileSize = try? container.decode(String.self, forKey: .data)
         }
         
         self.fileExtension = try? container.decode(FileExtension.self, forKey: .fileExtension)
@@ -79,4 +81,3 @@ public struct AttachmentModel: Decodable, Equatable, Hashable {
         return lhs.id == rhs.id
     }
 }
-
