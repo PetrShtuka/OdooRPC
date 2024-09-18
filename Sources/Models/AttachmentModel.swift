@@ -16,7 +16,7 @@ public struct AttachmentModel: Decodable, Equatable, Hashable {
     public var resName: String?
     public var filename: String
     public var type: String?
-    public var data: Data? 
+    public var data: String?
     public var path: String?
     public var fileMimeType: String
     public var companyId: Int?
@@ -64,9 +64,7 @@ public struct AttachmentModel: Decodable, Equatable, Hashable {
         self.localPath = try? container.decode(String.self, forKey: .localPath)
         self.lastOpenedAt = try? container.decode(String.self, forKey: .lastOpenedAt)
         
-        if let base64String = try? container.decode(String.self, forKey: .data),
-           let decodedData = Data(base64Encoded: base64String) {
-            self.data = decodedData
+        if let _ = try? container.decode(String.self, forKey: .data) {
             self.fileSize = nil
         } else {
             self.data = nil
