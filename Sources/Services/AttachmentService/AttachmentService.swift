@@ -27,14 +27,6 @@ public class AttachmentService {
         case let .fetchArray(idAttachment, includeDates):
             endpoint = "/web/dataset/call_kw"
             params = buildParams(for: AttachmentsListRequest(attachmentIds: idAttachment, isIncludeDates: includeDates, userID: userID))
-            
-            //        case let .uploadAttachment(attachment, message):
-            //            endpoint = "/web/dataset/call_kw"
-            //            params = buildParams(for: CreateAttachmentRequest(filename: attachment.filename, fileData: attachment.data?.base64EncodedString(), model: message.models, resId: message.resId))
-            //
-            //        case let .uploadAttachmentChat(attachment, message):
-            //            endpoint = "/web/dataset/call_kw"
-            //            params = buildParams(for: CreateAttachmentRequest(filename: attachment.filename, fileData: attachment.data?.base64EncodedString(), model: message.model, resId: message.resId))
         }
         
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
@@ -42,18 +34,20 @@ public class AttachmentService {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
-                        let errorMessage = errorData["message"] as? String ?? "Unknown error"
-                        let errorCode = errorData["code"] as? Int ?? -1
-                        let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
-                        completion(.failure(error))
-                    } else {
-                        let decoder = JSONDecoder()
-                        if let response = try? decoder.decode(OdooResponse<[AttachmentModel]>.self, from: data) {
-                            completion(.success(response.result))
+                    if let jsonResponseDict = jsonResponse as? [String: Any] {
+                        if let errorData = jsonResponseDict["error"] as? [String: Any] {
+                            let errorMessage = errorData["message"] as? String ?? "Unknown error"
+                            let errorCode = errorData["code"] as? Int ?? -1
+                            let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+                            completion(.failure(error))
+                        } else if let resultArray = jsonResponseDict["result"] as? [[String: Any]] {
+                            let attachments = resultArray.compactMap { AttachmentModel.from(json: $0) }
+                            completion(.success(attachments))
                         } else {
                             completion(.failure(NSError(domain: "InvalidResponse", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
                         }
+                    } else {
+                        completion(.failure(NSError(domain: "JSONError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid JSON format"])))
                     }
                 } catch {
                     completion(.failure(error))

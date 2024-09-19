@@ -5,11 +5,7 @@
 //  Created by Peter on 06.09.2024.
 //
 
-import Foundation
-
-import Foundation
-
-public struct AttachmentModel: Decodable, Equatable, Hashable {
+public struct AttachmentModel: Equatable, Hashable {
     public var id: Int
     public var resModel: String?
     public var resId: Int?
@@ -26,56 +22,45 @@ public struct AttachmentModel: Decodable, Equatable, Hashable {
     public var fileExtension: FileExtension?
     public var state: AttachmentState?
 
-    enum CodingKeys: String, CodingKey {
-        case id
-        case resModel = "res_model"
-        case resId = "res_id"
-        case resName = "res_name"
-        case filename = "name"
-        case type
-        case data = "datas"
-        case path
-        case fileMimeType = "mimetype"
-        case companyId = "company_id"
-        case localPath = "local_path"
-        case lastOpenedAt = "last_opened_at"
-        case fileExtension = "file_extension"
-        case state = "state"
+    // Инициализация
+    public init(id: Int, resModel: String?, resId: Int?, resName: String?, filename: String, type: String?, data: String?, path: String?, fileMimeType: String, companyId: Int?, localPath: String?, fileSize: String?, lastOpenedAt: String?, fileExtension: FileExtension?, state: AttachmentState?) {
+        self.id = id
+        self.resModel = resModel
+        self.resId = resId
+        self.resName = resName
+        self.filename = filename
+        self.type = type
+        self.data = data
+        self.path = path
+        self.fileMimeType = fileMimeType
+        self.companyId = companyId
+        self.localPath = localPath
+        self.fileSize = fileSize
+        self.lastOpenedAt = lastOpenedAt
+        self.fileExtension = fileExtension
+        self.state = state
     }
     
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        
-        self.id = try container.decode(Int.self, forKey: .id)
-        self.resModel = try? container.decode(String.self, forKey: .resModel)
-        self.resId = try? container.decode(Int.self, forKey: .resId)
-        
-        if let resNameString = try? container.decode(String.self, forKey: .resName) {
-            self.resName = resNameString
-        } else {
-            self.resName = nil
+    static func from(json: [String: Any]) -> AttachmentModel? {
+        guard let id = json["id"] as? Int,
+              let filename = json["name"] as? String,
+              let fileMimeType = json["mimetype"] as? String else {
+            return nil
         }
         
-        self.filename = try container.decode(String.self, forKey: .filename)
-        self.type = try? container.decode(String.self, forKey: .type)
-        self.path = try? container.decode(String.self, forKey: .path)
-        self.fileMimeType = try container.decode(String.self, forKey: .fileMimeType)
-        self.companyId = try? container.decode(Int.self, forKey: .companyId)
-        self.localPath = try? container.decode(String.self, forKey: .localPath)
-        self.lastOpenedAt = try? container.decode(String.self, forKey: .lastOpenedAt)
-        
-        if let _ = try? container.decode(String.self, forKey: .data) {
-            self.fileSize = nil
-        } else {
-            self.data = nil
-            self.fileSize = try? container.decode(String.self, forKey: .data)
-        }
-        
-        self.fileExtension = try? container.decode(FileExtension.self, forKey: .fileExtension)
-        self.state = try? container.decode(AttachmentState.self, forKey: .state)
-    }
-    
-    public static func ==(lhs: AttachmentModel, rhs: AttachmentModel) -> Bool {
-        return lhs.id == rhs.id
+        let resModel = json["res_model"] as? String
+        let resId = json["res_id"] as? Int
+        let resName = json["res_name"] as? String
+        let type = json["type"] as? String
+        let data = json["datas"] as? String
+        let path = json["path"] as? String
+        let companyId = json["company_id"] as? Int
+        let localPath = json["local_path"] as? String
+        let fileSize = json["file_size"] as? String
+        let lastOpenedAt = json["last_opened_at"] as? String
+        let fileExtension = FileExtension(rawValue: json["file_extension"] as? String ?? "")
+        let state = AttachmentState(rawValue: json["state"] as? String ?? "")
+
+        return AttachmentModel(id: id, resModel: resModel, resId: resId, resName: resName, filename: filename, type: type, data: data, path: path, fileMimeType: fileMimeType, companyId: companyId, localPath: localPath, fileSize: fileSize, lastOpenedAt: lastOpenedAt, fileExtension: fileExtension, state: state)
     }
 }
