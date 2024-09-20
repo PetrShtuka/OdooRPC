@@ -12,11 +12,11 @@ public struct AttachmentModel: Equatable, Hashable {
     public var resModel: String?
     public var resId: Int?
     public var resName: String?
-    public var filename: String
+    public var filename: String?
     public var type: String?
     public var data: String?
     public var path: String?
-    public var fileMimeType: String
+    public var fileMimeType: String?
     public var companyId: Int?
     public var localPath: String?
     public var fileSize: String?
@@ -25,7 +25,7 @@ public struct AttachmentModel: Equatable, Hashable {
     public var state: AttachmentState?
 
     // Инициализация
-    public init(id: Int, resModel: String?, resId: Int?, resName: String?, filename: String, type: String?, data: String?, path: String?, fileMimeType: String, companyId: Int?, localPath: String?, fileSize: String?, lastOpenedAt: String?, fileExtension: FileExtension?, state: AttachmentState?) {
+    public init(id: Int, resModel: String?, resId: Int?, resName: String?, filename: String?, type: String?, data: String?, path: String?, fileMimeType: String?, companyId: Int?, localPath: String?, fileSize: String?, lastOpenedAt: String?, fileExtension: FileExtension?, state: AttachmentState?) {
         self.id = id
         self.resModel = resModel
         self.resId = resId
@@ -44,12 +44,12 @@ public struct AttachmentModel: Equatable, Hashable {
     }
     
     static func from(json: [String: Any]) -> AttachmentModel? {
-        guard let id = json["id"] as? Int,
-              let filename = json["name"] as? String,
-              let fileMimeType = json["mimetype"] as? String else {
+        guard let id = json["id"] as? Int else {
             return nil
         }
         
+        let fileMimeType = json["mimetype"] as? String
+        let filename = json["name"] as? String
         let resModel = json["res_model"] as? String
         let resId = json["res_id"] as? Int
         let resName = json["res_name"] as? String
