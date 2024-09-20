@@ -71,7 +71,7 @@ public struct AttachmentModel: Equatable, Hashable {
             if let decodedData = Data(base64Encoded: base64Data) {
                 data = decodedData.base64EncodedString() // Успешно декодированное значение
             } else {
-                convertedFileSize = "Failed to decode Base64" // Ошибка декодирования, записываем в fileSize
+                convertedFileSize = nil
             }
         }
         
