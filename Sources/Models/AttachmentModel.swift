@@ -5,6 +5,8 @@
 //  Created by Peter on 06.09.2024.
 //
 
+import Foundation
+
 public struct AttachmentModel: Equatable, Hashable {
     public var id: Int
     public var resModel: String?
@@ -52,7 +54,7 @@ public struct AttachmentModel: Equatable, Hashable {
         let resId = json["res_id"] as? Int
         let resName = json["res_name"] as? String
         let type = json["type"] as? String
-        let data = json["datas"] as? String
+        let base64Data = json["datas"] as? String
         let path = json["path"] as? String
         let companyId = json["company_id"] as? Int
         let localPath = json["local_path"] as? String
@@ -61,6 +63,19 @@ public struct AttachmentModel: Equatable, Hashable {
         let fileExtension = FileExtension(rawValue: json["file_extension"] as? String ?? "")
         let state = AttachmentState(rawValue: json["state"] as? String ?? "")
 
-        return AttachmentModel(id: id, resModel: resModel, resId: resId, resName: resName, filename: filename, type: type, data: data, path: path, fileMimeType: fileMimeType, companyId: companyId, localPath: localPath, fileSize: fileSize, lastOpenedAt: lastOpenedAt, fileExtension: fileExtension, state: state)
+        // Попытка конвертации Base64 в Data
+        var data: String? = nil
+        var convertedFileSize: String? = fileSize
+
+        if let base64Data = base64Data {
+            if let decodedData = Data(base64Encoded: base64Data) {
+                data = decodedData.base64EncodedString() // Успешно декодированное значение
+            } else {
+                convertedFileSize = "Failed to decode Base64" // Ошибка декодирования, записываем в fileSize
+            }
+        }
+        
+        return AttachmentModel(id: id, resModel: resModel, resId: resId, resName: resName, filename: filename, type: type, data: data, path: path, fileMimeType: fileMimeType, companyId: companyId, localPath: localPath, fileSize: convertedFileSize, lastOpenedAt: lastOpenedAt, fileExtension: fileExtension, state: state)
     }
+
 }
