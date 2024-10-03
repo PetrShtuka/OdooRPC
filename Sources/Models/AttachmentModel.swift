@@ -24,7 +24,6 @@ public struct AttachmentModel: Equatable, Hashable {
     public var fileExtension: FileExtension?
     public var state: AttachmentState?
 
-    // Инициализация
     public init(id: Int, resModel: String?, resId: Int?, resName: String?, filename: String?, type: String?, data: String?, path: String?, fileMimeType: String?, companyId: Int?, localPath: String?, fileSize: String?, lastOpenedAt: String?, fileExtension: FileExtension?, state: AttachmentState?) {
         self.id = id
         self.resModel = resModel

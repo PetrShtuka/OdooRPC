@@ -27,6 +27,12 @@ public class AttachmentService {
         case let .fetchArray(idAttachment, includeDates):
             endpoint = "/web/dataset/call_kw"
             params = buildParams(for: AttachmentsListRequest(attachmentIds: idAttachment, isIncludeDates: includeDates, userID: userID))
+        case let .uploadAttachment(attachment: attachment, message: message):
+            endpoint = "/web/dataset/call_kw"
+            params = buildParams(for: CreateAttachmentRequest(filename: attachment.filename, fileData: attachment.data, model: message.models, resId: message.resId))
+        case let .uploadAttachmentChat(attachment: attachment, message: message):
+            endpoint = "/web/dataset/call_kw"
+            params = buildParams(for: CreateAttachmentRequest(filename: attachment.filename, fileData: attachment.data, model: message.model, resId: message.resId))
         }
         
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
@@ -110,12 +116,12 @@ public class AttachmentService {
 public enum AttachmentRequestType {
     case fetch(idAttachment: Int, includeDates: Bool)
     case fetchArray(idAttachment: [Int], includeDates: Bool)
-    //    case uploadAttachment(attachment: AttachmentModel, message: SentMessageModel)
-    //    case uploadAttachmentChat(attachment: AttachmentModel, message: ChatMessageRealm)
+    case uploadAttachment(attachment: AttachmentModel, message: MobileSentMessage)
+    case uploadAttachmentChat(attachment: AttachmentModel, message: MessageConversation)
 }
 
 // Structs for requests
-public struct AttachmentsRequest {
+public struct AttachmentsRequest  {
     var attachmentId: Int?
     var isIncludeDates: Bool
     var userID: String

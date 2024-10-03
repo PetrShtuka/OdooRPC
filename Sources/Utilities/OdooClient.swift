@@ -24,7 +24,6 @@ public class OdooClient {
         self.rpcClient.updateSessionService(_authService)  
     }
 
-    // Остальные сервисы
     public lazy var messagesService: MessagesServer = MessagesServer(rpcClient: rpcClient)
     public lazy var userDataService: UserDataService = UserDataService(rpcClient: rpcClient)
     public lazy var odooService: OdooService = OdooService(rpcClient: rpcClient)

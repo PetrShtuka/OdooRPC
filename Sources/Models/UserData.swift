@@ -17,7 +17,7 @@ public struct UserData: Equatable, Decodable {
     public static func == (lhs: UserData, rhs: UserData) -> Bool {
         return lhs.uid == rhs.uid &&
                lhs.name == rhs.name &&
-        lhs.partnerID?.id == rhs.partnerID?.id
+               lhs.partnerID?.id == rhs.partnerID?.id
     }
     
     public var uid: Int?
@@ -26,7 +26,11 @@ public struct UserData: Equatable, Decodable {
     public var isSuperuser: Bool?
     public var language: String?
     public var timezone: String?
+    public var avatar: String?
     public var partnerID: PartnerID?
+    
+    // Добавим версию сервера как поле в структуру
+    public var serverVersion: Int?
     
     private enum CodingKeys: String, CodingKey {
         case uid
@@ -38,7 +42,7 @@ public struct UserData: Equatable, Decodable {
         case partnerID = "partner_id"
     }
     
-    public init(uid: Int?, name: String?, sessionToken: String?, isSuperuser: Bool?, language: String?, timezone: String?, partnerID: PartnerID?) {
+    public init(uid: Int?, name: String?, sessionToken: String?, isSuperuser: Bool?, language: String?, timezone: String?, partnerID: PartnerID?, serverVersion: Int?) {
         self.uid = uid
         self.name = name
         self.sessionToken = sessionToken
@@ -46,6 +50,10 @@ public struct UserData: Equatable, Decodable {
         self.language = language
         self.timezone = timezone
         self.partnerID = partnerID
+        self.serverVersion = serverVersion
+        
+        // Выбор аватара в зависимости от версии сервера
+        self.avatar = serverVersion ?? 0 >= 15 ? "avatar_128" : "image_small"
     }
     
     public init(from decoder: Decoder) throws {
@@ -56,6 +64,7 @@ public struct UserData: Equatable, Decodable {
         isSuperuser = try container.decodeIfPresent(Bool.self, forKey: .isSuperuser)
         language = try container.decodeIfPresent(String.self, forKey: .language)
         timezone = try container.decodeIfPresent(String.self, forKey: .timezone)
+        
         if let partnerIDArray = try? container.decodeIfPresent([AnyDecodable].self, forKey: .partnerID), let firstElement = partnerIDArray.first?.value as? Int {
             partnerID = PartnerID(id: firstElement, name: partnerIDArray.dropFirst().first?.value as? String)
         } else if let partnerIDInt = try? container.decodeIfPresent(Int.self, forKey: .partnerID) {
@@ -63,6 +72,12 @@ public struct UserData: Equatable, Decodable {
         } else {
             partnerID = nil
         }
+        
+        // Инициализация поля serverVersion должна быть из контекста запроса, где сервер возвращает версию
+        self.serverVersion = nil // Предположительно, версию сервера можно передать позднее
+        
+        // Устанавливаем значение avatar в зависимости от версии сервера
+        self.avatar = serverVersion ?? 0 >= 15 ? "avatar_128" : "image_small"
     }
 }
 
