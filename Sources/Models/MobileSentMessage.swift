@@ -74,8 +74,7 @@ extension MobileSentMessage {
     public mutating func prepare(with user: UserData, replayMessage: MessageModel, typeEmail: MessageSendType, type: MailboxItem, attachments: [AttachmentModel], selectPartnersEmail: [ContactsModel], selectPartnersCc: [ContactsModel], selectPartnersBcc: [ContactsModel], messagesBody: String, subject: String?) {
         self.authorId = user.partnerID?.id ?? 0
         self.authorDisplay = user.name ?? ""
-#warning("This need avatar author String")
-        //        self.avatarAuthor = user.
+        self.avatarAuthor = user.avatar ?? ""  // Решение для аватара
         
         self.messageId = replayMessage.id
         self.parentId = replayMessage.parentID?.id ?? 0
