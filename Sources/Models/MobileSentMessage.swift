@@ -29,6 +29,29 @@ public struct MobileSentMessage {
     public var wizardType: String = ""
     public var parentId: Int = 0
     
+    public init(messageId: Int = 1, userId: String = "", authorDisplay: String = "", authorId: Int = 0, selectedPartners: [[Int]] = [[]], selectedPartnersCc: [[Int]] = [[]], selectedPartnersBcc: [[Int]] = [[]], attachments: [[Int]] = [[]], avatarAuthor: String = "", dateSent: String = Date().description, categories: String = "", recordName: String = "", models: String = "", resId: Int = 0, isSent: Bool = false, oldBody: String = "", body: String = "", subject: String = "", wizardType: String = "", parentId: Int = 0) {
+          self.messageId = messageId
+          self.userId = userId
+          self.authorDisplay = authorDisplay
+          self.authorId = authorId
+          self.selectedPartners = selectedPartners
+          self.selectedPartnersCc = selectedPartnersCc
+          self.selectedPartnersBcc = selectedPartnersBcc
+          self.attachments = attachments
+          self.avatarAuthor = avatarAuthor
+          self.dateSent = dateSent
+          self.categories = categories
+          self.recordName = recordName
+          self.models = models
+          self.resId = resId
+          self.isSent = isSent
+          self.oldBody = oldBody
+          self.body = body
+          self.subject = subject
+          self.wizardType = wizardType
+          self.parentId = parentId
+      }
+    
     public func createMessageModel() -> [MobileSentMessage] {
         var sentMessages: [MobileSentMessage] = []
         
@@ -115,6 +138,3 @@ extension MobileSentMessage {
         return data
     }
 }
-
-
-
