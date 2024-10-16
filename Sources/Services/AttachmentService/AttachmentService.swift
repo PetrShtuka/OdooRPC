@@ -64,20 +64,19 @@ public class AttachmentService {
         }
     }
     
-    private func buildParams(for request: AttachmentsRequest) -> [String: Any] {
+    private func buildParams(for request: CreateAttachmentRequest) -> [String: Any] {
         return [
             "model": "ir.attachment",
-            "method": "read",
-            "args": [[request.attachmentId]],
-            "kwargs": [
-                "context": [
-                    "lang": "en_US",
-                    "tz": "Europe/Rome",
-                    "uid": request.userID,
-                    "allowed_company_ids": [1],
-                    "bin_size": !request.isIncludeDates
+            "method": "create",
+            "args": [
+                [
+                    "name": request.filename ?? "",
+                    "datas": request.fileData ?? "",
+                    "res_model": request.model ?? "",
+                    "res_id": request.resId ?? 0
                 ]
-            ]
+            ],
+            "kwargs": [:]  // Добавляем пустой kwargs
         ]
     }
     
