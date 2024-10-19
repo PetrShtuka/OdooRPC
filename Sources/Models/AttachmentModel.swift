@@ -24,6 +24,7 @@ public struct AttachmentModel: Equatable, Hashable {
     public var fileExtension: FileExtension?
     public var state: AttachmentState?
 
+    // Полный инициализатор
     public init(id: Int, resModel: String?, resId: Int?, resName: String?, filename: String?, type: String?, data: String?, path: String?, fileMimeType: String?, companyId: Int?, localPath: String?, fileSize: String?, lastOpenedAt: String?, fileExtension: FileExtension?, state: AttachmentState?) {
         self.id = id
         self.resModel = resModel
@@ -41,12 +42,32 @@ public struct AttachmentModel: Equatable, Hashable {
         self.fileExtension = fileExtension
         self.state = state
     }
-    
+
+    // Упрощенный инициализатор, принимающий только ID
+    public init(id: Int) {
+        self.id = id
+        self.resModel = nil
+        self.resId = nil
+        self.resName = nil
+        self.filename = nil
+        self.type = nil
+        self.data = nil
+        self.path = nil
+        self.fileMimeType = nil
+        self.companyId = nil
+        self.localPath = nil
+        self.fileSize = nil
+        self.lastOpenedAt = nil
+        self.fileExtension = nil
+        self.state = nil
+    }
+
+    // Метод для создания модели из JSON
     static func from(json: [String: Any]) -> AttachmentModel? {
         guard let id = json["id"] as? Int else {
             return nil
         }
-        
+
         let fileMimeType = json["mimetype"] as? String
         let filename = json["name"] as? String
         let resModel = json["res_model"] as? String
@@ -76,5 +97,4 @@ public struct AttachmentModel: Equatable, Hashable {
         
         return AttachmentModel(id: id, resModel: resModel, resId: resId, resName: resName, filename: filename, type: type, data: data, path: path, fileMimeType: fileMimeType, companyId: companyId, localPath: localPath, fileSize: convertedFileSize, lastOpenedAt: lastOpenedAt, fileExtension: fileExtension, state: state)
     }
-
 }
