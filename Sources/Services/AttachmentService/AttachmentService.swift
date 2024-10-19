@@ -36,33 +36,45 @@ public class AttachmentService {
         }
         
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
-            switch result {
-            case .success(let data):
-                do {
-                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                    if let jsonResponseDict = jsonResponse as? [String: Any] {
-                        if let errorData = jsonResponseDict["error"] as? [String: Any] {
-                            let errorMessage = errorData["message"] as? String ?? "Unknown error"
-                            let errorCode = errorData["code"] as? Int ?? -1
-                            let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
-                            completion(.failure(error))
-                        } else if let resultArray = jsonResponseDict["result"] as? [[String: Any]] {
-                            let attachments = resultArray.compactMap { AttachmentModel.from(json: $0) }
-                            completion(.success(attachments))
+                switch result {
+                case .success(let data):
+                    do {
+                        let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                        if let jsonResponseDict = jsonResponse as? [String: Any] {
+                            // Если есть ошибки в ответе
+                            if let errorData = jsonResponseDict["error"] as? [String: Any] {
+                                let errorMessage = errorData["message"] as? String ?? "Unknown error"
+                                let errorCode = errorData["code"] as? Int ?? -1
+                                let error = NSError(domain: "OdooServerError", code: errorCode, userInfo: [NSLocalizedDescriptionKey: errorMessage])
+                                completion(.failure(error))
+                            }
+                            // Парсинг поля "result", если он есть
+                            else if let resultArray = jsonResponseDict["result"] as? [[String: Any]] {
+                                let attachments = resultArray.compactMap { AttachmentModel.from(json: $0) }
+                                completion(.success(attachments))
+                            }
+                            // Дополнительный парсинг по полям "jsonrpc" и "id"
+                            else if let jsonrpc = jsonResponseDict["jsonrpc"] as? String,
+                                    let id = jsonResponseDict["id"] as? Int,
+                                    let resultValue = jsonResponseDict["result"] {
+                                print("JSON-RPC Version: \(jsonrpc), Request ID: \(id), Result: \(resultValue)")
+                                // Здесь вы можете добавить дополнительную обработку поля resultValue
+                                completion(.success([]))  // Заглушка для примера
+                            } else {
+                                completion(.failure(NSError(domain: "InvalidResponse", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
+                            }
                         } else {
-                            completion(.failure(NSError(domain: "InvalidResponse", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
+                            completion(.failure(NSError(domain: "JSONError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid JSON format"])))
                         }
-                    } else {
-                        completion(.failure(NSError(domain: "JSONError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid JSON format"])))
+                    } catch {
+                        completion(.failure(error))
                     }
-                } catch {
+                case .failure(let error):
                     completion(.failure(error))
                 }
-            case .failure(let error):
-                completion(.failure(error))
             }
         }
-    }
+        
     
     private func buildParams(for request: AttachmentsRequest) -> [String: Any] {
         return [
@@ -112,7 +124,7 @@ public class AttachmentService {
             "kwargs": [:]  // Добавляем пустой kwargs
         ]
     }
-
+    
 }
 
 public enum AttachmentRequestType {
