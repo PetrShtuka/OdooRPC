@@ -76,11 +76,11 @@ public class RPCClient {
 
     private func executeNetworkRequest(request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask {
         let task = session.dataTask(with: request) { data, response, error in
-            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
-                let errorInfo = [NSLocalizedDescriptionKey: "Server returned status code \(httpResponse.statusCode)", "StatusCode": "\(httpResponse.statusCode)"] as [String: Any]
-                completion(.failure(NSError(domain: "HTTPError", code: httpResponse.statusCode, userInfo: errorInfo)))
-                return
-            }
+//            if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+//                let errorInfo = [NSLocalizedDescriptionKey: "Server returned status code \(httpResponse.statusCode)", "StatusCode": "\(httpResponse.statusCode)"] as [String: Any]
+//                completion(.failure(NSError(domain: "HTTPError", code: httpResponse.statusCode, userInfo: errorInfo)))
+//                return
+//            }
             
             if let error = error {
                 completion(.failure(error))

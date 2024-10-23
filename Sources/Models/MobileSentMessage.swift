@@ -21,7 +21,7 @@ public struct MobileSentMessage {
     public var categories: String = ""
     public var recordName: String = ""
     public var models: String = ""
-    public var resId: Int = 0
+    public var resId: Int?
     public var isSent: Bool = false
     public var oldBody: String = ""
     public var body: String = ""
@@ -29,7 +29,7 @@ public struct MobileSentMessage {
     public var wizardType: String = ""
     public var parentId: Int = 0
     
-    public init(messageId: Int = 1, userId: String = "", authorDisplay: String = "", authorId: Int = 0, selectedPartners: [[Int]] = [[]], selectedPartnersCc: [[Int]] = [[]], selectedPartnersBcc: [[Int]] = [[]], attachments: [[Int]] = [[]], avatarAuthor: String = "", dateSent: String = Date().description, categories: String = "", recordName: String = "", models: String = "", resId: Int = 0, isSent: Bool = false, oldBody: String = "", body: String = "", subject: String = "", wizardType: String = "", parentId: Int = 0) {
+    public init(messageId: Int = 1, userId: String = "", authorDisplay: String = "", authorId: Int = 0, selectedPartners: [[Int]] = [[]], selectedPartnersCc: [[Int]] = [[]], selectedPartnersBcc: [[Int]] = [[]], attachments: [[Int]] = [[]], avatarAuthor: String = "", dateSent: String = Date().description, categories: String = "", recordName: String = "", models: String = "", resId: Int?, isSent: Bool = false, oldBody: String = "", body: String = "", subject: String = "", wizardType: String = "", parentId: Int = 0) {
           self.messageId = messageId
           self.userId = userId
           self.authorDisplay = authorDisplay

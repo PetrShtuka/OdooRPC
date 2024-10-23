@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCPackageTests.build/master.swiftdeps"
+  },
+  "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCPackageTests.derived/runner.swift": {
+    "dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCPackageTests.build/runner.d",
+    "object": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCPackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCPackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCPackageTests.build/runner.swiftdeps"
+  }
+}

@@ -17,7 +17,7 @@ public class AuthService: SessionServiceDelegate {
     private var userData: UserData?
     private var credentials: Credentials?
     public weak var delegate: AuthServiceDelegate?
-    private var totpService: AuthenticationServiceTotp?
+    var totpService: AuthenticationServiceTotp?
     private var requestOtpCode: ((@escaping (String?) -> Void) -> Void)?
 
     public func onRequestOtpCode(_ handler: @escaping (@escaping (String?) -> Void) -> Void) {
@@ -35,7 +35,7 @@ public class AuthService: SessionServiceDelegate {
     }
 
     public func authenticate(credentials: Credentials, completion: @escaping (Result<UserData, Error>) -> Void) {
-        self.credentials = credentials  // Сохраняем учетные данные при аутентификации
+        self.credentials = credentials
         client.sendAuthenticationRequest(endpoint: "/web/session/authenticate", method: .post, params: credentials.asDictionary()) { [weak self] result in
             guard let self = self else { return }
             switch result {

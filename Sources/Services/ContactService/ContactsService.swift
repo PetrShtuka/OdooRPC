@@ -52,7 +52,7 @@ public class ContactsService {
             }
         }
     }
-
+    
     private func buildParameters(for action: ContactAction, searchParameters: ContactParameters) -> [String: Any] {
         var domain: [[Any]] = []
         

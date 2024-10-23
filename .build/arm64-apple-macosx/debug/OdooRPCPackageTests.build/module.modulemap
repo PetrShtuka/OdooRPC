@@ -1,0 +1,4 @@
+module OdooRPCPackageTests {
+    header "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCPackageTests.build/OdooRPCPackageTests-Swift.h"
+    requires objc
+}

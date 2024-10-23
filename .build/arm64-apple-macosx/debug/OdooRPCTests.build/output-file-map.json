@@ -1,0 +1,41 @@
+{
+  "": {
+    "swift-dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/master.swiftdeps"
+  },
+  "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/Tests/OdooConnectorSwiftTests/AuthServiceTests.swift": {
+    "dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/AuthServiceTests.d",
+    "object": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/AuthServiceTests.swift.o",
+    "swiftmodule": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/AuthServiceTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/AuthServiceTests.swiftdeps"
+  },
+  "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/Tests/OdooConnectorSwiftTests/AuthenticationServiceTotpTests.swift": {
+    "dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/AuthenticationServiceTotpTests.d",
+    "object": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/AuthenticationServiceTotpTests.swift.o",
+    "swiftmodule": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/AuthenticationServiceTotpTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/AuthenticationServiceTotpTests.swiftdeps"
+  },
+  "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/Tests/OdooConnectorSwiftTests/CetmixCommunicatorServiceTests.swift": {
+    "dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/CetmixCommunicatorServiceTests.d",
+    "object": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/CetmixCommunicatorServiceTests.swift.o",
+    "swiftmodule": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/CetmixCommunicatorServiceTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/CetmixCommunicatorServiceTests.swiftdeps"
+  },
+  "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/Tests/OdooConnectorSwiftTests/ContactsServiceTests.swift": {
+    "dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/ContactsServiceTests.d",
+    "object": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/ContactsServiceTests.swift.o",
+    "swiftmodule": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/ContactsServiceTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/ContactsServiceTests.swiftdeps"
+  },
+  "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/Tests/OdooConnectorSwiftTests/DatabaseServiceTests.swift": {
+    "dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/DatabaseServiceTests.d",
+    "object": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/DatabaseServiceTests.swift.o",
+    "swiftmodule": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/DatabaseServiceTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/DatabaseServiceTests.swiftdeps"
+  },
+  "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/Tests/OdooConnectorSwiftTests/MessagesServerTests.swift": {
+    "dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/MessagesServerTests.d",
+    "object": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/MessagesServerTests.swift.o",
+    "swiftmodule": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/MessagesServerTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPCTests.build/MessagesServerTests.swiftdeps"
+  }
+}

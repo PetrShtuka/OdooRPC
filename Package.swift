@@ -7,6 +7,11 @@ let package = Package(
         .library(name: "OdooRPC", targets: ["OdooRPC"])
     ],
     targets: [
-        .target(name: "OdooRPC", dependencies: [], path: "Sources")
+        .target(name: "OdooRPC", dependencies: [], path: "Sources"),
+        .testTarget(
+            name: "OdooRPCTests",
+            dependencies: ["OdooRPC"],
+            path: "Tests"
+        )
     ]
 )

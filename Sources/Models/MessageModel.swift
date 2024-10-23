@@ -28,7 +28,7 @@ public struct MessageModel: Decodable, Equatable {
     public var authorDisplay: String
     public var authorID: IDNamePair?
     public var date: String
-    public var resID: Int
+    public var resID: Int?
     public var needaction: Bool
     public var active: Bool
     public var subject: String?
@@ -72,7 +72,7 @@ public struct MessageModel: Decodable, Equatable {
         case subtypeID = "subtype_id"
     }
     
-    public init(id: Int, authorDisplay: String, authorID: IDNamePair?, date: String, resID: Int, needaction: Bool, active: Bool, subject: String?, partnerIDs: [Int], parentID: IDNamePair?, body: String, recordName: String?, emailFrom: String, displayName: String, deleteUID: Bool, model: String, authorAvatar: String?, starred: Bool, attachmentIDs: [Int], refPartnerIDs: [Int], subtypeID: (Int, String)?, isAuthorIDBool: Bool) {
+    public init(id: Int, authorDisplay: String, authorID: IDNamePair?, date: String, resID: Int?, needaction: Bool, active: Bool, subject: String?, partnerIDs: [Int], parentID: IDNamePair?, body: String, recordName: String?, emailFrom: String, displayName: String, deleteUID: Bool, model: String, authorAvatar: String?, starred: Bool, attachmentIDs: [Int], refPartnerIDs: [Int], subtypeID: (Int, String)?, isAuthorIDBool: Bool) {
         self.id = id
         self.authorDisplay = authorDisplay
         self.authorID = authorID
@@ -208,8 +208,6 @@ public struct MessageModel: Decodable, Equatable {
         )
     }
     
-    
-    // Метод для удаления HTML-тегов
     private static func removeHTMLTags(from htmlString: String) -> String {
         let regex = try! NSRegularExpression(pattern: "<.*?>", options: [])
         let range = NSRange(location: 0, length: htmlString.utf16.count)
