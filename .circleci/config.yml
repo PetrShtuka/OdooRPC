@@ -3,27 +3,24 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-executors:
-  ios-executor:
-    macos:
-      xcode: "16.0" 
-
 jobs:
   build:
-    executor: ios-executor
+    macos:
+      xcode: "16.0.0"  # Укажите нужную версию Xcode
     steps:
       - checkout
       - run:
-          name: Build the project
-          command: xcodebuild -scheme YourSchemeName -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 13,OS=latest' build
+          name: Build the library
+          command: xcodebuild -scheme OdooRPC -sdk macosx build
 
   test:
-    executor: ios-executor
+    macos:
+      xcode: "16.0.0"
     steps:
       - checkout
       - run:
           name: Run tests
-          command: xcodebuild test -scheme YourSchemeName -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 13,OS=latest'
+          command: xcodebuild test -scheme OdooRPC -sdk macosx
 
 workflows:
   version: 2
