@@ -1,0 +1,50 @@
+# Couldn't automatically generate a config from your source code.
+# This is a generic template to serve as a base for your custom config
+# See: https://circleci.com/docs/configuration-reference
+version: 2.1
+
+executors:
+  swift-executor:
+    docker:
+      - image: cimg/swift:5.3
+
+jobs:
+  test:
+    executor: swift-executor
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: swift package resolve
+      - run:
+          name: Run Tests
+          command: swift test
+
+  build:
+    executor: swift-executor
+    steps:
+      - checkout
+      - run:
+          name: Build the Package
+          command: swift build
+      - store_artifacts:
+          path: .build/debug/OdooRPC
+
+  deploy:
+    executor: swift-executor
+    steps:
+      - run:
+          name: Deploy
+          command: echo "Deploying your package..." 
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test
+      - deploy:
+          requires:
+            - test
