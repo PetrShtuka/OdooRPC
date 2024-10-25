@@ -11,7 +11,7 @@ jobs:
       - checkout
       - run:
           name: Build the library
-          command: xcodebuild -scheme OdooRPC -sdk macosx build
+          command: xcodebuild -scheme OdooRPC -sdk macosx -destination 'platform=macOS' build
 
   test:
     macos:
