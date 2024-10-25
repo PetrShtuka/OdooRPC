@@ -6,7 +6,7 @@ version: 2.1
 executors:
   swift-executor:
     docker:
-      - image: cimg/swift:latest  # Use the latest Swift image
+      - image: cimg/swift:5.6
 
 jobs:
   test:
