@@ -3,19 +3,15 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-executors:
-  swift-executor:
-    docker:
-      - image: cimg/swift:5.3
-
 jobs:
   test:
-    executor: swift-executor
+    docker:
+      - image: circleci/swift:5.3
     steps:
       - checkout
       - run:
-          name: Install Dependencies
-          command: swift package resolve
+          name: Log in to Docker Hub
+          command: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
       - run:
           name: Run Tests
           command: swift test
