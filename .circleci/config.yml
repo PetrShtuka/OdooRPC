@@ -6,16 +6,16 @@ version: 2.1
 jobs:
   build:
     macos:
-      xcode: "16.0"
+      xcode: "16.0.0"
     steps:
       - checkout
       - run:
           name: Build the library
           command: xcodebuild -scheme OdooRPC -sdk macosx -destination 'platform=macOS' build
 
- test:
+  test:
     macos:
-      xcode: "16.0"
+      xcode: "16.0.0"
     steps:
       - checkout
       - run:
