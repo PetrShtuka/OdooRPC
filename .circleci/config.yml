@@ -6,7 +6,7 @@ version: 2.1
 executors:
   swift-executor:
     docker:
-      - image: cimg/swift:5.3 
+      - image: circleci/swift:5.3
 
 jobs:
   test:
