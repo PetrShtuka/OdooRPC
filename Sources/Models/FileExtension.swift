@@ -8,30 +8,30 @@
 import Foundation
 
 public enum FileExtension: String, Codable, CaseIterable {
-    
+
     case pdf
     case gif
     case avi
     case zip
     case mp3
-    
+
     case doc
     case ppt
     case txt
     case mov
-    
+
     case jpeg
     case jpg
     case png
-    
+
     public var extensionStr: String {
         return ".\(self.rawValue)"
     }
-    
+
     public var imageName: String {
         return "fileEx_\(self.rawValue)"
     }
-    
+
     public var mimeType: String {
         switch self {
         case .pdf:
@@ -52,7 +52,7 @@ public enum FileExtension: String, Codable, CaseIterable {
             return "text/plain"
         case .mov:
             return "video/quicktime"
-            
+
         case .jpeg:
             return "image/jpeg"
         case .jpg:

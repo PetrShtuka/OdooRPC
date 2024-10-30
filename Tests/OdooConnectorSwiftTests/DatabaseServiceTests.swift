@@ -24,7 +24,7 @@ class DatabaseServiceTests: XCTestCase {
         super.tearDown()
     }
     
-    // Тест успешного получения списка баз данных
+    // Test successful retrieval of the list of databases
     func testListDatabasesSuccess() {
         let jsonData = """
         {
@@ -41,22 +41,22 @@ class DatabaseServiceTests: XCTestCase {
             case .success(let databases):
                 XCTAssertEqual(databases, ["db1", "db2", "db3"])
             case .failure(let error):
-                XCTFail("Ожидали успех, но получили ошибку: \(error)")
+                XCTFail("Expected success but received error: \(error)")
             }
         }
     }
     
-    // Тест неуспешного получения списка баз данных
+    // Test unsuccessful retrieval of the list of databases
     func testListDatabasesFailure() {
         let mockError = NSError(domain: "NetworkError", code: -1, userInfo: nil)
         mockRPCClient.mockResult = .failure(mockError)
         
-        let expectation = self.expectation(description: "Неудача при получении списка баз данных")
+        let expectation = self.expectation(description: "Failure when retrieving the list of databases")
         
         databaseService.listDatabases { result in
             switch result {
             case .success:
-                XCTFail("Ожидали ошибку, но получили успех")
+                XCTFail("Expected error but received success")
             case .failure(let error as NSError):
                 XCTAssertEqual(error.domain, "NetworkError")
                 XCTAssertEqual(error.code, -1)

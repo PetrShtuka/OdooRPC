@@ -1,23 +1,24 @@
-
 import Foundation
 
 public class MessagesServer {
     private var rpcClient: RPCClient
     
+    // Initializer for MessagesServer, takes an RPCClient instance
     init(rpcClient: RPCClient) {
         self.rpcClient = rpcClient
     }
     
+    // Method to fetch messages based on the provided request
     public func fetchMessages(request: MessageFetchRequest, completion: @escaping (Result<[MessageModel], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
         let params = buildParams(for: request)
         
+        // Send the RPC request to fetch messages
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -29,8 +30,8 @@ public class MessagesServer {
                             let response = try decoder.decode(OdooResponse<MessageResponseDataWithLength>.self, from: data)
                             completion(.success(response.result.records))
                         } catch {
-                            let response = try decoder.decode(OdooResponse<MessageResponseDataWithoutLength>.self, from: data)
-                            completion(.success(response.result.records))
+                            let responseWithoutLength = try decoder.decode(OdooResponse<MessageResponseDataWithoutLength>.self, from: data)
+                            completion(.success(responseWithoutLength.result.records))
                         }
                     }
                 } catch {
@@ -42,19 +43,22 @@ public class MessagesServer {
         }
     }
     
+    // Method to search for messages, effectively calls fetchMessages
     public func searchMessages(request: MessageFetchRequest, completion: @escaping (Result<[MessageModel], Error>) -> Void) {
         fetchMessages(request: request, completion: completion)
     }
     
+    // Method to fetch available modules
     public func fetchModules(completion: @escaping (Result<[ModelOdoo], Error>) -> Void) {
         let endpoint = "/web/session/modules"
         let params: [String: Any] = [:]
         
+        // Send the RPC request to fetch modules
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
-                    let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
+                    _ = try JSONSerialization.jsonObject(with: data, options: [])
                     
                     if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                        let moduleNames = jsonResponse["result"] as? [String] {
@@ -73,6 +77,7 @@ public class MessagesServer {
         }
     }
     
+    // Method to delete messages by their IDs
     public func deleteMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let method = type == .bin ? "undelete" : "unlink_pro"
@@ -83,12 +88,13 @@ public class MessagesServer {
             "kwargs": ["context": [Any]()]
         ]
         
+        // Send the RPC request to delete messages by IDs
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-          
+                    
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -106,6 +112,7 @@ public class MessagesServer {
         }
     }
     
+    // Method to archive messages by their IDs
     public func archiveMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let params: [String: Any] = [
@@ -120,7 +127,7 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                  
+                    
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -138,6 +145,7 @@ public class MessagesServer {
         }
     }
     
+    // Method to mark messages as read by their IDs
     public func markReadMessages(messageIDs: [Int], type: MailboxOperation, completion: @escaping (Result<Bool, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let params: [String: Any] = [
@@ -152,7 +160,7 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-                 
+                    
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -170,6 +178,7 @@ public class MessagesServer {
         }
     }
     
+    // Method to fetch existing message IDs based on local message IDs
     public func fetchExistingMessageIDs(localMessagesID: [Int], completion: @escaping (Result<[Int], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
         let params: [String: Any] = [
@@ -183,7 +192,7 @@ public class MessagesServer {
             case .success(let data):
                 do {
                     let jsonResponse = try JSONSerialization.jsonObject(with: data, options: [])
-               
+                    
                     if let jsonResponse = jsonResponse as? [String: Any], let errorData = jsonResponse["error"] as? [String: Any] {
                         let errorMessage = errorData["message"] as? String ?? "Unknown error"
                         let errorCode = errorData["code"] as? Int ?? -1
@@ -231,7 +240,6 @@ public class MessagesServer {
             "context": context
         ]
     }
-
     
     private func createDomain(for request: MessageFetchRequest) -> [[Any]] {
         var domain: [[Any]] = request.operation.domain(for: request.uid)
@@ -240,14 +248,12 @@ public class MessagesServer {
             domain.append(["id", request.comparisonOperator, request.messageId])
         }
         
-        
-        
         domain.append(["message_type",
-                        "in",
-                        ["email", "comment"]])
+                       "in",
+                       ["email", "comment"]])
         
         domain.append(["message_type", "!=", "notification"])
-
+        
         if let requestText = request.requestText, !requestText.isEmpty {
             switch request.selectFilter {
             case .subject:
@@ -265,158 +271,4 @@ public class MessagesServer {
         
         return domain
     }
-}
-
-// Enumeration for inbox types
-public enum InboxType {
-    case active
-    case archive
-    case bin
-    case shared
-    case sent(odooPartnerUserId: Int)
-    
-    var domain: [[Any]] {
-        switch self {
-        case .active:
-            return [
-                ["active", "=", false],
-                ["delete_uid", "=", false]
-            ]
-        case .archive:
-            return [
-                ["active", "=", false],
-                ["delete_uid", "=", false]
-            ]
-        case .bin:
-            return [
-                ["active", "=", false],
-                ["delete_uid", "!=", false]
-            ]
-        case .shared:
-            return [
-                ["shared_inbox", "=", true]
-            ]
-        case .sent(let odooPartnerUserId):
-            return [
-                ["author_id", "=", odooPartnerUserId]
-            ]
-        }
-    }
-}
-
-public struct MessageFetchRequest {
-    public var operation: MailboxOperation
-    public var messageId: Int
-    public var limit: Int
-    public var comparisonOperator: String
-    public var partnerUserId: Int?
-    public var requestText: String?
-    public var localMessagesID: [Int]?
-    public var selectedFields: Set<MessageField> = Set(MessageField.allCases)
-    public var language: String
-    public var timeZone: String
-    public var uid: Int
-    public var selectFilter: FilterTypeMessage = .none
-    public var isActive: Bool?
-    public var isNotDeleted: Bool?
-    public var inboxType: MailboxOperation
-    
-    public init(operation: MailboxOperation, messageId: Int, limit: Int, comparisonOperator: String, partnerUserId: Int? = nil, requestText: String? = nil, localMessagesID: [Int]? = nil, selectedFields: Set<MessageField>, language: String, timeZone: String, uid: Int, selectFilter: FilterTypeMessage = .none, isActive: Bool? = nil, isNotDeleted: Bool? = nil, inboxType: MailboxOperation) {
-        self.operation = operation
-        self.messageId = messageId
-        self.limit = limit
-        self.comparisonOperator = comparisonOperator
-        self.partnerUserId = partnerUserId
-        self.requestText = requestText
-        self.localMessagesID = localMessagesID
-        self.selectedFields = selectedFields
-        self.language = language
-        self.timeZone = timeZone
-        self.uid = uid
-        self.selectFilter = selectFilter
-        self.isActive = isActive
-        self.isNotDeleted = isNotDeleted
-        self.inboxType = inboxType
-    }
-}
-
-// Models for decoding the response
-public struct OdooResponse<T: Decodable>: Decodable {
-    let jsonrpc: String
-    let id: Int
-    let result: T
-}
-
-public struct MessageResponseDataWithoutLength: Decodable {
-    let records: [MessageModel]
-}
-
-public struct MessageResponseDataWithLength: Decodable {
-    let length: Int
-    let records: [MessageModel]
-}
-
-public enum FilterTypeMessage {
-    case subject, content, author, recipients, none
-}
-
-public enum MailboxOperation: Equatable {
-    case sharedInbox
-    case privateInbox
-    case sent(odooPartnerUserId: Int)
-    case archive
-    case bin
-    
-    func domain(for userID: Int) -> [[Any]] {
-        switch self {
-        case .sharedInbox:
-            return [["shared_inbox", "=", true], ["active", "=", true], ["delete_uid", "=", false]]
-        case .privateInbox:
-            return [["partner_ids", "in", [userID]], ["active", "=", true], ["delete_uid", "=", false]]
-        case .sent(let odooPartnerUserId):
-            return [["author_id", "=", odooPartnerUserId], ["active", "=", true], ["delete_uid", "=", false]]
-        case .archive:
-            return [["active", "=", false], ["delete_uid", "=", true]]
-        case .bin:
-            return [["active", "=", false], ["delete_uid", "!=", false]]
-        }
-    }
-
-    public static func ==(lhs: MailboxOperation, rhs: MailboxOperation) -> Bool {
-        switch (lhs, rhs) {
-        case (.sharedInbox, .sharedInbox),
-             (.privateInbox, .privateInbox),
-             (.archive, .archive),
-             (.bin, .bin):
-            return true
-        case (.sent(let lhsUserId), .sent(let rhsUserId)):
-            return lhsUserId == rhsUserId
-        default:
-            return false
-        }
-    }
-}
-
-
-public enum MessageField: String, CaseIterable {
-    case deleteUID = "delete_uid"
-    case active
-    case authorAvatar = "author_avatar"
-    case model
-    case resID = "res_id"
-    case needaction
-    case starred
-    case date
-    case authorID = "author_id"
-    case emailFrom = "email_from"
-    case partnerIDs = "partner_ids"
-    case recordName = "record_name"
-    case body
-    case parentID = "parent_id"
-    case displayName = "display_name"
-    case id
-    case subject
-    case authorDisplay = "author_display"
-    case subtypeID = "subtype_id"
-    case attachmentIDs = "attachment_ids"
 }

@@ -23,8 +23,7 @@ public struct AttachmentModel: Equatable, Hashable {
     public var lastOpenedAt: String?
     public var fileExtension: FileExtension?
     public var state: AttachmentState?
-
-    // Полный инициализатор
+    
     public init(id: Int, resModel: String?, resId: Int?, resName: String?, filename: String?, type: String?, data: String?, path: String?, fileMimeType: String?, companyId: Int?, localPath: String?, fileSize: String?, lastOpenedAt: String?, fileExtension: FileExtension?, state: AttachmentState?) {
         self.id = id
         self.resModel = resModel
@@ -42,8 +41,7 @@ public struct AttachmentModel: Equatable, Hashable {
         self.fileExtension = fileExtension
         self.state = state
     }
-
-    // Упрощенный инициализатор, принимающий только ID
+    
     public init(id: Int) {
         self.id = id
         self.resModel = nil
@@ -61,13 +59,12 @@ public struct AttachmentModel: Equatable, Hashable {
         self.fileExtension = nil
         self.state = nil
     }
-
-    // Метод для создания модели из JSON
+    
     static func from(json: [String: Any]) -> AttachmentModel? {
         guard let id = json["id"] as? Int else {
             return nil
         }
-
+        
         let fileMimeType = json["mimetype"] as? String
         let filename = json["name"] as? String
         let resModel = json["res_model"] as? String
@@ -82,14 +79,13 @@ public struct AttachmentModel: Equatable, Hashable {
         let lastOpenedAt = json["last_opened_at"] as? String
         let fileExtension = FileExtension(rawValue: json["file_extension"] as? String ?? "")
         let state = AttachmentState(rawValue: json["state"] as? String ?? "")
-
-        // Попытка конвертации Base64 в Data
-        var data: String? = nil
+        
+        var data: String?
         var convertedFileSize: String? = fileSize
-
+        
         if let base64Data = base64Data {
             if let decodedData = Data(base64Encoded: base64Data) {
-                data = decodedData.base64EncodedString() // Успешно декодированное значение
+                data = decodedData.base64EncodedString()
             } else {
                 convertedFileSize = nil
             }

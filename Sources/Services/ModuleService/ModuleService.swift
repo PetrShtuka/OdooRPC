@@ -9,15 +9,14 @@ import Foundation
 
 public class ModuleService {
     private let rpcClient: RPCClient
-    
+
     init(rpcClient: RPCClient) {
         self.rpcClient = rpcClient
     }
-    
+
     public func loadModulesServer(completion: @escaping (Result<ModuleStatus, Error>) -> Void) {
         let endpoint = "/web/session/modules"  // Endpoint for fetching modules
-        
-        // Ensure method and endpoint are correctly matched to your API documentation
+
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: [:]) { result in
             switch result {
             case .success(let data):
@@ -33,13 +32,13 @@ public class ModuleService {
             }
         }
     }
-    
+
     private func createModuleStatus(from moduleNames: [String]) -> ModuleStatus {
         var moduleStatus = ModuleStatus()
         moduleStatus.mailMessages = moduleNames.contains("prt_mail_messages")
         moduleStatus.mailMessagesPro = moduleNames.contains("prt_mail_messages_pro")
         moduleStatus.cetmixCommunicator = moduleNames.contains("cetmix_communicator")
-        
+
         return moduleStatus
     }
 }

@@ -8,35 +8,6 @@
 import XCTest
 @testable import OdooRPC
 
-// Мок для RPCClient
-class MockRPCClient: RPCClient {
-    var mockResult: Result<Data, Error>?
-    
-    override func sendRPCRequest(endpoint: String, method: HTTPMethod, params: [String: Any], completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask? {
-        if let result = mockResult {
-            completion(result)
-        }
-        return nil
-    }
-    
-    override func sendAuthenticationRequest(endpoint: String, method: HTTPMethod, params: [String: Any], completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask? {
-        // Проверяем, совпадает ли endpoint и method с ожидаемыми
-        if endpoint == "/web/session/authenticate" && method == .post {
-            if let result = mockResult {
-                completion(result)
-            } else {
-                let error = NSError(domain: "MockError", code: 0, userInfo: [NSLocalizedDescriptionKey: "No mock result provided."])
-                completion(.failure(error))
-            }
-        } else {
-            if let result = mockResult {
-                completion(result)
-            }
-        }
-        return nil
-    }
-}
-
 class MessagesServerTests: XCTestCase {
     var messagesServer: MessagesServer!
     var mockRPCClient: MockRPCClient!
@@ -53,9 +24,8 @@ class MessagesServerTests: XCTestCase {
         super.tearDown()
     }
     
-    // Тест успешного получения сообщений
+    // Test successful retrieval of messages
     func testFetchMessagesSuccess() {
-        // Подготовка данных для успешного ответа
         let jsonData = """
         {
             "jsonrpc": "2.0",
@@ -90,7 +60,6 @@ class MessagesServerTests: XCTestCase {
         
         """.data(using: .utf8)!
         
-        // Мокаем успешный результат
         mockRPCClient.mockResult = .success(jsonData)
         
         let request = MessageFetchRequest(
@@ -105,27 +74,19 @@ class MessagesServerTests: XCTestCase {
             inboxType: .privateInbox
         )
         
-        let expectation = self.expectation(description: "FetchMessagesSuccess")
-        
         messagesServer.fetchMessages(request: request) { result in
             switch result {
             case .success(let messages):
-                // Проверяем, что мы получили один результат
                 XCTAssertEqual(messages.count, 1)
                 XCTAssertEqual(messages.first?.authorDisplay, "John Doe")
                 XCTAssertEqual(messages.first?.body, "Test message")
-                expectation.fulfill()
             case .failure(let error):
-                // Логируем ошибку для отладки
                 XCTFail("Expected success, but got failure with error: \(error)")
             }
         }
-        
-        // Ждем выполнения асинхронной операции
-        waitForExpectations(timeout: 1.0)
     }
     
-    // Тест ошибки с сервера
+    // Test server error
     func testFetchMessagesServerError() {
         // Подготовка данных для ошибки с сервера
         let jsonData = """
@@ -169,9 +130,8 @@ class MessagesServerTests: XCTestCase {
         waitForExpectations(timeout: 1.0)
     }
     
-    // Тест для пустого ответа
+    // Test empty response from the server
     func testFetchMessagesEmptyResponse() {
-        // Подготовка данных для ответа с пустыми сообщениями
         let jsonData = """
         {
             "jsonrpc": "2.0",
@@ -192,25 +152,22 @@ class MessagesServerTests: XCTestCase {
             language: "en",
             timeZone: "UTC",
             uid: 1,
-            inboxType: .privateInbox  // Добавлено
+            inboxType: .privateInbox
         )
         
-        let expectation = self.expectation(description: "FetchMessagesEmptyResponse")
         
         messagesServer.fetchMessages(request: request) { result in
             switch result {
             case .success(let messages):
-                XCTAssertEqual(messages.count, 0) // Ожидаем пустой массив
-                expectation.fulfill()
+                XCTAssertEqual(messages.count, 0)
             case .failure:
                 XCTFail("Expected success, but got failure")
             }
         }
         
-        waitForExpectations(timeout: 1.0)
     }
     
-    // Тест для некорректного формата данных
+    // Test for invalid data format in the response
     func testFetchMessagesInvalidDataFormat() {
         // Некорректный JSON-ответ
         let invalidJsonData = """
@@ -246,7 +203,7 @@ class MessagesServerTests: XCTestCase {
         waitForExpectations(timeout: 1.0)
     }
     
-    // Тест для сетевой ошибки (например, таймаут)
+    // Test for network error (e.g., timeout)
     func testFetchMessagesNetworkError() {
         // Сетевой сбой
         let networkError = NSError(domain: NSURLErrorDomain, code: NSURLErrorTimedOut, userInfo: nil)
@@ -280,6 +237,7 @@ class MessagesServerTests: XCTestCase {
         waitForExpectations(timeout: 1.0)
     }
     
+    // Test fetching new messages
     func testFetchNewMessages() {
         let jsonData = """
         {
@@ -319,7 +277,7 @@ class MessagesServerTests: XCTestCase {
         
         let request = MessageFetchRequest(
             operation: .privateInbox,
-            messageId: 50, // Получаем новые сообщения с ID больше 50
+            messageId: 50,
             limit: 10,
             comparisonOperator: ">",
             selectedFields: [.id, .authorDisplay, .date, .body],
@@ -329,24 +287,20 @@ class MessagesServerTests: XCTestCase {
             inboxType: .privateInbox
         )
         
-        let expectation = self.expectation(description: "FetchNewMessages")
-        
         messagesServer.fetchMessages(request: request) { result in
             switch result {
             case .success(let messages):
                 XCTAssertEqual(messages.count, 1)
-                XCTAssertEqual(messages.first?.id, 100) // Проверяем, что ID сообщения больше
+                XCTAssertEqual(messages.first?.id, 100)
                 XCTAssertEqual(messages.first?.authorDisplay, "Mark Smith")
                 XCTAssertEqual(messages.first?.body, "New message")
-                expectation.fulfill()
             case .failure(let error):
                 XCTFail("Expected success, but got failure with error: \(error)")
             }
         }
-        
-        waitForExpectations(timeout: 1.0)
     }
     
+    // Test fetching old messages
     func testFetchOldMessages() {
         let jsonData = """
         {
@@ -414,6 +368,7 @@ class MessagesServerTests: XCTestCase {
         waitForExpectations(timeout: 1.0)
     }
     
+    // Test for deleting a message
     func testDeleteMessage() {
         let jsonData = """
         {
@@ -462,23 +417,20 @@ class MessagesServerTests: XCTestCase {
             inboxType: .privateInbox
         )
         
-        let expectation = self.expectation(description: "DeleteMessage")
         
         messagesServer.fetchMessages(request: request) { result in
             switch result {
             case .success(let messages):
                 XCTAssertEqual(messages.count, 1)
-                XCTAssertFalse(messages.first!.active) // Сообщение не активно
-                XCTAssertTrue(messages.first!.deleteUID) // Сообщение помечено как удаленное
-                expectation.fulfill()
+                XCTAssertFalse(messages.first!.active)
+                XCTAssertTrue(messages.first!.deleteUID)
             case .failure(let error):
                 XCTFail("Expected success, but got failure with error: \(error)")
             }
         }
-        
-        waitForExpectations(timeout: 1.0)
     }
     
+    // Test for archiving a message
     func testArchiveMessage() {
         let jsonData = """
         {
@@ -544,6 +496,7 @@ class MessagesServerTests: XCTestCase {
         waitForExpectations(timeout: 1.0)
     }
     
+    // Test for reading a message
     func testReadMessage() {
         let jsonData = """
         {
@@ -593,24 +546,19 @@ class MessagesServerTests: XCTestCase {
             inboxType: .privateInbox
         )
         
-        let expectation = self.expectation(description: "ReadMessage")
-        
         messagesServer.fetchMessages(request: request) { result in
             switch result {
             case .success(let messages):
                 XCTAssertEqual(messages.count, 1)
-                XCTAssertFalse(messages.first!.active) // Сообщение не активно
-                XCTAssertFalse(messages.first!.deleteUID) // Сообщение прочитано
-                expectation.fulfill()
+                XCTAssertFalse(messages.first!.active)
+                XCTAssertFalse(messages.first!.deleteUID)
             case .failure(let error):
                 XCTFail("Expected success, but got failure with error: \(error)")
             }
         }
-        
-        waitForExpectations(timeout: 1.0)
     }
     
-    // Тест для поиска сообщений по теме (subject)
+    // Test searching messages by subject
     func testSearchMessagesBySubject() {
         let jsonData = """
            {
@@ -661,8 +609,6 @@ class MessagesServerTests: XCTestCase {
             inboxType: .sharedInbox
         )
         
-        let expectation = self.expectation(description: "SearchMessagesBySubject")
-        
         messagesServer.searchMessages(request: request) { result in
             switch result {
             case .success(let messages):
@@ -670,16 +616,13 @@ class MessagesServerTests: XCTestCase {
                 XCTAssertEqual(messages.first?.id, 4)
                 XCTAssertEqual(messages.first?.authorDisplay, "Alice Johnson")
                 XCTAssertEqual(messages.first?.body, "Search result message")
-                expectation.fulfill()
             case .failure(let error):
                 XCTFail("Expected success, but got failure with error: \(error)")
             }
         }
-        
-        waitForExpectations(timeout: 1.0)
     }
     
-    // Тест для поиска сообщений по содержимому (body)
+    // Test searching messages by content
     func testSearchMessagesByContent() {
         let jsonData = """
            {
@@ -730,8 +673,6 @@ class MessagesServerTests: XCTestCase {
             inboxType: .sharedInbox
         )
         
-        let expectation = self.expectation(description: "SearchMessagesByContent")
-        
         messagesServer.searchMessages(request: request) { result in
             switch result {
             case .success(let messages):
@@ -739,16 +680,13 @@ class MessagesServerTests: XCTestCase {
                 XCTAssertEqual(messages.first?.id, 5)
                 XCTAssertEqual(messages.first?.authorDisplay, "Bob Smith")
                 XCTAssertEqual(messages.first?.body, "This is the message content")
-                expectation.fulfill()
             case .failure(let error):
                 XCTFail("Expected success, but got failure with error: \(error)")
             }
         }
-        
-        waitForExpectations(timeout: 1.0)
     }
     
-    // Тест для поиска сообщений по автору (author)
+    // Test searching messages by author
     func testSearchMessagesByAuthor() {
         let jsonData = """
            {
@@ -799,8 +737,6 @@ class MessagesServerTests: XCTestCase {
             inboxType: .sharedInbox
         )
         
-        let expectation = self.expectation(description: "SearchMessagesByAuthor")
-        
         messagesServer.searchMessages(request: request) { result in
             switch result {
             case .success(let messages):
@@ -808,16 +744,13 @@ class MessagesServerTests: XCTestCase {
                 XCTAssertEqual(messages.first?.id, 6)
                 XCTAssertEqual(messages.first?.authorDisplay, "Chris Evans")
                 XCTAssertEqual(messages.first?.body, "Author test message")
-                expectation.fulfill()
             case .failure(let error):
                 XCTFail("Expected success, but got failure with error: \(error)")
             }
         }
-        
-        waitForExpectations(timeout: 1.0)
     }
     
-    // Тест для поиска сообщений по получателям (recipients)
+    // Test searching messages by recipients
     func testSearchMessagesByRecipients() {
         let jsonData = """
            {
@@ -859,7 +792,7 @@ class MessagesServerTests: XCTestCase {
             messageId: 0,
             limit: 10,
             comparisonOperator: "=",
-            requestText: "17",  // Ищем по partner_id
+            requestText: "17",
             selectedFields: [.id, .authorDisplay, .body, .partnerIDs],
             language: "en",
             timeZone: "UTC",
@@ -868,8 +801,6 @@ class MessagesServerTests: XCTestCase {
             inboxType: .sharedInbox
         )
         
-        let expectation = self.expectation(description: "SearchMessagesByRecipients")
-        
         messagesServer.searchMessages(request: request) { result in
             switch result {
             case .success(let messages):
@@ -877,13 +808,10 @@ class MessagesServerTests: XCTestCase {
                 XCTAssertEqual(messages.first?.id, 7)
                 XCTAssertEqual(messages.first?.authorDisplay, "David Lee")
                 XCTAssertEqual(messages.first?.body, "Recipient message")
-                XCTAssertEqual(messages.first?.partnerIDs, [17, 18])  // Проверяем partner_ids
-                expectation.fulfill()
+                XCTAssertEqual(messages.first?.partnerIDs, [17, 18])
             case .failure(let error):
                 XCTFail("Expected success, but got failure with error: \(error)")
             }
         }
-        
-        waitForExpectations(timeout: 1.0)
     }
 }

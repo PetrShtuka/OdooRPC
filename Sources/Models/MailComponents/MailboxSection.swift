@@ -10,7 +10,7 @@ import Foundation
 enum MailboxSection: Int, CaseIterable {
     case messages
     case other
-    
+
     var title: String {
         switch self {
         case .messages:

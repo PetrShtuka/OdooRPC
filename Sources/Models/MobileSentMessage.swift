@@ -7,6 +7,19 @@
 
 import Foundation
 
+public struct PrepareParameters {
+    let user: UserData
+    let replayMessage: MessageModel
+    let typeEmail: MessageSendType
+    let type: MailboxItem
+    let attachments: [AttachmentModel]
+    let selectPartnersEmail: [ContactsModel]
+    let selectPartnersCc: [ContactsModel]
+    let selectPartnersBcc: [ContactsModel]
+    let messagesBody: String
+    let subject: String?
+}
+
 public struct MobileSentMessage {
     public var messageId: Int = 1
     public var userId: String = ""
@@ -30,42 +43,30 @@ public struct MobileSentMessage {
     public var parentId: Int = 0
     
     public init(messageId: Int = 1, userId: String = "", authorDisplay: String = "", authorId: Int = 0, selectedPartners: [[Int]] = [[]], selectedPartnersCc: [[Int]] = [[]], selectedPartnersBcc: [[Int]] = [[]], attachments: [[Int]] = [[]], avatarAuthor: String = "", dateSent: String = Date().description, categories: String = "", recordName: String = "", models: String = "", resId: Int?, isSent: Bool = false, oldBody: String = "", body: String = "", subject: String = "", wizardType: String = "", parentId: Int = 0) {
-          self.messageId = messageId
-          self.userId = userId
-          self.authorDisplay = authorDisplay
-          self.authorId = authorId
-          self.selectedPartners = selectedPartners
-          self.selectedPartnersCc = selectedPartnersCc
-          self.selectedPartnersBcc = selectedPartnersBcc
-          self.attachments = attachments
-          self.avatarAuthor = avatarAuthor
-          self.dateSent = dateSent
-          self.categories = categories
-          self.recordName = recordName
-          self.models = models
-          self.resId = resId
-          self.isSent = isSent
-          self.oldBody = oldBody
-          self.body = body
-          self.subject = subject
-          self.wizardType = wizardType
-          self.parentId = parentId
-      }
+        self.messageId = messageId
+        self.userId = userId
+        self.authorDisplay = authorDisplay
+        self.authorId = authorId
+        self.selectedPartners = selectedPartners
+        self.selectedPartnersCc = selectedPartnersCc
+        self.selectedPartnersBcc = selectedPartnersBcc
+        self.attachments = attachments
+        self.avatarAuthor = avatarAuthor
+        self.dateSent = dateSent
+        self.categories = categories
+        self.recordName = recordName
+        self.models = models
+        self.resId = resId
+        self.isSent = isSent
+        self.oldBody = oldBody
+        self.body = body
+        self.subject = subject
+        self.wizardType = wizardType
+        self.parentId = parentId
+    }
     
     public func createMessageModel() -> [MobileSentMessage] {
         var sentMessages: [MobileSentMessage] = []
-        
-        let selectPartnersList = selectedPartners.map { partner in
-            return partner[1]
-        }
-        
-        let selectPartnersCcList = selectedPartnersCc.map { partner in
-            return partner[1]
-        }
-        
-        let selectPartnersBccList = selectedPartnersBcc.map { partner in
-            return partner[1]
-        }
         
         let message = MobileSentMessage(messageId: self.messageId,
                                         userId: self.userId,
@@ -94,33 +95,33 @@ public struct MobileSentMessage {
 }
 
 extension MobileSentMessage {
-    public mutating func prepare(with user: UserData, replayMessage: MessageModel, typeEmail: MessageSendType, type: MailboxItem, attachments: [AttachmentModel], selectPartnersEmail: [ContactsModel], selectPartnersCc: [ContactsModel], selectPartnersBcc: [ContactsModel], messagesBody: String, subject: String?) {
-        self.authorId = user.partnerID?.id ?? 0
-        self.authorDisplay = user.name ?? ""
-        self.avatarAuthor = user.avatar ?? ""  // Решение для аватара
+    public mutating func prepare(with parameters: PrepareParameters) {
+        self.authorId = parameters.user.partnerID?.id ?? 0
+        self.authorDisplay = parameters.user.name ?? ""
+        self.avatarAuthor = parameters.user.avatar ?? ""
         
-        self.messageId = replayMessage.id
-        self.parentId = replayMessage.parentID?.id ?? 0
+        self.messageId = parameters.replayMessage.id
+        self.parentId = parameters.replayMessage.parentID?.id ?? 0
         
-        let body = messagesBody.isEmpty ? replayMessage.body : messagesBody
+        let body = parameters.messagesBody.isEmpty ? parameters.replayMessage.body : parameters.messagesBody
         let lines = body.components(separatedBy: .newlines)
         let html = lines.joined(separator: "<br>")
-        self.body = messageWrapperStyle(replayMessage, newBody: html)
+        self.body = messageWrapperStyle(parameters.replayMessage, newBody: html)
         
-        self.subject = subject ?? replayMessage.subject ?? ""
-        self.resId = replayMessage.resID
-        self.models = replayMessage.model
-        self.recordName = replayMessage.recordName ?? ""
-        self.wizardType = typeEmail.identifier
-        self.oldBody = replayMessage.body
+        self.subject = parameters.subject ?? parameters.replayMessage.subject ?? ""
+        self.resId = parameters.replayMessage.resID
+        self.models = parameters.replayMessage.model
+        self.recordName = parameters.replayMessage.recordName ?? ""
+        self.wizardType = parameters.typeEmail.identifier
+        self.oldBody = parameters.replayMessage.body
         
         // Convert ContactsModel for email, cc, and bcc into the required format for partners
-        self.selectedPartners = selectPartnersEmail.map { [4, $0.id] }
-        self.selectedPartnersCc = selectPartnersCc.map { [4, $0.id] }
-        self.selectedPartnersBcc = selectPartnersBcc.map { [4, $0.id] }
+        self.selectedPartners = parameters.selectPartnersEmail.map { [4, $0.id] }
+        self.selectedPartnersCc = parameters.selectPartnersCc.map { [4, $0.id] }
+        self.selectedPartnersBcc = parameters.selectPartnersBcc.map { [4, $0.id] }
         
         // Handle attachments
-        self.attachments = attachments.map { attachment in
+        self.attachments = parameters.attachments.map { attachment in
             [4, attachment.id]
         }
     }

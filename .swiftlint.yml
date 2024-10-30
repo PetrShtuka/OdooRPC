@@ -1,0 +1,22 @@
+# swiftlint.yml
+
+# swiftlint.yml
+
+disabled_rules:
+    - trailing_whitespace
+    - force_cast
+    - line_length 
+
+opt_in_rules:
+    - empty_count
+    - explicit_init
+    - force_unwrapping
+
+included:
+    - Sources
+
+excluded:
+    - Tests
+
+force_unwrapping:
+    severity: warning

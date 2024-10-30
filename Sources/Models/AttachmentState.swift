@@ -8,8 +8,8 @@
 import Foundation
 
 public enum AttachmentState: String, Codable {
-  case notUploaded
-  case uploading
-  case uploaded
-  case failed
+    case notUploaded
+    case uploading
+    case uploaded
+    case failed
 }

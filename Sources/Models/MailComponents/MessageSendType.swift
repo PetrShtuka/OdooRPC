@@ -10,7 +10,7 @@ import Foundation
 public enum MessageSendType {
     case email
     case odoo
-    
+
     public var identifier: String {
         switch self {
         case .odoo:
@@ -20,4 +20,3 @@ public enum MessageSendType {
         }
     }
 }
-

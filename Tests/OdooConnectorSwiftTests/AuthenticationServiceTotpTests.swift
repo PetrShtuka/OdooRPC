@@ -11,21 +11,24 @@ import XCTest
 class AuthenticationServiceTotpTests: XCTestCase {
     var totpService: AuthenticationServiceTotp!
     var mockRPCClient: MockRPCClient!
-
+    
+    // Setup method to initialize the mock client and TOTP service before each test
     override func setUp() {
         super.setUp()
         mockRPCClient = MockRPCClient(baseURL: URL(string: "https://example.com")!)
         totpService = AuthenticationServiceTotp(rpcClient: mockRPCClient)
     }
-
+    
+    // Teardown method to clean up after each test
     override func tearDown() {
         totpService = nil
         mockRPCClient = nil
         super.tearDown()
     }
-
-    // Тест успешной аутентификации через TOTP
+    
+    // Test for successful TOTP authentication
     func testAuthenticateTotpSuccess() {
+        // Arrange: Prepare mock JSON response for successful TOTP authentication
         let jsonData = """
         {
             "jsonrpc": "2.0",
@@ -42,14 +45,16 @@ class AuthenticationServiceTotpTests: XCTestCase {
             }
         }
         """.data(using: .utf8)!
-
+        
         mockRPCClient.mockResult = .success(jsonData)
-
+        
         let expectation = self.expectation(description: "TOTP Authentication Success")
-
-        totpService.authenticateTotp("123456", db: "test_db") { result in
+        
+        // Act: Call the authenticateTotp method
+        totpService.authenticateTotp("123456", database: "test_db") { result in
             switch result {
             case .success(let userData):
+                // Assert: Verify returned user data matches expected values
                 XCTAssertEqual(userData.uid, 1)
                 XCTAssertEqual(userData.name, "John Doe")
                 XCTAssertEqual(userData.sessionToken, "test-session-token")
@@ -62,12 +67,14 @@ class AuthenticationServiceTotpTests: XCTestCase {
                 XCTFail("Expected success, but got failure with error: \(error)")
             }
         }
-
+        
+        // Wait for the expectations to be fulfilled
         waitForExpectations(timeout: 1.0)
     }
-
-    // Тест неуспешной аутентификации через TOTP
+    
+    // Test for failure due to invalid TOTP code
     func testAuthenticateTotpFailure() {
+        // Arrange: Prepare mock JSON response for invalid TOTP code
         let jsonData = """
         {
             "jsonrpc": "2.0",
@@ -78,44 +85,51 @@ class AuthenticationServiceTotpTests: XCTestCase {
             }
         }
         """.data(using: .utf8)!
-
+        
         mockRPCClient.mockResult = .success(jsonData)
-
+        
         let expectation = self.expectation(description: "TOTP Authentication Failure")
-
-        totpService.authenticateTotp("wrongotp", db: "test_db") { result in
+        
+        // Act: Call the authenticateTotp method with an invalid code
+        totpService.authenticateTotp("wrongotp", database: "test_db") { result in
             switch result {
             case .success:
                 XCTFail("Expected failure, but got success")
             case .failure(let error as NSError):
+                // Assert: Verify error details are correct
                 XCTAssertEqual(error.domain, "NSCocoaErrorDomain")
-                XCTAssertEqual(error.code, 4865)
+                XCTAssertEqual(error.code, 4865) // Example error code
                 XCTAssertEqual(error.localizedDescription, "The data couldn’t be read because it is missing.")
                 expectation.fulfill()
             }
         }
-
+        
+        // Wait for the expectations to be fulfilled
         waitForExpectations(timeout: 1.0)
     }
-
-    // Тест на сетевую ошибку
+    
+    // Test for network error during TOTP authentication
     func testAuthenticateTotpNetworkError() {
+        // Arrange: Simulate a network error
         let networkError = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
         mockRPCClient.mockResult = .failure(networkError)
-
+        
         let expectation = self.expectation(description: "Network Error")
-
-        totpService.authenticateTotp("123456", db: "test_db") { result in
+        
+        // Act: Call the authenticateTotp method
+        totpService.authenticateTotp("123456", database: "test_db") { result in
             switch result {
             case .success:
                 XCTFail("Expected failure, but got success")
             case .failure(let error as NSError):
+                // Assert: Verify error domain and code match expected values
                 XCTAssertEqual(error.domain, NSURLErrorDomain)
                 XCTAssertEqual(error.code, NSURLErrorNotConnectedToInternet)
                 expectation.fulfill()
             }
         }
-
+        
+        // Wait for the expectations to be fulfilled
         waitForExpectations(timeout: 1.0)
     }
 }

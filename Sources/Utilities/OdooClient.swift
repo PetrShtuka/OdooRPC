@@ -21,7 +21,7 @@ public class OdooClient {
         self.baseURL = baseURL
         self.rpcClient = RPCClient(baseURL: baseURL)
         self._authService = AuthService(client: rpcClient)
-        self.rpcClient.updateSessionService(_authService)  
+        self.rpcClient.updateSessionService(_authService)
     }
 
     public lazy var messagesService: MessagesServer = MessagesServer(rpcClient: rpcClient)

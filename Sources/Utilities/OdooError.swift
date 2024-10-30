@@ -15,16 +15,15 @@ enum OdooError: Error {
     case networkError(String)
     case sessionExpired(String)
     case unknownError(String)
-    
+
     static func from(json: [String: Any]) -> OdooError {
         guard let error = json["error"] as? [String: Any],
-              let code = error["code"] as? Int,
               let data = error["data"] as? [String: Any],
               let name = data["name"] as? String,
               let message = data["message"] as? String else {
             return .unknownError("Invalid error format")
         }
-        
+
         switch name {
         case "odoo.exceptions.AccessError":
             return .accessError(message)

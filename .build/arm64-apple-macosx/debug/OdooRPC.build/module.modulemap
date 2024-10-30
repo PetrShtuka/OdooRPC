@@ -1,4 +1,0 @@
-module OdooRPC {
-    header "/Users/peter/Desktop/New Cetmix project/libary/OdooConnectorSwift/.build/arm64-apple-macosx/debug/OdooRPC.build/OdooRPC-Swift.h"
-    requires objc
-}

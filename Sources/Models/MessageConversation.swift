@@ -9,7 +9,7 @@
 import Foundation
 
 public struct MessageConversation: Codable, Hashable {
-    
+
     public var accountID: String = ""
     public var channelID: Int?
     public var id: Int?
@@ -27,7 +27,7 @@ public struct MessageConversation: Codable, Hashable {
     public var authorName: String?
     public var hasError: Bool = false
     public var avatar: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case body
@@ -43,7 +43,7 @@ public struct MessageConversation: Codable, Hashable {
         case time = "date"
         case avatar = "author_avatar"
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try? container.decode(Int.self, forKey: .id)
@@ -53,12 +53,11 @@ public struct MessageConversation: Codable, Hashable {
         if var authorIdArray = try? container.nestedUnkeyedContainer(forKey: .authorId) {
             let authorIdValue = try authorIdArray.decode(Int.self)
             let authorNameValue = try authorIdArray.decode(String.self)
-            
+
             authorId = authorIdValue
             authorName = authorNameValue
         }
-        
-        
+
         partnerIds = try? container.decode([Int].self, forKey: .partnerIds)
         parentId  = try? container.decode(Int.self, forKey: .id)
         deleteUid = try? container.decode(Bool.self, forKey: .deleteUid)
@@ -68,7 +67,7 @@ public struct MessageConversation: Codable, Hashable {
         time = try? container.decode(String.self, forKey: .time)
         avatar = try? container.decode(String.self, forKey: .avatar)
     }
-    
+
     init(channelID: Int?, id: Int?, body: String?, attachmentIds: [Int]?, needAction: Bool?, authorId: Int?, partnerIds: [Int]?, parentId: Int?, deleteUid: Bool?, active: Bool?, model: String?, resId: Int?, time: String?, authorDisplay: String?, hasError: Bool = false, avatar: String?) {
         self.channelID = channelID
         self.id = id
@@ -93,24 +92,24 @@ extension MessageConversation {
     mutating func setAccountID(_ accountID: String) {
         self.accountID = accountID
     }
-    
+
     mutating func setChannelID(_ channelID: Int) {
         self.channelID = channelID
     }
-    
+
     public func parseResultObject(_ resultObject: [String: Any],
-                           channelID: Int) -> [MessageConversation]? {
+                                  channelID: Int) -> [MessageConversation]? {
         guard let recordsArray = resultObject["records"] as? [[String: Any]] else {
             return nil
         }
-        
+
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(DateFormatter())
-        
+
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: recordsArray)
             var message = try decoder.decode([MessageConversation].self, from: jsonData)
-            
+
             message = message.map { var channel = $0
                 channel.setChannelID(channelID)
                 return channel }

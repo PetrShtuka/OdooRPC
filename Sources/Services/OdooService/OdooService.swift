@@ -9,15 +9,14 @@ import Foundation
 
 public class OdooService {
     private let rpcClient: RPCClient
-    
+
     init(rpcClient: RPCClient) {
         self.rpcClient = rpcClient
     }
-    
+
     public func getVersionOdoo(serverURL: URL, completion: @escaping (Result<Double, Error>) -> Void) {
         let endpoint = "/web/webclient/version_info"  // Confirm this endpoint with your server setup.
-        
-        // Use the provided URL directly in the RPCClient request
+
         rpcClient.sendAuthenticationRequest(endpoint: endpoint, method: .post, params: [:]) { result in
             switch result {
             case .success(let data):

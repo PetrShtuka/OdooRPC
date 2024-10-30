@@ -107,7 +107,7 @@ public struct MessageModel: Decodable, Equatable {
         id = try container.decode(Int.self, forKey: .id)
         authorDisplay = try container.decode(String.self, forKey: .authorDisplay)
         date = try container.decode(String.self, forKey: .date)
-        resID = try container.decode(Int.self, forKey: .resID)
+        resID = try? container.decode(Int.self, forKey: .resID) // Изменено с force try на optional
         needaction = try container.decode(Bool.self, forKey: .needaction)
         active = try container.decode(Bool.self, forKey: .active)
         
@@ -124,24 +124,14 @@ public struct MessageModel: Decodable, Equatable {
         body = try container.decode(String.self, forKey: .body)
         
         // Handle recordName as String or Bool
-        do {
-            recordName = try container.decodeIfPresent(String.self, forKey: .recordName)
-        } catch DecodingError.typeMismatch {
-            _ = try container.decodeIfPresent(Bool.self, forKey: .recordName)
-            recordName = nil
-        }
+        recordName = try? container.decodeIfPresent(String.self, forKey: .recordName)
         
         emailFrom = try container.decode(String.self, forKey: .emailFrom)
         displayName = try container.decode(String.self, forKey: .displayName)
         model = try container.decode(String.self, forKey: .model)
         
         // Handle authorAvatar as String or Bool
-        do {
-            authorAvatar = try container.decodeIfPresent(String.self, forKey: .authorAvatar)
-        } catch DecodingError.typeMismatch {
-            _ = try container.decodeIfPresent(Bool.self, forKey: .authorAvatar)
-            authorAvatar = nil
-        }
+        authorAvatar = try? container.decodeIfPresent(String.self, forKey: .authorAvatar)
         
         starred = try container.decode(Bool.self, forKey: .starred)
         attachmentIDs = try container.decodeIfPresent([Int].self, forKey: .attachmentIDs) ?? []
@@ -150,11 +140,7 @@ public struct MessageModel: Decodable, Equatable {
         if var subtypeIDContainer = try? container.nestedUnkeyedContainer(forKey: .subtypeID) {
             let id = try? subtypeIDContainer.decode(Int.self)
             let name = try? subtypeIDContainer.decode(String.self)
-            if let id = id, let name = name {
-                subtypeID = (id, name)
-            } else {
-                subtypeID = nil
-            }
+            subtypeID = (id ?? 0, name ?? "")
         } else {
             subtypeID = nil
         }
@@ -167,16 +153,7 @@ public struct MessageModel: Decodable, Equatable {
             authorID = nil
         }
         
-        do {
-            deleteUID = try container.decode(Bool.self, forKey: .deleteUID)
-        } catch DecodingError.typeMismatch {
-            if let array = try? container.decode([AnyDecodable].self, forKey: .deleteUID) {
-                // If it's an array, consider the message as deleted
-                deleteUID = true
-            } else {
-                deleteUID = false
-            }
-        }
+        deleteUID = (try? container.decode(Bool.self, forKey: .deleteUID)) ?? false
         
         self.truncatedBody = MessageModel.truncateText(MessageModel.removeHTMLTags(from: body), maxLength: 100)
     }
@@ -209,12 +186,11 @@ public struct MessageModel: Decodable, Equatable {
     }
     
     private static func removeHTMLTags(from htmlString: String) -> String {
-        let regex = try! NSRegularExpression(pattern: "<.*?>", options: [])
+        let regex = try? NSRegularExpression(pattern: "<.*?>", options: [])
         let range = NSRange(location: 0, length: htmlString.utf16.count)
-        return regex.stringByReplacingMatches(in: htmlString, options: [], range: range, withTemplate: "")
+        return regex?.stringByReplacingMatches(in: htmlString, options: [], range: range, withTemplate: "") ?? ""
     }
     
-    // Метод для обрезки текста до указанного количества символов
     private static func truncateText(_ text: String, maxLength: Int) -> String {
         if text.count <= maxLength {
             return text
@@ -251,5 +227,4 @@ extension MessageModel {
             isAuthorIDBool: self.isAuthorIDBool
         )
     }
-    
 }

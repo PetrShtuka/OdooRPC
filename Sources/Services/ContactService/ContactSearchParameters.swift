@@ -20,7 +20,7 @@ public struct ContactParameters {
     public var customFields: [String]?
     public var additionalParams: [String: Any]?
     public var sessionId: String
-
+    
     public init(uid: Int, sessionId: String, searchName: String = "", searchEmail: String = "", idFilter: IDFilterType? = nil, timeZone: String = "", language: String = "", limit: Int = 100, serverVersion: Double = 0.0, lastContactId: Int? = nil, customFields: [String]? = nil, additionalParams: [String: Any]? = nil) {
         self.uid = uid
         self.sessionId = sessionId

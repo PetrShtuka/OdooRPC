@@ -12,7 +12,7 @@ public enum MailboxItem: String, CaseIterable {
     case bin = "Bin"
     case archive = "Archive"
     case attachments = "Attachments"
-    
+
     var section: MailboxSection {
         switch self {
         case .messages, .bin, .archive:
@@ -21,7 +21,7 @@ public enum MailboxItem: String, CaseIterable {
             return .other
         }
     }
-    
+
     public var iconName: String {
         switch self {
         case .messages:

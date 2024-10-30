@@ -13,7 +13,7 @@ public class CetmixCommunicatorService {
     init(rpcClient: RPCClient) {
         self.rpcClient = rpcClient
     }
-    
+
     public func fetchDatabase(login: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
         let endpoint = "/cetmix_communicator/get_db"  // Modify if necessary
         let method: HTTPMethod = .post
@@ -51,4 +51,3 @@ public class CetmixCommunicatorService {
     }
 
 }
-

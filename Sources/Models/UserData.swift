@@ -7,7 +7,6 @@
 
 import Foundation
 
-// Decodable structure to decode user data from JSON response
 public struct ResponseWrapper: Decodable {
     public var result: UserData
 }
@@ -16,8 +15,8 @@ public struct UserData: Equatable, Decodable {
     
     public static func == (lhs: UserData, rhs: UserData) -> Bool {
         return lhs.uid == rhs.uid &&
-               lhs.name == rhs.name &&
-               lhs.partnerID?.id == rhs.partnerID?.id
+        lhs.name == rhs.name &&
+        lhs.partnerID?.id == rhs.partnerID?.id
     }
     
     public var uid: Int?
@@ -28,8 +27,6 @@ public struct UserData: Equatable, Decodable {
     public var timezone: String?
     public var avatar: String?
     public var partnerID: PartnerID?
-    
-    // Добавим версию сервера как поле в структуру
     public var serverVersion: Int?
     
     private enum CodingKeys: String, CodingKey {
@@ -52,7 +49,6 @@ public struct UserData: Equatable, Decodable {
         self.partnerID = partnerID
         self.serverVersion = serverVersion
         
-        // Выбор аватара в зависимости от версии сервера
         self.avatar = serverVersion ?? 0 >= 15 ? "avatar_128" : "image_small"
     }
     
@@ -73,10 +69,7 @@ public struct UserData: Equatable, Decodable {
             partnerID = nil
         }
         
-        // Инициализация поля serverVersion должна быть из контекста запроса, где сервер возвращает версию
-        self.serverVersion = nil // Предположительно, версию сервера можно передать позднее
-        
-        // Устанавливаем значение avatar в зависимости от версии сервера
+        self.serverVersion = nil
         self.avatar = serverVersion ?? 0 >= 15 ? "avatar_128" : "image_small"
     }
 }

@@ -12,14 +12,14 @@ public struct Credentials {
     public var username: String    // Used as login
     public  var password: String
     public var database: String
-    
-    public init(username: String, 
+
+    public init(username: String,
                 password: String,
                 database: String) {
-            self.username = username
-            self.password = password
-            self.database = database
-        }
+        self.username = username
+        self.password = password
+        self.database = database
+    }
 }
 
 // Extension to Credentials to make it easier to use with the AuthModule

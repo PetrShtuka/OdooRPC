@@ -26,18 +26,35 @@ public struct ContactsModel: Codable {
     public var avatar: String?
     public var name: String?
     public var lastUpdate: String?
-
+    
     public struct CountryId: Codable {
         public var id: Int
         public var name: String
     }
-
+    
     public struct ParentId: Codable {
         public var id: Int
         public var name: String
     }
-
-    public init(id: Int, street: String? = nil, street2: String? = nil, mobile: String? = nil, phone: String? = nil, zip: String? = nil, city: String? = nil, countryId: CountryId? = nil, displayName: String? = nil, isCompany: Bool? = nil, parentId: ParentIdOrBool? = nil, type: String? = nil, childIds: [Int]? = nil, comment: String? = nil, email: String? = nil, avatar: String? = nil, name: String? = nil, lastUpdate: String? = nil) {
+    
+    public init(id: Int,
+                street: String? = nil,
+                street2: String? = nil,
+                mobile: String? = nil,
+                phone: String? = nil,
+                zip: String? = nil,
+                city: String? = nil,
+                countryId: CountryId? = nil,
+                displayName: String? = nil,
+                isCompany: Bool? = nil,
+                parentId: ParentIdOrBool? = nil,
+                type: String? = nil,
+                childIds: [Int]? = nil,
+                comment: String? = nil,
+                email: String? = nil,
+                avatar: String? = nil,
+                name: String? = nil,
+                lastUpdate: String? = nil) {
         self.id = id
         self.street = street
         self.street2 = street2
@@ -68,7 +85,7 @@ public struct ContactsModel: Codable {
         case avatar = "avatar_128"
         case lastUpdate = "__last_update"
     }
-
+    
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(Int.self, forKey: .id)
@@ -96,7 +113,7 @@ public struct ContactsModel: Codable {
         name = try decodeSafe(container: container, key: .name)
         lastUpdate = try decodeSafe(container: container, key: .lastUpdate)
     }
-
+    
     private func decodeSafe<T: Decodable>(container: KeyedDecodingContainer<CodingKeys>, key: CodingKeys) throws -> T? {
         return try? container.decodeIfPresent(T.self, forKey: key)
     }
@@ -131,39 +148,31 @@ public enum ParentIdOrBool: Codable {
 
 public struct JSONAny: Codable {
     public let value: Any
-
+    
     public init(_ value: Any) {
         self.value = value
     }
-
+    
     public init(from decoder: Decoder) throws {
-        if let container = try? decoder.singleValueContainer() {
-            if let value = try? container.decode(Bool.self) {
-                self.value = value
-                return
-            }
-            if let value = try? container.decode(Int.self) {
-                self.value = value
-                return
-            }
-            if let value = try? container.decode(Double.self) {
-                self.value = value
-                return
-            }
-            if let value = try? container.decode(String.self) {
-                self.value = value
-                return
-            }
-            if let value = try? container.decodeNil() {
-                self.value = value
-                return
-            }
+        let container = try decoder.singleValueContainer()
+        if let value = try? container.decode(Bool.self) {
+            self.value = value
+        } else if let value = try? container.decode(Int.self) {
+            self.value = value
+        } else if let value = try? container.decode(Double.self) {
+            self.value = value
+        } else if let value = try? container.decode(String.self) {
+            self.value = value
+        } else if container.decodeNil() {
+            self.value = NSNull()
+        } else {
+            throw DecodingError.typeMismatch(JSONAny.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Could not decode JSONAny"))
         }
-        throw DecodingError.typeMismatch(JSONAny.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Could not decode JSONAny"))
     }
-
+    
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
+        
         if let value = self.value as? Bool {
             try container.encode(value)
             return
@@ -180,10 +189,11 @@ public struct JSONAny: Codable {
             try container.encode(value)
             return
         }
-        if let _ = self.value as? NSNull {
+        if self.value is NSNull {
             try container.encodeNil()
             return
         }
         throw EncodingError.invalidValue(self.value, EncodingError.Context(codingPath: encoder.codingPath, debugDescription: "Could not encode JSONAny"))
     }
+
 }
