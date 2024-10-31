@@ -76,7 +76,7 @@ class AttachmentServiceTests: XCTestCase {
     // Test for successfully uploading an attachment
     func testUploadAttachmentSuccess() {
         // Arrange: Prepare mock attachment model and JSON response
-        let attachment = AttachmentModel(id: 1, filename: "test.txt", type: "application/octet-stream", data: "base64data")
+        let attachment = AttachmentModel(id: 1)
         
         rpcClientMock.mockResult = .success(try! JSONSerialization.data(withJSONObject: [
             "jsonrpc": "2.0",
@@ -105,7 +105,7 @@ class AttachmentServiceTests: XCTestCase {
     // Test for failure when uploading an attachment
     func testUploadAttachmentFailure() {
         // Arrange: Simulate a server error
-        let attachment = AttachmentModel(id: 1, filename: "test.txt", type: "application/octet-stream", data: "base64data")
+        let attachment = AttachmentModel(id: 1)
         
         rpcClientMock.mockResult = .failure(NSError(domain: "OdooServerError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Server error"]))
         

@@ -1,0 +1,41 @@
+# Swift Package Manager
+.build/
+Package.resolved
+
+# Xcode files
+*.xcworkspace
+*.xcuserstate
+
+*.xcscheme
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+
+# Derived data
+DerivedData/
+*.xcuserdata/
+
+# Build products
+*.o
+*.linkfilelist
+*.dSYM
+*.app
+*.ipa
+
+# Log files
+*.log
+
+# User-specific files
+*.swp
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
+*.user
+
+# SwiftPM specific
+*.build/
+
+# Other
+*.tmp
+*.temp
+
