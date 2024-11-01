@@ -33,4 +33,6 @@ public class OdooClient {
     public lazy var moduleServiceOdoo: ModuleService = ModuleService(rpcClient: rpcClient)
     public lazy var contactsService: ContactsService = ContactsService(rpcClient: rpcClient)
     public lazy var attachmentService: AttachmentService = AttachmentService(rpcClient: rpcClient)
+    public lazy var mailChannelMessageService: MailChannelMessageService = MailChannelMessageService(rpcClient: rpcClient)
+    public lazy var mailChannelService: MailChannelService = MailChannelService(rpcClient: rpcClient)
 }
