@@ -16,7 +16,7 @@ public class MailChannelService {
     }
     
     // Method to fetch mail channels
-    public func fetchChannels(limit: Int, user: UserData, completion: @escaping (Result<[MailChannelModel], Error>) -> Void) {
+    public func fetchChannels(limit: Int, language: String, timezone: String, uid: Int, completion: @escaping (Result<[MailChannelModel], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
         let params: [String: Any] = [
             "model": "mail.channel",
@@ -27,9 +27,9 @@ public class MailChannelService {
             "limit": limit,
             "sort": "id DESC",
             "context": [
-                "lang": user.language as Any,
-                "tz": user.timezone as Any,
-                "uid": user.uid as Any
+                "lang": language as Any,
+                "tz":  timezone as Any,
+                "uid": uid as Any
             ]
         ]
         
@@ -51,7 +51,7 @@ public class MailChannelService {
     }
     
     // Method to fetch channel members
-    public func fetchChannelMembers(channelID: [Int], user: UserData, completion: @escaping (Result<[MailChannelMemberModel], Error>) -> Void) {
+    public func fetchChannelMembers(channelID: [Int], language: String, timezone: String, uid: Int, completion: @escaping (Result<[MailChannelMemberModel], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
         let params: [String: Any] = [
             "model": "mail.channel.member",
@@ -61,9 +61,9 @@ public class MailChannelService {
             "domain": [["channel_id", "in", channelID]],
             "sort": "id DESC",
             "context": [
-                "lang": user.language as Any,
-                "tz": user.timezone as Any,
-                "uid": user.uid as Any
+                "lang": language as Any,
+                "tz":  timezone as Any,
+                "uid": uid as Any
             ]
         ]
         
@@ -85,7 +85,7 @@ public class MailChannelService {
     }
     
     // Method to load chats by channel ID
-    public func loadChatsById(idChat: Int, comparison: String, user: UserData, completion: @escaping (Result<[MailChannelModel], Error>) -> Void) {
+    public func loadChatsById(idChat: Int, comparison: String, language: String, timezone: String, uid: Int, completion: @escaping (Result<[MailChannelModel], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
         let params: [String: Any] = [
             "model": "mail.channel",
@@ -96,9 +96,9 @@ public class MailChannelService {
             "limit": 30,
             "sort": "id DESC",
             "context": [
-                "lang": user.language as Any,
-                "tz": user.timezone as Any,
-                "uid": user.uid as Any
+                "lang": language as Any,
+                "tz":  timezone as Any,
+                "uid": uid as Any
             ]
         ]
         

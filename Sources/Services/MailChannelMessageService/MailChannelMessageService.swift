@@ -16,11 +16,13 @@ public class MailChannelMessageService {
     }
     
     func requestAttachment(request: MailChannelMessageAction,
-                           user: UserData,
+                           language: String,
+                           timezone: String,
+                           uid: Int,
                            completionHandler: @escaping (Result<[ChatMessageModel], Error>) -> Void ) {
         
         let endpoint = "/web/dataset/search_read"
-        var params: [String: Any] = ["context": ["lang": user.language as Any, "tz": user.timezone as Any, "uid": user.uid as Any]]
+        var params: [String: Any] = ["context": ["lang": language as Any, "tz": timezone as Any, "uid": uid as Any]]
         
         switch request {
         case let .fetchChannelMessages(channelID, limit):

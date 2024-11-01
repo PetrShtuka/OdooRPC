@@ -16,7 +16,7 @@ public class AttachmentService {
     }
 
     // Fetch attachment based on the request type and user ID
-    public func fetchAttachment(request: AttachmentRequestType, userID: String, completion: @escaping (Result<[AttachmentModel], Error>) -> Void) {
+    public func fetchAttachment(request: AttachmentRequestType, userID: Int, completion: @escaping (Result<[AttachmentModel], Error>) -> Void) {
         let (endpoint, params) = getEndpointAndParams(for: request, userID: userID)
 
         // Send the RPC request
@@ -31,7 +31,7 @@ public class AttachmentService {
     }
 
     // Determine the appropriate endpoint and parameters based on the request type
-    private func getEndpointAndParams(for request: AttachmentRequestType, userID: String) -> (String, [String: Any]) {
+    private func getEndpointAndParams(for request: AttachmentRequestType, userID: Int) -> (String, [String: Any]) {
         let endpoint = "/web/dataset/call_kw"
         let params: [String: Any]
         
@@ -158,7 +158,7 @@ public enum AttachmentRequestType {
 public struct AttachmentsRequest {
     var attachmentId: Int?
     var isIncludeDates: Bool
-    var userID: String
+    var userID: Int
     var includeDates = ["datas"]
     var excludeDates = ["name", "mimetype", "res_name", "datas"]
 }
@@ -166,7 +166,7 @@ public struct AttachmentsRequest {
 public struct AttachmentsListRequest {
     var attachmentIds: [Int]
     var isIncludeDates: Bool
-    var userID: String
+    var userID: Int
     var includeDates = ["datas"]
     var excludeDates = ["name", "mimetype", "res_name", "datas"]
 }
