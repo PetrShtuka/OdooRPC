@@ -90,17 +90,17 @@ public struct ChatMessageModel: Codable, Hashable {
     }
 }
 
-extension ChatMessageModel {
-    mutating func setAccountID(_ accountID: String) {
+public extension ChatMessageModel {
+    mutating public func setAccountID(_ accountID: String) {
         self.accountID = accountID
     }
     
-    mutating func setChannelID(_ channelID: Int) {
+    mutating public func setChannelID(_ channelID: Int) {
         self.channelID = channelID
     }
 }
 
-func parseResultObject(_ resultObject: [String: Any],
+public func parseResultObject(_ resultObject: [String: Any],
                        channelID: Int) -> [ChatMessageModel]? {
     // Attempt to retrieve the records array from resultObject
     guard let recordsArray = resultObject["records"] as? [[String: Any]] else {
@@ -130,7 +130,7 @@ func parseResultObject(_ resultObject: [String: Any],
 }
 
 // Helper function to define the date format for JSON decoding
-func dateFormatter() -> DateFormatter {
+public func dateFormatter() -> DateFormatter {
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ" // Example ISO 8601 format
     formatter.locale = Locale(identifier: "en_US_POSIX")
