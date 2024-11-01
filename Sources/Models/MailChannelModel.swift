@@ -9,23 +9,23 @@ import Foundation
 
 public struct MailChannelModel: Codable {
     public let id: Int?
-   public var writeDate: Date?
-   public var name: String?
-   public var description: String?
-   public let channelType: ChannelType?
-   public var avatar128: String?
-   public var channelMemberIds: [Int]?
-   public var isMember: Bool?
-   public var lastInterestDt: Date?
-   public var partnerId: Int?
-   public var questId: Int?
-   public var customChannelName: String?
-   public var messageUnreadCounter: Int?
-   public var fetchedMessageId: Int?
-   public var seenMessageId: Int?
-   public var lastSeenDt: Date?
-   public var messages: [ChatMessageModel]?
-
+    public var writeDate: Date?
+    public var name: String?
+    public var description: String?
+    public let channelType: ChannelType?
+    public var avatar128: String?
+    public var channelMemberIds: [Int]?
+    public var isMember: Bool?
+    public var lastInterestDt: Date?
+    public var partnerId: Int?
+    public var questId: Int?
+    public var customChannelName: String?
+    public var messageUnreadCounter: Int?
+    public var fetchedMessageId: Int?
+    public var seenMessageId: Int?
+    public var lastSeenDt: Date?
+    public var messages: [ChatMessageModel]?
+    
     enum CodingKeys: String, CodingKey {
         case id = "id"
         case writeDate = "write_date"
@@ -44,8 +44,8 @@ public struct MailChannelModel: Codable {
         case seenMessageId = "seen_message_id"
         case lastSeenDt = "last_seen_dt"
     }
-
-   public init(from decoder: Decoder) throws {
+    
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try? container.decode(Int.self, forKey: .id)
         writeDate = try? container.decode(Date.self, forKey: .writeDate)
@@ -65,23 +65,23 @@ public struct MailChannelModel: Codable {
         lastSeenDt = try? container.decode(Date.self, forKey: .lastSeenDt)
     }
     
-    init(id: Int?, writeDate: Date?, name: String?, description: String?, channelType: ChannelType?, avatar128: String?, channelMemberIds: [Int]?, isMember: Bool?, lastInterestDt: Date?, partnerId: Int?, questId: Int?, customChannelName: String?, messageUnreadCounter: Int?, fetchedMessageId: Int?, seenMessageId: Int?, lastSeenDt: Date?, messages: [ChatMessageModel]?) {
-           self.id = id
-           self.writeDate = writeDate
-           self.name = name
-           self.description = description
-           self.channelType = channelType
-           self.avatar128 = avatar128
-           self.channelMemberIds = channelMemberIds
-           self.isMember = isMember
-           self.lastInterestDt = lastInterestDt
-           self.partnerId = partnerId
-           self.questId = questId
-           self.customChannelName = customChannelName
-           self.messageUnreadCounter = messageUnreadCounter
-           self.fetchedMessageId = fetchedMessageId
-           self.seenMessageId = seenMessageId
-           self.lastSeenDt = lastSeenDt
-           self.messages = messages
-       }
+    public init(id: Int?, writeDate: Date?, name: String?, description: String?, channelType: ChannelType?, avatar128: String?, channelMemberIds: [Int]?, isMember: Bool?, lastInterestDt: Date?, partnerId: Int?, questId: Int?, customChannelName: String?, messageUnreadCounter: Int?, fetchedMessageId: Int?, seenMessageId: Int?, lastSeenDt: Date?, messages: [ChatMessageModel]?) {
+        self.id = id
+        self.writeDate = writeDate
+        self.name = name
+        self.description = description
+        self.channelType = channelType
+        self.avatar128 = avatar128
+        self.channelMemberIds = channelMemberIds
+        self.isMember = isMember
+        self.lastInterestDt = lastInterestDt
+        self.partnerId = partnerId
+        self.questId = questId
+        self.customChannelName = customChannelName
+        self.messageUnreadCounter = messageUnreadCounter
+        self.fetchedMessageId = fetchedMessageId
+        self.seenMessageId = seenMessageId
+        self.lastSeenDt = lastSeenDt
+        self.messages = messages
+    }
 }

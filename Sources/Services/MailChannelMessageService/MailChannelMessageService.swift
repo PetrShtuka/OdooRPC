@@ -15,7 +15,7 @@ public class MailChannelMessageService {
         self.rpcClient = rpcClient
     }
     
-    func requestAttachment(request: MailChannelMessageAction,
+    public func requestAttachment(request: MailChannelMessageAction,
                            language: String,
                            timezone: String,
                            uid: Int,
