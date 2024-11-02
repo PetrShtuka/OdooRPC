@@ -26,15 +26,17 @@ class AttachmentServiceTests: XCTestCase {
         let expectedAttachment = AttachmentModel(id: 1)
         let mockData = try! JSONSerialization.data(withJSONObject: [
             "jsonrpc": "2.0",
-            "result": 1
+            "result": [
+                ["id": 1]
+            ]
         ], options: [])
         
-        rpcClientMock.mockResult = .success(mockData) // Ensure this is of type Result<Data, Error>
+        rpcClientMock.mockResult = .success(mockData)
         
         let expectation = self.expectation(description: "Fetch attachment")
         
         // Act: Call the fetchAttachment method
-        attachmentService.fetchAttachment(request: .fetch(idAttachment: 1, includeDates: false), userID: 123) { result in
+        attachmentService.fetchAttachment(request: .fetch(idAttachment: 1, includeData: false), userID: 123) { result in
             switch result {
             case .success(let attachments):
                 // Assert: Verify the attachment data is as expected
@@ -58,7 +60,7 @@ class AttachmentServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Fetch attachment failure")
         
         // Act: Call the fetchAttachment method
-        attachmentService.fetchAttachment(request: .fetch(idAttachment: 1, includeDates: false), userID: 123) { result in
+        attachmentService.fetchAttachment(request: .fetch(idAttachment: 1, includeData: false), userID: 123) { result in
             switch result {
             case .success:
                 XCTFail("Expected failure but got success")
@@ -75,8 +77,11 @@ class AttachmentServiceTests: XCTestCase {
     
     // Test for successfully uploading an attachment
     func testUploadAttachmentSuccess() {
-        // Arrange: Prepare mock attachment model and JSON response
-        let attachment = AttachmentModel(id: 1)
+        // Arrange: Prepare mock attachment data and JSON response
+        let filename = "test.txt"
+        let fileData = Data("Test data".utf8).base64EncodedString()
+        let model = "test.model"
+        let resId = 1
         
         rpcClientMock.mockResult = .success(try! JSONSerialization.data(withJSONObject: [
             "jsonrpc": "2.0",
@@ -86,12 +91,12 @@ class AttachmentServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Upload attachment")
         
         // Act: Call the uploadAttachment method
-        attachmentService.fetchAttachment(request: .uploadAttachment(attachment: attachment, message: MobileSentMessage(resId: 1)), userID: 123) { result in
+        attachmentService.fetchAttachment(request: .uploadAttachment(filename: filename, fileData: fileData, model: model, resId: resId), userID: 123) { result in
             switch result {
             case .success(let attachments):
                 // Assert: Verify uploaded attachment data is as expected
                 XCTAssertEqual(attachments.count, 1)
-                XCTAssertEqual(attachments.first?.id, attachment.id)
+                XCTAssertEqual(attachments.first?.id, 1)
             case .failure:
                 XCTFail("Expected success but got failure")
             }
@@ -104,15 +109,18 @@ class AttachmentServiceTests: XCTestCase {
     
     // Test for failure when uploading an attachment
     func testUploadAttachmentFailure() {
-        // Arrange: Simulate a server error
-        let attachment = AttachmentModel(id: 1)
+        // Arrange: Prepare mock attachment data
+        let filename = "test.txt"
+        let fileData = Data("Test data".utf8).base64EncodedString()
+        let model = "test.model"
+        let resId = 1
         
         rpcClientMock.mockResult = .failure(NSError(domain: "OdooServerError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Server error"]))
         
         let expectation = self.expectation(description: "Upload attachment failure")
         
         // Act: Call the uploadAttachment method
-        attachmentService.fetchAttachment(request: .uploadAttachment(attachment: attachment, message: MobileSentMessage(resId: 1)), userID: 123) { result in
+        attachmentService.fetchAttachment(request: .uploadAttachment(filename: filename, fileData: fileData, model: model, resId: resId), userID: 123) { result in
             switch result {
             case .success:
                 XCTFail("Expected failure but got success")

@@ -1,7 +1,6 @@
 //
 //  AttachmentService.swift
 //
-//
 //  Created by Peter on 06.09.2024.
 //
 
@@ -36,14 +35,14 @@ public class AttachmentService {
         let params: [String: Any]
         
         switch request {
-        case let .fetch(idAttachment, includeDates):
-            params = buildParams(for: AttachmentsRequest(attachmentId: idAttachment, isIncludeDates: includeDates, userID: userID))
-        case let .fetchArray(idAttachment, includeDates):
-            params = buildParams(for: AttachmentsListRequest(attachmentIds: idAttachment, isIncludeDates: includeDates, userID: userID))
-        case let .uploadAttachment(attachment: attachment, message: message):
-            params = buildParams(for: CreateAttachmentRequest(filename: attachment.filename, fileData: attachment.data, model: message.models, resId: message.resId))
-        case let .uploadAttachmentChat(attachment: attachment, message: message):
-            params = buildParams(for: CreateAttachmentRequest(filename: attachment.filename, fileData: attachment.data, model: message.model, resId: message.resId))
+        case let .fetch(idAttachment, includeData):
+            params = buildParams(for: AttachmentsRequest(attachmentId: idAttachment, includeData: includeData, userID: userID))
+        case let .fetchArray(idAttachments, includeData):
+            params = buildParams(for: AttachmentsListRequest(attachmentIds: idAttachments, includeData: includeData, userID: userID))
+        case let .uploadAttachment(filename, fileData, model, resId):
+            params = buildParams(for: CreateAttachmentRequest(filename: filename, fileData: fileData, model: model, resId: resId))
+        case let .uploadAttachmentChat(filename, fileData, model, resId):
+            params = buildParams(for: CreateAttachmentRequest(filename: filename, fileData: fileData, model: model, resId: resId))
         }
         
         return (endpoint, params)
@@ -105,7 +104,7 @@ public class AttachmentService {
                     "tz": "Europe/Rome",
                     "uid": request.userID,
                     "allowed_company_ids": [1],
-                    "bin_size": !request.isIncludeDates
+                    "bin_size": !request.includeData
                 ]
             ]
         ]
@@ -118,11 +117,11 @@ public class AttachmentService {
             "method": "search_read",
             "args": [
                 [["id", "in", request.attachmentIds]],
-                request.isIncludeDates ? request.includeDates : request.excludeDates
+                request.includeData ? request.includeFields : request.excludeFields
             ],
             "kwargs": [
                 "context": [
-                    "bin_size": !request.isIncludeDates
+                    "bin_size": !request.includeData
                 ]
             ]
         ]
@@ -135,10 +134,10 @@ public class AttachmentService {
             "method": "create",
             "args": [
                 [
-                    "name": request.filename ?? "",
-                    "datas": request.fileData ?? "",
-                    "res_model": request.model ?? "",
-                    "res_id": request.resId ?? 0
+                    "name": request.filename,
+                    "datas": request.fileData,
+                    "res_model": request.model,
+                    "res_id": request.resId
                 ]
             ],
             "kwargs": [:]
@@ -148,32 +147,32 @@ public class AttachmentService {
 
 // Define the request types for attachments
 public enum AttachmentRequestType {
-    case fetch(idAttachment: Int, includeDates: Bool)
-    case fetchArray(idAttachment: [Int], includeDates: Bool)
-    case uploadAttachment(attachment: AttachmentModel, message: MobileSentMessage)
-    case uploadAttachmentChat(attachment: AttachmentModel, message: MessageConversation)
+    case fetch(idAttachment: Int, includeData: Bool)
+    case fetchArray(idAttachments: [Int], includeData: Bool)
+    case uploadAttachment(filename: String, fileData: String, model: String, resId: Int)
+    case uploadAttachmentChat(filename: String, fileData: String, model: String, resId: Int)
 }
 
 // Structs to represent different request types
 public struct AttachmentsRequest {
-    var attachmentId: Int?
-    var isIncludeDates: Bool
+    var attachmentId: Int
+    var includeData: Bool
     var userID: Int
-    var includeDates = ["datas"]
-    var excludeDates = ["name", "mimetype", "res_name", "datas"]
+    var includeFields = ["datas"]
+    var excludeFields = ["name", "mimetype", "res_name", "datas"]
 }
 
 public struct AttachmentsListRequest {
     var attachmentIds: [Int]
-    var isIncludeDates: Bool
+    var includeData: Bool
     var userID: Int
-    var includeDates = ["datas"]
-    var excludeDates = ["name", "mimetype", "res_name", "datas"]
+    var includeFields = ["datas"]
+    var excludeFields = ["name", "mimetype", "res_name", "datas"]
 }
 
 public struct CreateAttachmentRequest {
-    var filename: String?
-    var fileData: String?
-    var model: String?
-    var resId: Int?
+    var filename: String
+    var fileData: String
+    var model: String
+    var resId: Int
 }

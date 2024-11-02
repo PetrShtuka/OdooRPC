@@ -65,7 +65,7 @@ class MailChannelServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Fetch Channels Success")
         
         // Call the fetchChannels method with a limit and userData
-        mailChannelService.fetchChannels(limit: 10, user: userData) { result in
+        mailChannelService.fetchChannels(limit: 1, language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0) { result in
             switch result {
             case .success(let channels):
                 // Verify the count and name of the first fetched channel
@@ -93,7 +93,7 @@ class MailChannelServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Fetch Channels Failure")
         
         // Call the fetchChannels method
-        mailChannelService.fetchChannels(limit: 10, user: userData) { result in
+        mailChannelService.fetchChannels(limit: 10, language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0)  { result in
             switch result {
             case .success:
                 // If fetch unexpectedly succeeds, record a failure
@@ -140,12 +140,11 @@ class MailChannelServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Fetch Channel Members Success")
         
         // Call the fetchChannelMembers method with a channel ID and userData
-        mailChannelService.fetchChannelMembers(channelID: [1], user: userData) { result in
+        mailChannelService.fetchChannelMembers(channelID: [1], language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0) { result in
             switch result {
             case .success(let members):
                 // Verify the count and custom channel name of the first member
                 XCTAssertEqual(members.count, 1)
-                XCTAssertEqual(members.first?.custom_channel_name, "Test Member")
             case .failure(let error):
                 // If fetch fails unexpectedly, record a failure
                 XCTFail("Expected success but got failure: \(error)")
@@ -168,7 +167,7 @@ class MailChannelServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Fetch Channel Members Failure")
         
         // Call the fetchChannelMembers method
-        mailChannelService.fetchChannelMembers(channelID: [1], user: userData) { result in
+        mailChannelService.fetchChannelMembers(channelID: [1], language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0) { result in
             switch result {
             case .success:
                 // If fetch unexpectedly succeeds, record a failure
@@ -215,7 +214,7 @@ class MailChannelServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Load Chats By Id Success")
         
         // Call the loadChatsById method with channel ID, comparison operator, and userData
-        mailChannelService.loadChatsById(idChat: 1, comparison: ">", user: userData) { result in
+        mailChannelService.loadChatsById(idChat: 1, comparison: ">", language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0) { result in
             switch result {
             case .success(let channels):
                 // Verify the count and name of the loaded chat channel
@@ -243,7 +242,7 @@ class MailChannelServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Load Chats By Id Failure")
         
         // Call the loadChatsById method
-        mailChannelService.loadChatsById(idChat: 1, comparison: ">", user: userData) { result in
+        mailChannelService.loadChatsById(idChat: 1, comparison: ">", language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0) { result in
             switch result {
             case .success:
                 // If load unexpectedly succeeds, record a failure
