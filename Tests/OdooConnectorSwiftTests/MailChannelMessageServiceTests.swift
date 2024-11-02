@@ -50,11 +50,11 @@ class MailChannelMessageServiceTests: XCTestCase {
             isSuperuser: false,
             language: "en",
             timezone: "UTC",
-            partnerID: PartnerID(id: 1, name: "Test Partner"), // или инициализируйте партнера, если он является сложным объектом
+            partnerID: PartnerID(id: 1, name: "Test Partner"),
             serverVersion: 15
         )
 
-        service.requestAttachment(request: request, user: userData) { result in
+        service.requestAttachment(request: request, language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0) { result in
             switch result {
             case .success(let messages):
                 XCTAssertEqual(messages.count, 1)
@@ -84,11 +84,11 @@ class MailChannelMessageServiceTests: XCTestCase {
             isSuperuser: false,
             language: "en",
             timezone: "UTC",
-            partnerID: PartnerID(id: 1, name: "Test Partner"), // или инициализируйте партнера, если он является сложным объектом
+            partnerID: PartnerID(id: 1, name: "Test Partner"),
             serverVersion: 15
         )
         
-        service.requestAttachment(request: request, user: userData) { result in
+        service.requestAttachment(request: request, language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0) { result in
             switch result {
             case .success:
                 XCTFail("Expected failure, got success")
@@ -126,11 +126,11 @@ class MailChannelMessageServiceTests: XCTestCase {
             isSuperuser: false,
             language: "en",
             timezone: "UTC",
-            partnerID: PartnerID(id: 1, name: "Test Partner"), // или инициализируйте партнера, если он является сложным объектом
+            partnerID: PartnerID(id: 1, name: "Test Partner"),
             serverVersion: 15
         )
         
-        service.requestAttachment(request: request, user: userData) { result in
+        service.requestAttachment(request: request, language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0) { result in
             switch result {
             case .success(let messages):
                 XCTAssertEqual(messages.count, 1)
@@ -160,11 +160,11 @@ class MailChannelMessageServiceTests: XCTestCase {
             isSuperuser: false,
             language: "en",
             timezone: "UTC",
-            partnerID: PartnerID(id: 1, name: "Test Partner"), // или инициализируйте партнера, если он является сложным объектом
+            partnerID: PartnerID(id: 1, name: "Test Partner"),
             serverVersion: 15
         )
         
-        service.requestAttachment(request: request, user: userData) { result in
+        service.requestAttachment(request: request, language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0) { result in
             switch result {
             case .success:
                 XCTFail("Expected failure, got success")
@@ -205,7 +205,7 @@ class MailChannelMessageServiceTests: XCTestCase {
             serverVersion: 15
         )
         
-        service.requestAttachment(request: request, user: userData) { result in
+        service.requestAttachment(request: request, language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0) { result in
             switch result {
             case .success(let messages):
                 XCTAssertEqual(messages.count, 1)
@@ -235,11 +235,11 @@ class MailChannelMessageServiceTests: XCTestCase {
             isSuperuser: false,
             language: "en",
             timezone: "UTC",
-            partnerID: PartnerID(id: 1, name: "Test Partner"), // или инициализируйте партнера, если он является сложным объектом
+            partnerID: PartnerID(id: 1, name: "Test Partner"),
             serverVersion: 15
         )
         
-        service.requestAttachment(request: request, user: userData) { result in
+        service.requestAttachment(request: request, language: userData.language ?? "", timezone: userData.timezone ?? "", uid: userData.uid ?? 0) { result in
             switch result {
             case .success:
                 XCTFail("Expected failure, got success")

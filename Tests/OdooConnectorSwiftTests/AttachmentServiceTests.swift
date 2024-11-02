@@ -34,7 +34,7 @@ class AttachmentServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Fetch attachment")
         
         // Act: Call the fetchAttachment method
-        attachmentService.fetchAttachment(request: .fetch(idAttachment: 1, includeDates: false), userID: "123") { result in
+        attachmentService.fetchAttachment(request: .fetch(idAttachment: 1, includeDates: false), userID: 123) { result in
             switch result {
             case .success(let attachments):
                 // Assert: Verify the attachment data is as expected
@@ -58,7 +58,7 @@ class AttachmentServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Fetch attachment failure")
         
         // Act: Call the fetchAttachment method
-        attachmentService.fetchAttachment(request: .fetch(idAttachment: 1, includeDates: false), userID: "123") { result in
+        attachmentService.fetchAttachment(request: .fetch(idAttachment: 1, includeDates: false), userID: 123) { result in
             switch result {
             case .success:
                 XCTFail("Expected failure but got success")
@@ -86,7 +86,7 @@ class AttachmentServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Upload attachment")
         
         // Act: Call the uploadAttachment method
-        attachmentService.fetchAttachment(request: .uploadAttachment(attachment: attachment, message: MobileSentMessage(resId: 1)), userID: "123") { result in
+        attachmentService.fetchAttachment(request: .uploadAttachment(attachment: attachment, message: MobileSentMessage(resId: 1)), userID: 123) { result in
             switch result {
             case .success(let attachments):
                 // Assert: Verify uploaded attachment data is as expected
@@ -112,7 +112,7 @@ class AttachmentServiceTests: XCTestCase {
         let expectation = self.expectation(description: "Upload attachment failure")
         
         // Act: Call the uploadAttachment method
-        attachmentService.fetchAttachment(request: .uploadAttachment(attachment: attachment, message: MobileSentMessage(resId: 1)), userID: "123") { result in
+        attachmentService.fetchAttachment(request: .uploadAttachment(attachment: attachment, message: MobileSentMessage(resId: 1)), userID: 123) { result in
             switch result {
             case .success:
                 XCTFail("Expected failure but got success")

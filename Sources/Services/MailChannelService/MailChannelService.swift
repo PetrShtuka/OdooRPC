@@ -51,7 +51,7 @@ public class MailChannelService {
     }
     
     // Method to fetch channel members
-    public func fetchChannelMembers(channelID: [Int], language: String, timezone: String, uid: Int, completion: @escaping (Result<[MailChannelMemberModel], Error>) -> Void) {
+    public func fetchChannelMembers(channelID: [Int], language: String, timezone: String, uid: Int, completion: @escaping (Result<[MailChannelModel], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
         let params: [String: Any] = [
             "model": "mail.channel.member",
@@ -73,7 +73,7 @@ public class MailChannelService {
             case .success(let data):
                 do {
                     let decoder = JSONDecoder()
-                    let response = try decoder.decode(OdooResponse<MailChannelMemberResponseData>.self, from: data)
+                    let response = try decoder.decode(OdooResponse<MailChannelResponseData>.self, from: data)
                     completion(.success(response.result.records))
                 } catch {
                     completion(.failure(error))
