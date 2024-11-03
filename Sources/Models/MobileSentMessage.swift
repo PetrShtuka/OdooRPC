@@ -8,16 +8,18 @@
 import Foundation
 
 public struct PrepareParameters {
-   public let user: UserData
-   public let replayMessage: MessageModel
-   public let typeEmail: MessageSendType
-   public let type: MailboxItem
-   public let attachments: [AttachmentModel]
-   public let selectPartnersEmail: [ContactsModel]
-   public let selectPartnersCc: [ContactsModel]
-   public let selectPartnersBcc: [ContactsModel]
-   public let messagesBody: String
-   public let subject: String?
+    public let partnerID: Int
+    public let authorDisplay: String
+    public let avatarAuthor: String
+    public let replayMessage: MessageModel
+    public let typeEmail: MessageSendType
+    public let type: MailboxItem
+    public let attachments: [AttachmentModel]
+    public let selectPartnersEmail: [ContactsModel]
+    public let selectPartnersCc: [ContactsModel]
+    public let selectPartnersBcc: [ContactsModel]
+    public let messagesBody: String
+    public let subject: String?
 }
 
 public struct MobileSentMessage {
@@ -96,9 +98,9 @@ public struct MobileSentMessage {
 
 extension MobileSentMessage {
     public mutating func prepare(with parameters: PrepareParameters) {
-        self.authorId = parameters.user.partnerID?.id ?? 0
-        self.authorDisplay = parameters.user.name ?? ""
-        self.avatarAuthor = parameters.user.avatar ?? ""
+        self.authorId = parameters.partnerID
+        self.authorDisplay = parameters.authorDisplay
+        self.avatarAuthor = parameters.avatarAuthor
         
         self.messageId = parameters.replayMessage.id
         self.parentId = parameters.replayMessage.parentID?.id ?? 0
