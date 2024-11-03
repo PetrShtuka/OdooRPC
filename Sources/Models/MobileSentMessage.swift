@@ -8,16 +8,16 @@
 import Foundation
 
 public struct PrepareParameters {
-    let user: UserData
-    let replayMessage: MessageModel
-    let typeEmail: MessageSendType
-    let type: MailboxItem
-    let attachments: [AttachmentModel]
-    let selectPartnersEmail: [ContactsModel]
-    let selectPartnersCc: [ContactsModel]
-    let selectPartnersBcc: [ContactsModel]
-    let messagesBody: String
-    let subject: String?
+   public let user: UserData
+   public let replayMessage: MessageModel
+   public let typeEmail: MessageSendType
+   public let type: MailboxItem
+   public let attachments: [AttachmentModel]
+   public let selectPartnersEmail: [ContactsModel]
+   public let selectPartnersCc: [ContactsModel]
+   public let selectPartnersBcc: [ContactsModel]
+   public let messagesBody: String
+   public let subject: String?
 }
 
 public struct MobileSentMessage {
