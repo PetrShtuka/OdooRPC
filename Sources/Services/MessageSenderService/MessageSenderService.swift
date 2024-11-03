@@ -2,7 +2,7 @@
 //  MessageSenderService.swift
 //  OdooRPC
 //
-//  Created by Peter on 03.11.2024.
+//  Created by Peter on 30.10.2024.
 //
 
 import Foundation
@@ -14,7 +14,7 @@ public class MessageSenderService {
         self.rpcClient = rpcClient
     }
     
-    public func createMessageId(_ message: MobileSentMessage, user: UserData, completion: @escaping (Result<Int, Error>) -> Void) {
+    public func createMessageId(_ message: MobileSentMessage, lang: String, timeZone: String, uid: Int, completion: @escaping (Result<Int, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let params: [String: Any] = [
             "model": "mail.compose.message",
@@ -34,9 +34,9 @@ public class MessageSenderService {
             ]],
             "kwargs": [
                 "context": [
-                    "lang": user.language as Any,
-                    "tz": "Europe/Rome",
-                    "uid": user.uid as Any
+                    "lang": lang as Any,
+                    "tz": timeZone as Any,
+                    "uid": uid as Any
                 ]
             ]
         ]
@@ -60,17 +60,17 @@ public class MessageSenderService {
         }
     }
     
-    public func sendMessage(createId: Int, message: MobileSentMessage, user: UserData, completion: @escaping (Bool) -> Void) {
+    public func sendMessage(createId: Int, message: MobileSentMessage, language: String, timeZone: String, uid: Int, serverVersion: Int, completion: @escaping (Bool) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let params: [String: Any] = [
             "model": "mail.compose.message",
-            "method": user.serverVersion ?? 11 >= 12 ? "action_send_mail" : "send_mail_action",
+            "method": serverVersion >= 12 ? "action_send_mail" : "send_mail_action",
             "args": [[createId]],
             "kwargs": [
                 "context": [
-                    "lang": user.language as Any,
-                    "tz": user.timezone as Any,
-                    "uid": user.uid as Any,
+                    "lang": language as Any,
+                    "tz": timeZone as Any,
+                    "uid": uid as Any,
                     "to_ids": message.selectedPartners,
                     "cc_ids": message.selectedPartnersCc,
                     "bcc_ids": message.selectedPartnersBcc
