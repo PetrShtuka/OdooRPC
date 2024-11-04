@@ -7,11 +7,11 @@
 
 import Foundation
 
-enum MailboxSection: Int, CaseIterable {
+public enum MailboxSection: Int, CaseIterable {
     case messages
     case other
 
-    var title: String {
+    public var title: String {
         switch self {
         case .messages:
             return "Mailboxes"
