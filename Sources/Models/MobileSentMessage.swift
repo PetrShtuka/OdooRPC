@@ -20,6 +20,22 @@ public struct PrepareParameters {
     public let selectPartnersBcc: [ContactsModel]
     public let messagesBody: String
     public let subject: String?
+    
+    public init(partnerID: Int, authorDisplay: String, avatarAuthor: String, replayMessage: MessageModel, typeEmail: MessageSendType, type: MailboxItem, attachments: [AttachmentModel], selectPartnersEmail: [ContactsModel], selectPartnersCc: [ContactsModel], selectPartnersBcc: [ContactsModel], messagesBody: String, subject: String?) {
+        self.partnerID = partnerID
+        self.authorDisplay = authorDisplay
+        self.avatarAuthor = avatarAuthor
+        self.replayMessage = replayMessage
+        self.typeEmail = typeEmail
+        self.type = type
+        self.attachments = attachments
+        self.selectPartnersEmail = selectPartnersEmail
+        self.selectPartnersCc = selectPartnersCc
+        self.selectPartnersBcc = selectPartnersBcc
+        self.messagesBody = messagesBody
+        self.subject = subject
+    }
+    
 }
 
 public struct MobileSentMessage {

@@ -60,7 +60,7 @@ public struct AttachmentModel: Equatable, Hashable {
         self.state = nil
     }
     
-    static func from(json: [String: Any]) -> AttachmentModel? {
+    public static func from(json: [String: Any]) -> AttachmentModel? {
         guard let id = json["id"] as? Int else {
             return nil
         }
