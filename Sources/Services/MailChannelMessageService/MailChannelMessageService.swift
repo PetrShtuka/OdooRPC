@@ -22,7 +22,7 @@ public class MailChannelMessageService {
                                   timezone: String,
                                   uid: Int,
                                   completionHandler: @escaping (Result<[ChatMessageModel], Error>) -> Void) {
-        
+
         let endpoint = "/web/dataset/search_read"
         var params: [String: Any] = [
             "context": ["lang": language, "tz": timezone, "uid": uid]
@@ -34,8 +34,7 @@ public class MailChannelMessageService {
                 "model": "mail.channel",
                 "limit": limit,
                 "domain": [
-                    ["is_member", "!=", false],
-                    ["res_id", "=", channelID]
+                    ["is_member", "!=", false] // Removed ["res_id", "=", channelID]
                 ],
                 "fields": ["id", "body", "attachment_ids", "author_display"]
             ], uniquingKeysWith: { (_, new) in new })
@@ -43,7 +42,6 @@ public class MailChannelMessageService {
         case let .fetchChannelNewMessages(channelID, limit, messagesID, comparisonOperator, userPartnerID, isChat):
             var domain: [[Any]] = [
                 ["model", "=", "mail.channel"],
-                ["res_id", "=", channelID],
                 ["id", comparisonOperator, messagesID]
             ]
             if comparisonOperator == ">" && isChat {
@@ -60,8 +58,7 @@ public class MailChannelMessageService {
             params.merge([
                 "model": "mail.message",
                 "domain": [
-                    ["id", "in", messagesIDs],
-                    ["res_id", "=", channelID]
+                    ["id", "in", messagesIDs]
                 ],
                 "fields": ["id", "body", "attachment_ids"]
             ], uniquingKeysWith: { (_, new) in new })
