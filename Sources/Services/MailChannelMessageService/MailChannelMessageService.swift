@@ -30,8 +30,8 @@ public class MailChannelMessageService {
                 "model": "mail.channel",
                 "limit": limit,
                 "domain": [
-                    ["is_member": "!=", "value": false],
-                    ["res_id": "=", "value": channelID]
+                    ["is_member", "!=", false],
+                    ["res_id", "=", channelID]
                 ],
                 "fields": ["id", "body", "attachment_ids", "author_display"]
             ], uniquingKeysWith: { (_, new) in new })
