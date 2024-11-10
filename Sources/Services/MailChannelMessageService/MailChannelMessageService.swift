@@ -31,7 +31,7 @@ public class MailChannelMessageService {
         switch request {
         case let .fetchChannelMessages(channelID, limit):
             params.merge([
-                "model": "mail.channel",
+                "model": "mail.message",
                 "limit": limit,
                 "domain": [
                     ["is_member", "!=", false]
@@ -41,7 +41,7 @@ public class MailChannelMessageService {
             
         case let .fetchChannelNewMessages(channelID, limit, messagesID, comparisonOperator, userPartnerID, isChat):
             var domain: [[Any]] = [
-                ["model", "=", "mail.channel"],
+                ["model", "=", "mail.message"],
                 ["id", comparisonOperator, messagesID]
             ]
             if comparisonOperator == ">" && isChat {
