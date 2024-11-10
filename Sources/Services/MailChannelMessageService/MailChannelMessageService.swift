@@ -34,9 +34,9 @@ public class MailChannelMessageService {
                 "model": "mail.channel",
                 "limit": limit,
                 "domain": [
-                    ["is_member", "!=", false] // Removed ["res_id", "=", channelID]
+                    ["is_member", "!=", false]
                 ],
-                "fields": ["id", "body", "attachment_ids", "author_display"]
+                "fields": ["id", "attachment_ids", "author_display"] // Removed "body"
             ], uniquingKeysWith: { (_, new) in new })
             
         case let .fetchChannelNewMessages(channelID, limit, messagesID, comparisonOperator, userPartnerID, isChat):
@@ -60,7 +60,7 @@ public class MailChannelMessageService {
                 "domain": [
                     ["id", "in", messagesIDs]
                 ],
-                "fields": ["id", "body", "attachment_ids"]
+                "fields": ["id", "attachment_ids"]
             ], uniquingKeysWith: { (_, new) in new })
         }
         
@@ -85,4 +85,5 @@ public class MailChannelMessageService {
             }
         }
     }
+
 }
