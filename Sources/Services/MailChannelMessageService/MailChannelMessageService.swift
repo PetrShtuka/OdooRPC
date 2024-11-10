@@ -7,6 +7,8 @@
 
 import Foundation
 
+import Foundation
+
 public class MailChannelMessageService {
     private let rpcClient: RPCClient
     
@@ -16,13 +18,15 @@ public class MailChannelMessageService {
     }
     
     public func requestAttachment(request: MailChannelMessageAction,
-                           language: String,
-                           timezone: String,
-                           uid: Int,
-                           completionHandler: @escaping (Result<[ChatMessageModel], Error>) -> Void ) {
+                                  language: String,
+                                  timezone: String,
+                                  uid: Int,
+                                  completionHandler: @escaping (Result<[ChatMessageModel], Error>) -> Void) {
         
         let endpoint = "/web/dataset/search_read"
-        var params: [String: Any] = ["context": ["lang": language as Any, "tz": timezone as Any, "uid": uid as Any]]
+        var params: [String: Any] = [
+            "context": ["lang": language, "tz": timezone, "uid": uid]
+        ]
         
         switch request {
         case let .fetchChannelMessages(channelID, limit):
@@ -37,13 +41,13 @@ public class MailChannelMessageService {
             ], uniquingKeysWith: { (_, new) in new })
             
         case let .fetchChannelNewMessages(channelID, limit, messagesID, comparisonOperator, userPartnerID, isChat):
-            var domain: [[String: Any]] = [
-                ["model": "=", "value": "mail.channel"],
-                ["res_id": "=", "value": channelID],
-                ["id": comparisonOperator, "value": messagesID]
+            var domain: [[Any]] = [
+                ["model", "=", "mail.channel"],
+                ["res_id", "=", channelID],
+                ["id", comparisonOperator, messagesID]
             ]
             if comparisonOperator == ">" && isChat {
-                domain.append(["author_id": "!=", "value": userPartnerID])
+                domain.append(["author_id", "!=", userPartnerID])
             }
             params.merge([
                 "model": "mail.message",
@@ -56,8 +60,8 @@ public class MailChannelMessageService {
             params.merge([
                 "model": "mail.message",
                 "domain": [
-                    ["id": "in", "value": messagesIDs],
-                    ["res_id": "=", "value": channelID]
+                    ["id", "in", messagesIDs],
+                    ["res_id", "=", channelID]
                 ],
                 "fields": ["id", "body", "attachment_ids"]
             ], uniquingKeysWith: { (_, new) in new })
@@ -67,13 +71,9 @@ public class MailChannelMessageService {
             switch result {
             case .success(let data):
                 do {
-                    // Attempt to decode a wrapper if present
                     if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                        let records = json["records"] as? [[String: Any]] {
-                        // Convert records to JSON data
                         let recordsData = try JSONSerialization.data(withJSONObject: records)
-                        
-                        // Decode the ChatMessageModel array from records data
                         let decoder = JSONDecoder()
                         let messages = try decoder.decode([ChatMessageModel].self, from: recordsData)
                         completionHandler(.success(messages))
