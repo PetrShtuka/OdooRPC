@@ -67,9 +67,19 @@ public class MailChannelMessageService {
             switch result {
             case .success(let data):
                 do {
-                    let decoder = JSONDecoder()
-                    let response = try decoder.decode([ChatMessageModel].self, from: data)
-                    completionHandler(.success(response))
+                    // Attempt to decode a wrapper if present
+                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                       let records = json["records"] as? [[String: Any]] {
+                        // Convert records to JSON data
+                        let recordsData = try JSONSerialization.data(withJSONObject: records)
+                        
+                        // Decode the ChatMessageModel array from records data
+                        let decoder = JSONDecoder()
+                        let messages = try decoder.decode([ChatMessageModel].self, from: recordsData)
+                        completionHandler(.success(messages))
+                    } else {
+                        throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Expected `records` array in JSON"))
+                    }
                 } catch {
                     completionHandler(.failure(error))
                 }

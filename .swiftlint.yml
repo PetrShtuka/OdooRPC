@@ -1,7 +1,5 @@
 # swiftlint.yml
 
-# swiftlint.yml
-
 disabled_rules:
     - trailing_whitespace
     - force_cast
