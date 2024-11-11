@@ -92,16 +92,25 @@ public class MailChannelMessageService {
             switch result {
             case .success(let data):
                 do {
-                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                       let records = json["records"] as? [[String: Any]] {
-                        let recordsData = try JSONSerialization.data(withJSONObject: records)
-                        let decoder = JSONDecoder()
-                        let messages = try decoder.decode([ChatMessageModel].self, from: recordsData)
-                        completionHandler(.success(messages))
+                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                        // Check if `result` key exists and contains `records`
+                        let records = (json["result"] as? [String: Any])?["records"] as? [[String: Any]] ?? json["records"] as? [[String: Any]]
+                        
+                        if let records = records {
+                            print("Records found: \(records)") // Debugging print
+                            
+                            let recordsData = try JSONSerialization.data(withJSONObject: records)
+                            let decoder = JSONDecoder()
+                            let messages = try decoder.decode([ChatMessageModel].self, from: recordsData)
+                            completionHandler(.success(messages))
+                        } else {
+                            completionHandler(.failure(DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Expected `records` array in JSON"))))
+                        }
                     } else {
-                        completionHandler(.failure(DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Expected `records` array in JSON"))))
+                        completionHandler(.failure(DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Expected JSON object"))))
                     }
                 } catch {
+                    print("Decoding error details: \(error)")
                     completionHandler(.failure(error))
                 }
             case .failure(let error):

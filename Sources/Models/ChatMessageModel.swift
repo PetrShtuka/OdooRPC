@@ -91,11 +91,11 @@ public struct ChatMessageModel: Codable, Hashable {
 }
 
 public extension ChatMessageModel {
-    mutating public func setAccountID(_ accountID: String) {
+    mutating func setAccountID(_ accountID: String) {
         self.accountID = accountID
     }
     
-    mutating public func setChannelID(_ channelID: Int) {
+    mutating func setChannelID(_ channelID: Int) {
         self.channelID = channelID
     }
 }
