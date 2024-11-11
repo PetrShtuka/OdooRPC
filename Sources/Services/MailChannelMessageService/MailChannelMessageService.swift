@@ -20,10 +20,27 @@ public class MailChannelMessageService {
                                   timezone: String,
                                   uid: Int,
                                   completionHandler: @escaping (Result<[ChatMessageModel], Error>) -> Void) {
-        
+
         let endpoint = "/web/dataset/search_read"
         var params: [String: Any] = [
             "context": ["lang": language, "tz": timezone, "uid": uid]
+        ]
+        
+        // Common fields for all requests
+        let fields = [
+            "model",
+            "res_id",
+            "id",
+            "body",
+            "attachment_ids",
+            "needaction",
+            "author_display",
+            "author_id",
+            "partner_ids",
+            "parent_id",
+            "delete_uid",
+            "active",
+            "date"
         ]
         
         switch request {
@@ -37,16 +54,16 @@ public class MailChannelMessageService {
                     ["message_type", "in", ["email", "comment"]],
                     ["message_type", "!=", "notification"]
                 ],
-                "fields": ["id", "attachment_ids", "author_display", "body"]
+                "fields": fields
             ]) { (_, new) in new }
             
         case let .fetchChannelNewMessages(channelID, limit, messagesID, comparisonOperator, userPartnerID, isChat):
             var domain: [[Any]] = [
                 ["model", "=", "mail.message"],
+                ["id", comparisonOperator, messagesID],
                 ["res_id", "=", channelID],
                 ["message_type", "in", ["email", "comment"]],
-                ["message_type", "!=", "notification"],
-                ["id", comparisonOperator, messagesID]
+                ["message_type", "!=", "notification"]
             ]
             if comparisonOperator == ">" && isChat {
                 domain.append(["author_id", "!=", userPartnerID])
@@ -55,7 +72,7 @@ public class MailChannelMessageService {
                 "model": "mail.message",
                 "limit": limit,
                 "domain": domain,
-                "fields": ["id", "body", "attachment_ids", "author_display"]
+                "fields": fields
             ]) { (_, new) in new }
             
         case let .fetchCheckOutMessages(channelID, messagesIDs):
@@ -67,7 +84,7 @@ public class MailChannelMessageService {
                     ["message_type", "in", ["email", "comment"]],
                     ["message_type", "!=", "notification"]
                 ],
-                "fields": ["id", "attachment_ids"]
+                "fields": fields
             ]) { (_, new) in new }
         }
         
