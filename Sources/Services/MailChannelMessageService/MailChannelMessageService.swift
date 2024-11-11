@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 public class MailChannelMessageService {
     private let rpcClient: RPCClient
     
@@ -22,7 +20,7 @@ public class MailChannelMessageService {
                                   timezone: String,
                                   uid: Int,
                                   completionHandler: @escaping (Result<[ChatMessageModel], Error>) -> Void) {
-
+        
         let endpoint = "/web/dataset/search_read"
         var params: [String: Any] = [
             "context": ["lang": language, "tz": timezone, "uid": uid]
@@ -34,14 +32,20 @@ public class MailChannelMessageService {
                 "model": "mail.message",
                 "limit": limit,
                 "domain": [
-                    ["is_member", "!=", false]
+                    ["model", "=", "mail.channel"],
+                    ["res_id", "=", channelID],
+                    ["message_type", "in", ["email", "comment"]],
+                    ["message_type", "!=", "notification"]
                 ],
-                "fields": ["id", "attachment_ids", "author_display"] // Removed "body"
-            ], uniquingKeysWith: { (_, new) in new })
+                "fields": ["id", "attachment_ids", "author_display", "body"]
+            ]) { (_, new) in new }
             
         case let .fetchChannelNewMessages(channelID, limit, messagesID, comparisonOperator, userPartnerID, isChat):
             var domain: [[Any]] = [
                 ["model", "=", "mail.message"],
+                ["res_id", "=", channelID],
+                ["message_type", "in", ["email", "comment"]],
+                ["message_type", "!=", "notification"],
                 ["id", comparisonOperator, messagesID]
             ]
             if comparisonOperator == ">" && isChat {
@@ -52,16 +56,19 @@ public class MailChannelMessageService {
                 "limit": limit,
                 "domain": domain,
                 "fields": ["id", "body", "attachment_ids", "author_display"]
-            ], uniquingKeysWith: { (_, new) in new })
+            ]) { (_, new) in new }
             
         case let .fetchCheckOutMessages(channelID, messagesIDs):
             params.merge([
                 "model": "mail.message",
                 "domain": [
-                    ["id", "in", messagesIDs]
+                    ["id", "in", messagesIDs],
+                    ["res_id", "=", channelID],
+                    ["message_type", "in", ["email", "comment"]],
+                    ["message_type", "!=", "notification"]
                 ],
                 "fields": ["id", "attachment_ids"]
-            ], uniquingKeysWith: { (_, new) in new })
+            ]) { (_, new) in new }
         }
         
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
@@ -75,7 +82,7 @@ public class MailChannelMessageService {
                         let messages = try decoder.decode([ChatMessageModel].self, from: recordsData)
                         completionHandler(.success(messages))
                     } else {
-                        throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Expected `records` array in JSON"))
+                        completionHandler(.failure(DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Expected `records` array in JSON"))))
                     }
                 } catch {
                     completionHandler(.failure(error))
@@ -85,5 +92,4 @@ public class MailChannelMessageService {
             }
         }
     }
-
 }
