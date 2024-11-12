@@ -11,5 +11,6 @@ public enum AttachmentState: String, Codable {
     case notUploaded
     case uploading
     case uploaded
+    case uploadServer
     case failed
 }
