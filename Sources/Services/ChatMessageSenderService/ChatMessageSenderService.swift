@@ -15,38 +15,41 @@ public class ChatMessageSenderService {
     }
     
     public func sendMessage(
+        message: ChatMessageModel,
         lang: String,
         timeZone: String,
         uid: Int,
-        message: MobileSentMessage,
         completion: @escaping (Result<Int, Error>) -> Void
     ) {
         let endpoint = "/web/dataset/call_kw"
+        
+        // Create the parameters from the ChatMessageModel
         let params: [String: Any] = [
             "model": "mail.compose.message",
             "method": "create",
             "args": [[
-                "body": message.body,
+                "body": message.body ?? "",
                 "parent_id": message.parentId as Any,
-                "model": message.models as Any,
-                "wizard_type": message.wizardType as Any,
-                "partner_ids": message.selectedPartners,
-                "subject": message.subject as Any,
+                "model": message.model ?? "mail.channel",
+                "wizard_type": "comment",
+                "partner_ids": message.partnerIds ?? [],
+                "subject": message.authorName as Any,
                 "res_id": message.resId as Any,
                 "author_id": message.authorId as Any,
-                "partner_cc_ids": message.selectedPartnersCc as Any,
-                "partner_bcc_ids": message.selectedPartnersBcc as Any,
-                "attachment_ids": message.attachments
+                "partner_cc_ids": [], // Optional, add if needed
+                "partner_bcc_ids": [], // Optional, add if needed
+                "attachment_ids": message.attachmentIds ?? []
             ]],
             "kwargs": [
                 "context": [
-                    "lang": lang as Any,
-                    "tz": timeZone as Any,
-                    "uid": uid as Any
+                    "lang": lang,
+                    "tz": timeZone,
+                    "uid": uid
                 ]
             ]
         ]
         
+        // Send the request
         self.rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
