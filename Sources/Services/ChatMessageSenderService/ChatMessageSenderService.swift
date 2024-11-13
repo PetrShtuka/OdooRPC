@@ -15,34 +15,35 @@ public class ChatMessageSenderService {
     }
     
     public func sendMessage(
-        requestId: Int,
-        language: String = "en_US",
-        timeZone: String = "Europe/Rome",
-        userId: Int,
-        threadId: Int,
-        messageBody: String,
-        attachmentIDs: [Int] = [],
+        lang: String,
+        timeZone: String,
+        uid: Int,
+        message: MobileSentMessage,
         completion: @escaping (Result<Int, Error>) -> Void
     ) {
-        let endpoint = "/mail/message/post"
+        let endpoint = "/web/dataset/call_kw"
         let params: [String: Any] = [
-            "id": requestId,
-            "jsonrpc": "2.0",
-            "method": "call",
-            "params": [
+            "model": "mail.compose.message",
+            "method": "create",
+            "args": [[
+                "body": message.body,
+                "parent_id": message.parentId as Any,
+                "model": message.models as Any,
+                "wizard_type": message.wizardType as Any,
+                "partner_ids": message.selectedPartners,
+                "subject": message.subject as Any,
+                "res_id": message.resId as Any,
+                "author_id": message.authorId as Any,
+                "partner_cc_ids": message.selectedPartnersCc as Any,
+                "partner_bcc_ids": message.selectedPartnersBcc as Any,
+                "attachment_ids": message.attachments
+            ]],
+            "kwargs": [
                 "context": [
-                    "lang": language,
-                    "tz": timeZone,
-                    "uid": userId
-                ],
-                "thread_model": "mail.channel",
-                "thread_id": threadId,
-                "body": messageBody,
-                "message_type": "comment",
-                "subtype_xmlid": "mail.mt_comment",
-                "attachment_ids": attachmentIDs,
-                "attachment_tokens": [],
-                "partner_ids": []
+                    "lang": lang as Any,
+                    "tz": timeZone as Any,
+                    "uid": uid as Any
+                ]
             ]
         ]
         
@@ -51,10 +52,10 @@ public class ChatMessageSenderService {
             case .success(let data):
                 do {
                     if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                       let responseId = jsonResponse["result"] as? Int {
-                        completion(.success(responseId))
+                       let messageId = jsonResponse["result"] as? Int {
+                        completion(.success(messageId))
                     } else {
-                        completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response ID received"])))
+                        completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid message ID received"])))
                     }
                 } catch {
                     completion(.failure(error))
