@@ -37,14 +37,12 @@ public class ChatMessageSenderService {
                 ],
                 "thread_model": "mail.channel",
                 "thread_id": threadId,
-                "post_data": [
-                    "body": messageBody,
-                    "message_type": "comment",
-                    "subtype_xmlid": "mail.mt_comment",
-                    "attachment_ids": attachmentIDs,
-                    "attachment_tokens": [],
-                    "partner_ids": []
-                ]
+                "body": messageBody,
+                "message_type": "comment",
+                "subtype_xmlid": "mail.mt_comment",
+                "attachment_ids": attachmentIDs,
+                "attachment_tokens": [],
+                "partner_ids": []
             ]
         ]
         
