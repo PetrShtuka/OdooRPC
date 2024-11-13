@@ -30,14 +30,14 @@ public class ChatMessageSenderService {
             "args": [[
                 "body": message.body ?? "",
                 "parent_id": message.parentId as Any,
-                "model": message.model ?? "mail.channel",
+                "model": "mail.channel",
                 "wizard_type": "comment",
                 "partner_ids": message.partnerIds ?? [],
                 "subject": message.authorName as Any,
                 "res_id": message.resId as Any,
                 "author_id": message.authorId as Any,
-                "partner_cc_ids": [], // Optional, add if needed
-                "partner_bcc_ids": [], // Optional, add if needed
+                "partner_cc_ids": [],
+                "partner_bcc_ids": [],
                 "attachment_ids": message.attachmentIds ?? []
             ]],
             "kwargs": [
