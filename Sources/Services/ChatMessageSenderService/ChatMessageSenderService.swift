@@ -21,7 +21,7 @@ public class ChatMessageSenderService {
         uid: Int,
         completion: @escaping (Result<Int, Error>) -> Void
     ) {
-        let endpoint = "/web/dataset/call_kw"
+        let endpoint = "/mail/message/post"
         
         let params: [String: Any] = [
             "model": "mail.compose.message",
