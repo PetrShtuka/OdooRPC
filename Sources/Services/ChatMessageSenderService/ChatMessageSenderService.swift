@@ -23,30 +23,23 @@ public class ChatMessageSenderService {
     ) {
         let endpoint = "/web/dataset/call_kw"
         
-        // Create the parameters from the ChatMessageModel
         let params: [String: Any] = [
             "model": "mail.compose.message",
-            "method": "create",
-            "args": [[
-                "body": message.body ?? "",
-                "parent_id": message.parentId as Any,
-                "model": "mail.channel",
-                "wizard_type": "comment",
-                "partner_ids": message.partnerIds ?? [],
-                "subject": message.authorName as Any,
-                "res_id": message.resId as Any,
-                "author_id": message.authorId as Any,
-                "partner_cc_ids": [],
-                "partner_bcc_ids": [],
-                "attachment_ids": message.attachmentIds ?? []
-            ]],
-            "kwargs": [
-                "context": [
-                    "lang": lang,
-                    "tz": timeZone,
-                    "uid": uid
-                ]
-            ]
+            "thread_model": "mail.channel",
+            "thread_id": message.channelID ?? 0,
+            "post_data": [
+                "body": message.body as Any,
+                "message_type": "comment",
+                "subtype_xmlid": "mail.mt_comment",
+                "attachment_ids": message.attachmentIds ?? [],
+                "attachment_tokens": [],
+                "partner_ids": []
+            ],
+            "context": [
+                "lang": lang,
+                "tz": timeZone,
+                "uid": uid
+            ],
         ]
         
         // Send the request
