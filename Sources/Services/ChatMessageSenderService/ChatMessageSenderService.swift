@@ -48,7 +48,8 @@ public class ChatMessageSenderService {
             case .success(let data):
                 do {
                     if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                       let messageId = jsonResponse["result"] as? Int {
+                       let resultData = jsonResponse["result"] as? [String: Any],
+                       let messageId = resultData["id"] as? Int {
                         completion(.success(messageId))
                     } else {
                         completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid message ID received"])))
