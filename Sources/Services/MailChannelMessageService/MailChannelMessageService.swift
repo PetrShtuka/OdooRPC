@@ -59,7 +59,7 @@ public class MailChannelMessageService {
             
         case let .fetchChannelNewMessages(channelID, limit, messagesID, comparisonOperator, userPartnerID, isChat):
             var domain: [[Any]] = [
-                ["model", "=", "mail.message"],
+                ["model", "=", "mail.channel"],
                 ["id", comparisonOperator, messagesID],
                 ["res_id", "=", channelID]
             ]
@@ -76,7 +76,7 @@ public class MailChannelMessageService {
             
         case let .fetchCheckOutMessages(channelID, messagesIDs):
             params.merge([
-                "model": "mail.message",
+                "model": "mail.channel",
                 "domain": [
                     ["id", "in", messagesIDs],
                     ["res_id", "=", channelID],
