@@ -61,10 +61,9 @@ public class MailChannelMessageService {
             var domain: [[Any]] = [
                 ["model", "=", "mail.message"],
                 ["id", comparisonOperator, messagesID],
-                ["res_id", "=", channelID],
-                ["message_type", "in", ["email", "comment"]],
-                ["message_type", "!=", "notification"]
+                ["res_id", "=", channelID]
             ]
+            
             if comparisonOperator == ">" && isChat {
                 domain.append(["author_id", "!=", userPartnerID])
             }
@@ -97,7 +96,6 @@ public class MailChannelMessageService {
                         let records = (json["result"] as? [String: Any])?["records"] as? [[String: Any]] ?? json["records"] as? [[String: Any]]
                         
                         if let records = records {
-                            print("Records found: \(records)") // Debugging print
                             
                             let recordsData = try JSONSerialization.data(withJSONObject: records)
                             let decoder = JSONDecoder()
@@ -110,7 +108,6 @@ public class MailChannelMessageService {
                         completionHandler(.failure(DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Expected JSON object"))))
                     }
                 } catch {
-                    print("Decoding error details: \(error)")
                     completionHandler(.failure(error))
                 }
             case .failure(let error):
