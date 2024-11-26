@@ -23,6 +23,8 @@ public enum FileExtension: String, Codable, CaseIterable {
     case jpeg
     case jpg
     case png
+    
+    case other
 
     public var extensionStr: String {
         return ".\(self.rawValue)"
@@ -59,6 +61,8 @@ public enum FileExtension: String, Codable, CaseIterable {
             return "image/jpeg"
         case .png:
             return "image/jpeg"
+        case .other:
+               return "application/octet-stream"
         }
     }
 }
