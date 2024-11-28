@@ -64,9 +64,10 @@ public class MailChannelMessageService {
                 ["res_id", "=", channelID]
             ]
             
-//            if comparisonOperator == ">" && isChat {
-//                domain.append(["author_id", "!=", userPartnerID])
-//            }
+            if comparisonOperator == ">" && isChat {
+                domain.append(["author_id", "!=", userPartnerID])
+            }
+            
             params.merge([
                 "model": "mail.message",
                 "limit": limit,

@@ -68,9 +68,9 @@ public class MessageSenderService {
             "args": [[createId]],
             "kwargs": [
                 "context": [
-                    "lang": language as Any,
-                    "tz": timeZone as Any,
-                    "uid": uid as Any,
+                    "lang": language,
+                    "tz": timeZone,
+                    "uid": uid,
                     "to_ids": message.selectedPartners,
                     "cc_ids": message.selectedPartnersCc,
                     "bcc_ids": message.selectedPartnersBcc
@@ -80,11 +80,23 @@ public class MessageSenderService {
         
         self.rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
-            case .success:
-                completion(true)
-            case .failure:
+            case .success(let data):
+                do {
+                    let decoder = JSONDecoder()
+                    _ = try decoder.decode(OdooResponse<MailChannelResponseData>.self, from: data)
+                    // Assuming success if decoding is successful
+                    completion(true)
+                } catch {
+                    // If decoding fails, log the error and pass failure to completion
+                    print("Decoding error: \(error)")
+                    completion(false)
+                }
+            case .failure(let error):
+                // Handle RPC request failure
+                print("RPC request failed: \(error)")
                 completion(false)
             }
         }
     }
+
 }
