@@ -60,7 +60,7 @@ public class MessageSenderService {
         }
     }
     
-    public func sendMessage(createId: Int, message: MobileSentMessage, language: String, timeZone: String, uid: Int, serverVersion: Int, completion: @escaping (Bool) -> Void) {
+    public func sendMessage(createId: Int, message: MobileSentMessage, language: String, timeZone: String, uid: Int, serverVersion: Int, completion: @escaping (Result<Data, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
         let params: [String: Any] = [
             "model": "mail.compose.message",
@@ -81,20 +81,9 @@ public class MessageSenderService {
         self.rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
-                do {
-                    let decoder = JSONDecoder()
-                    _ = try decoder.decode(OdooResponse<MailChannelResponseData>.self, from: data)
-                    // Assuming success if decoding is successful
-                    completion(true)
-                } catch {
-                    // If decoding fails, log the error and pass failure to completion
-                    print("Decoding error: \(error)")
-                    completion(false)
-                }
+                completion(.success(data))
             case .failure(let error):
-                // Handle RPC request failure
-                print("RPC request failed: \(error)")
-                completion(false)
+                completion(.failure(error))
             }
         }
     }
