@@ -104,9 +104,9 @@ public class MessageSenderService {
                     "lang": language,
                     "tz": timeZone,
                     "uid": uid,
-                    "to_ids": toIds,
-                    "cc_ids": ccIds,
-                    "bcc_ids": bccIds
+                    "to_ids": [21029],
+                    "cc_ids": [],
+                    "bcc_ids": []
                 ]
             ]
         ]
