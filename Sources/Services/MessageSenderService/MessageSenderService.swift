@@ -60,8 +60,41 @@ public class MessageSenderService {
         }
     }
     
+//    public func sendMessage(createId: Int, message: MobileSentMessage, language: String, timeZone: String, uid: Int, serverVersion: Int, completion: @escaping (Result<Data, Error>) -> Void) {
+//        let endpoint = "/web/dataset/call_kw"
+//        let params: [String: Any] = [
+//            "model": "mail.compose.message",
+//            "method": serverVersion >= 12 ? "action_send_mail" : "send_mail_action",
+//            "args": [[createId]],
+//            "kwargs": [
+//                "context": [
+//                    "lang": language,
+//                    "tz": timeZone,
+//                    "uid": uid,
+//                    "to_ids": message.selectedPartners,
+//                    "cc_ids": message.selectedPartnersCc,
+//                    "bcc_ids": message.selectedPartnersBcc
+//                ]
+//            ]
+//        ]
+//        
+//        self.rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+//            switch result {
+//            case .success(let data):
+//                completion(.success(data))
+//            case .failure(let error):
+//                completion(.failure(error))
+//            }
+//        }
+//    }
+
     public func sendMessage(createId: Int, message: MobileSentMessage, language: String, timeZone: String, uid: Int, serverVersion: Int, completion: @escaping (Result<Data, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
+
+        let toIds = message.selectedPartners.flatMap { $0 }
+        let ccIds = message.selectedPartnersCc
+        let bccIds = message.selectedPartnersBcc
+
         let params: [String: Any] = [
             "model": "mail.compose.message",
             "method": serverVersion >= 12 ? "action_send_mail" : "send_mail_action",
@@ -71,21 +104,24 @@ public class MessageSenderService {
                     "lang": language,
                     "tz": timeZone,
                     "uid": uid,
-                    "to_ids": message.selectedPartners,
-                    "cc_ids": message.selectedPartnersCc,
-                    "bcc_ids": message.selectedPartnersBcc
+                    "to_ids": toIds,
+                    "cc_ids": ccIds,
+                    "bcc_ids": bccIds
                 ]
             ]
         ]
-        
+
+        print("Params being sent: \(params)")
+
         self.rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
+                print("Response received: \(String(data: data, encoding: .utf8) ?? "Invalid data")")
                 completion(.success(data))
             case .failure(let error):
+                print("Error occurred: \(error)")
                 completion(.failure(error))
             }
         }
     }
-
 }
