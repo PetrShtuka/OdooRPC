@@ -91,7 +91,7 @@ public class MessageSenderService {
     public func sendMessage(createId: Int, message: MobileSentMessage, language: String, timeZone: String, uid: Int, serverVersion: Int, completion: @escaping (Result<Data, Error>) -> Void) {
         let endpoint = "/web/dataset/call_kw"
 
-        let toIds = message.selectedPartners.flatMap { $0 }
+        let toIds = message.selectedPartners
         let ccIds = message.selectedPartnersCc
         let bccIds = message.selectedPartnersBcc
 
@@ -104,9 +104,9 @@ public class MessageSenderService {
                     "lang": language,
                     "tz": timeZone,
                     "uid": uid,
-                    "to_ids": [21029],
-                    "cc_ids": [],
-                    "bcc_ids": []
+                    "to_ids": toIds,
+                    "cc_ids": ccIds,
+                    "bcc_ids": bccIds
                 ]
             ]
         ]
