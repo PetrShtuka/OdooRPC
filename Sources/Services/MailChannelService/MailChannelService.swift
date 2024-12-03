@@ -51,29 +51,58 @@ public class MailChannelService {
     }
     
     // Method to fetch channel members
-    public func fetchChannelMembers(channelID: [Int], language: String, timezone: String, uid: Int, completion: @escaping (Result<[MailChannelModel], Error>) -> Void) {
+    public func fetchChannelMembers(forChannelID channelID: Int, language: String, timezone: String, uid: Int, completion: @escaping (Result<[MailChannelMemberModel], Error>) -> Void) {
         let endpoint = "/web/dataset/search_read"
         let params: [String: Any] = [
             "model": "mail.channel.member",
             "fields": [
-                "last_interest_dt", "partner_id", "guest_id", "custom_channel_name", "message_unread_counter", "fetched_message_id", "seen_message_id", "last_seen_dt"
+                "channel_id", "last_interest_dt", "partner_id", "guest_id", "custom_channel_name", "message_unread_counter", "fetched_message_id", "seen_message_id", "last_seen_dt"
             ],
-            "domain": [["channel_id", "in", channelID]],
-            "sort": "id DESC",
+            "domain": [["channel_id", "=", channelID]],
+            "sort": "last_interest_dt DESC",
             "context": [
                 "lang": language as Any,
-                "tz":  timezone as Any,
+                "tz": timezone as Any,
                 "uid": uid as Any
             ]
         ]
         
-        // Send the RPC request to fetch channel members
         rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
             switch result {
             case .success(let data):
                 do {
                     let decoder = JSONDecoder()
-                    let response = try decoder.decode(OdooResponse<MailChannelResponseData>.self, from: data)
+                    let response = try decoder.decode(OdooResponse<MailChannelMemberResponseData>.self, from: data)
+                    completion(.success(response.result.records))
+                } catch {
+                    completion(.failure(error))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public func fetchGuests(language: String, timezone: String, uid: Int, completion: @escaping (Result<[MailGuestModel], Error>) -> Void) {
+        let endpoint = "/web/dataset/search_read"
+        let params: [String: Any] = [
+            "model": "mail.guest",
+            "fields": [
+                "channel_ids", "name"
+            ],
+            "context": [
+                "lang": language as Any,
+                "tz": timezone as Any,
+                "uid": uid as Any
+            ]
+        ]
+        
+        rpcClient.sendRPCRequest(endpoint: endpoint, method: .post, params: params) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    let decoder = JSONDecoder()
+                    let response = try decoder.decode(OdooResponse<MailGuestResponseData>.self, from: data)
                     completion(.success(response.result.records))
                 } catch {
                     completion(.failure(error))
