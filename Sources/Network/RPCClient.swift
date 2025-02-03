@@ -99,11 +99,20 @@ public class RPCClient {
             }
             
             if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-               let errorDict = json["error"] as? [String: Any],
-               let errorMessage = errorDict["message"] as? String,
-               errorMessage == "Access Denied" {
-                completion(.failure(NSError(domain: "AccessDeniedError", code: 403, userInfo: ["message": "Access Denied"])))
-                return
+               let errorDict = json["error"] as? [String: Any] {
+                
+                if let errorData = errorDict["data"] as? [String: Any],
+                   let errorMessage = errorData["message"] as? String,
+                   errorMessage == "Access Denied" {
+                    completion(.failure(NSError(domain: "AccessDeniedError", code: 403, userInfo: ["message": "Access Denied"])))
+                    return
+                }
+                
+                if let errorMessage = errorDict["message"] as? String,
+                   errorMessage == "Access Denied" {
+                    completion(.failure(NSError(domain: "AccessDeniedError", code: 403, userInfo: ["message": "Access Denied"])))
+                    return
+                }
             }
             
             completion(.success(data))
