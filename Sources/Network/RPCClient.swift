@@ -21,20 +21,20 @@ public class RPCClient {
     private let taskAccessQueue = DispatchQueue(label: "com.odooRPC.RPCClient.TaskAccessQueue")
     private var isRefreshingSession = false
     private var pendingRequests: [PendingRequest] = []
-
+    
     // Initializer that sets up the base URL and URLSession
     public init(baseURL: URL) {
         self.baseURL = baseURL
         self.session = URLSession(configuration: .default)
     }
-
+    
     @discardableResult
     public func sendRPCRequest(endpoint: String, method: HTTPMethod, params: [String: Any], completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask? {
         let url = baseURL.appendingPathComponent(endpoint)
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         let requestBody = ["jsonrpc": "2.0", "method": "call", "params": params, "id": Int.random(in: 1...1000)] as [String: Any]
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
@@ -42,11 +42,11 @@ public class RPCClient {
             completion(.failure(error))
             return nil
         }
-
+        
         // Store the pending request for session management
         let pendingRequest = PendingRequest(id: Int.random(in: 1...1000), request: request, completion: completion)
         pendingRequests.append(pendingRequest)
-
+        
         var task: URLSessionDataTask?
         self.isSessionValid { [self] isValid in
             if isValid {
@@ -66,14 +66,14 @@ public class RPCClient {
         }
         return task
     }
-
+    
     @discardableResult
     public func sendAuthenticationRequest(endpoint: String, method: HTTPMethod, params: [String: Any], completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask? {
         let url = baseURL.appendingPathComponent(endpoint)
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         let requestBody = ["jsonrpc": "2.0", "method": "call", "params": params, "id": Int.random(in: 1...1000)] as [String: Any]
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
@@ -81,30 +81,37 @@ public class RPCClient {
             completion(.failure(error))
             return nil
         }
-
+        
         // Execute the network request for authentication
         return executeNetworkRequest(request: request, completion: completion)
     }
-
+    
     private func executeNetworkRequest(request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionDataTask {
         let task = session.dataTask(with: request) { data, _, error in
             if let error = error {
                 completion(.failure(error))
                 return
             }
-
+            
             guard let data = data else {
                 completion(.failure(NSError(domain: "NetworkError", code: -1, userInfo: nil)))
                 return
             }
-
-            // Return the successful data response
+            
+            if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+               let errorDict = json["error"] as? [String: Any],
+               let errorMessage = errorDict["message"] as? String,
+               errorMessage == "Access Denied" {
+                completion(.failure(NSError(domain: "AccessDeniedError", code: 403, userInfo: ["message": "Access Denied"])))
+                return
+            }
+            
             completion(.success(data))
         }
         task.resume()
         return task
     }
-
+    
     private func refreshSession(completion: @escaping (Bool) -> Void) {
         guard !isRefreshingSession else {
             completion(false)
@@ -127,7 +134,7 @@ public class RPCClient {
             }
         }
     }
-
+    
     // Check if the current session is valid
     func isSessionValid(completion: @escaping (Bool) -> Void) {
         guard let sessionService = sessionService else {
@@ -144,7 +151,7 @@ public class RPCClient {
             }
         })
     }
-
+    
     // Update the session service used for session management
     public func updateSessionService(_ service: SessionServiceDelegate) {
         print("Updating session service...")

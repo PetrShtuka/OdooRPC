@@ -31,7 +31,6 @@ public struct MailChannelMemberModel: Codable {
         case lastSeenDate = "last_seen_dt"
     }
     
-    // Инициализация из JSON
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
