@@ -50,6 +50,7 @@ public class AuthService: SessionServiceDelegate {
                     let userData = try decoder.decode(ResponseWrapper.self, from: data)
                     if userData.result.uid == nil {
                         NotificationCenter.default.post(name: .requireTwoFactorAuthentication, object: nil, userInfo: ["credentials": credentials])
+                        completion(.success(userData.result))
                     } else {
                         self.userData = userData.result
                         completion(.success(userData.result))  // Return successful authentication
