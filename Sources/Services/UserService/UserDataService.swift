@@ -24,7 +24,7 @@ public class UserDataService {
             "args": [], // Arguments for the method
             "kwargs": [
                 "domain": [["id", "=", uid]], // Domain to filter by user ID
-                "fields": ["id", "uid", "name", "email", "lang", "tz", "partner_id", "avatar_128"] // Fields to return
+                "fields": ["id", "name", "email", "lang", "tz", "partner_id", "avatar_128"] // Fields to return
             ]
         ]
 
