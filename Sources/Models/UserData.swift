@@ -28,9 +28,7 @@ public struct UserData: Equatable, Decodable {
     public var partnerID: PartnerID?
     public var serverVersion: Int?
 
-    public var avatar: String {
-        return (serverVersion ?? 0) >= 15 ? "avatar_128" : "image_small"
-    }
+    public var avatar: String?
 
     private enum CodingKeys: String, CodingKey {
         case uid
@@ -42,6 +40,7 @@ public struct UserData: Equatable, Decodable {
         case timezone = "tz"
         case partnerID = "partner_id"
         case serverVersion
+        case avatar = "avatar_128"
     }
 
     public init(from decoder: Decoder) throws {
@@ -56,7 +55,8 @@ public struct UserData: Equatable, Decodable {
         language = try container.decodeIfPresent(String.self, forKey: .language)
         timezone = try container.decodeIfPresent(String.self, forKey: .timezone)
         serverVersion = try container.decodeIfPresent(Int.self, forKey: .serverVersion)
-
+        avatar = try container.decodeIfPresent(String.self, forKey: .avatar) ?? ""
+        
         if let partnerIDArray = try? container.decodeIfPresent([AnyDecodable].self, forKey: .partnerID),
            let firstElement = partnerIDArray.first?.value as? Int {
             partnerID = PartnerID(id: firstElement, name: partnerIDArray.dropFirst().first?.value as? String)
