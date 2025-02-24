@@ -222,8 +222,8 @@ public class MessagesServer {
         var context: [String: Any] = [
             "lang": request.language,
             "tz": request.timeZone,
-            "uid": request.uid
-//            "check_messages_access": true
+            "uid": request.uid,
+            "check_messages_access": true
         ]
         
         // Add "active_test": 0 to context if the inbox type is archive or bin
