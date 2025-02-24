@@ -21,7 +21,7 @@ public enum MailboxOperation: Equatable {
         case .sent(let odooPartnerUserId):
             return [["author_id", "=", odooPartnerUserId], ["active", "=", true], ["delete_uid", "=", false]]
         case .archive:
-            return [["active", "=", "false"], ["delete_uid", "!=", "true"]]
+            return [["active", "=", "false"], ["delete_uid", "=", "false"]]
         case .bin:
             return [["active", "=", "false"], ["delete_uid", "!=", "false"]]
         }
