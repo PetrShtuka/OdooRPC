@@ -253,8 +253,11 @@ public class MessagesServer {
                        ["email", "comment"]])
         
         domain.append(["message_type", "!=", "notification"])
-        
+       
         if let requestText = request.requestText, !requestText.isEmpty {
+            
+            domain.append(["id", "not in", request.localMessagesID as Any])
+            
             switch request.selectFilter {
             case .subject:
                 domain.append(["subject", "ilike", requestText])
