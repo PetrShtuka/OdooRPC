@@ -134,6 +134,6 @@ public class ContactsService {
 
     // Determine the avatar field based on server version
     private func determineAvatarField(serverVersion: Double) -> String {
-        return serverVersion >= 15 ? "avatar_128" : "image_small"
+        return "avatar_128"
     }
 }
