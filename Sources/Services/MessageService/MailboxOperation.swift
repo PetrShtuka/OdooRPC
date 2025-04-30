@@ -11,6 +11,7 @@ public enum MailboxOperation: Equatable {
     case sent(odooPartnerUserId: Int)
     case archive
     case bin
+    case allInboxes(userPartnerID: Int)
 
     func domain(for userID: Int) -> [[Any]] {
         switch self {
@@ -24,7 +25,14 @@ public enum MailboxOperation: Equatable {
             return [["active", "=", "false"], ["delete_uid", "=", "false"]]
         case .bin:
             return [["active", "=", "false"], ["delete_uid", "!=", "false"]]
+        case .allInboxes(let userPartnerID):
+            return [
+                ["|", ["shared_inbox", "=", true], ["partner_ids", "in", [userPartnerID]]],
+                ["active", "=", true],
+                ["delete_uid", "=", false]
+            ]
         }
+        
     }
 
     public static func == (lhs: MailboxOperation, rhs: MailboxOperation) -> Bool {
