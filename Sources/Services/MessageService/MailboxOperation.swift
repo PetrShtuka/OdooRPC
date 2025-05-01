@@ -27,7 +27,7 @@ public enum MailboxOperation: Equatable {
             return [["active", "=", "false"], ["delete_uid", "!=", "false"]]
         case .allInboxes(let userPartnerID):
             return [
-                ["mail_notification_ids.message_type", "=", "inbox"], ["active", "=", true], ["delete_uid", "=", false]
+                ["mail_notification_ids.message_type", "=", "inbox"], ["active", "=", "true"], ["delete_uid", "=", "false"]
             ]
         }
         
