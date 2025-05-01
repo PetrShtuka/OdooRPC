@@ -7,7 +7,7 @@
 import Foundation
 
 // OdooError из библиотеки OdooRPC
-enum OdooError: Error {
+public enum OdooError: Error {
     case userError(String)
     case accessError(String)
     case validationError(String)
